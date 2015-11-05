@@ -1,2 +1,1 @@
-# SpaceSausageStudios
-Game name temporary
+# Empire Last Battle
