@@ -7,22 +7,27 @@ public class Board : MonoBehaviour {
     public Vector3 Origin;
     public BoardData Data;
     public float TileWidth = 1;
-    public GameObject[] Terrains;
-    public GameObject[] Buildings;
-    public List<Tile> _tiles;
+    public TileTypeData TileTypeData;
+    private List<Tile> _tiles;
 
+    public delegate void GenerateEvent();
+    public event GenerateEvent OnGenerate = delegate { };
 
 
 	// Use this for initialization
 	void Start () {
         _tiles = new List<Tile>();
         Generate(Origin);
+        foreach (Tile t in _tiles) {
+            Debug.Log(t.TileData.Height + "," + t.TileObject.transform.position.y);
+        }
 	}
 
-    public void Generate(Vector3 origin) {
-        int arrayWidth = Data.Data.Length,
-            arrayHeight = Data.Data[0].Data.Length;
-
+    public void Generate(Vector3 origin, bool loadHeights = false) {
+        Vector2 arraySize = GetBoardSize();
+        int arrayWidth = (int)arraySize.x,
+            arrayHeight = (int)arraySize.y;
+           
         // get start position
         Vector3 centreOffset = new Vector3(TileWidth / 2, 0, TileWidth / 2),
                 boardStart = origin - new Vector3((arrayWidth * TileWidth)/2, 0, (arrayHeight * TileWidth)/2) + centreOffset;
@@ -31,7 +36,10 @@ public class Board : MonoBehaviour {
                 TileData tile = GetTileDataAt(i, j);
                 GameObject tileGO;
                 if (tile != null) {
-                    float height = Random.Range(tile.HeightBetween.x, tile.HeightBetween.y);
+                    float height = GetTileHeight(tile, !loadHeights);
+                    if (tile.Height != height) {
+                        tile.Height = height;
+                    }
                     Vector3 position = new Vector3(i * TileWidth, height, j * TileWidth) + boardStart;
                     tileGO = (GameObject)Instantiate(GetTerrain(tile.Terrain), position, Quaternion.identity);
                     tileGO.name = "Tile " + "[" + i + "," + j + "]";
@@ -49,50 +57,55 @@ public class Board : MonoBehaviour {
                         t.TileData = tile;
                         _tiles.Add(t);
                     }
-                    else {
-                        t.TileObject = tileGO;
-                    }
+                    t.TileObject = tileGO;
 
                     if(CanTraverse(t.TileData)) {
                         for (int x = i - 1; x <= i + 1; x++) {
                             for (int y = j - 1; y <= j + 1; y++) {
                                 Tile tileAtXY = GetTileAt(x, y);
                                 if (tileAtXY == null) {
-                                    tileAtXY = new Tile();
-                                    tileAtXY.X = x;
-                                    tileAtXY.Y = y;
-                                    tileAtXY.TileData = GetTileDataAt(x, y);
-                                    _tiles.Add(tileAtXY);
+                                    TileData td = GetTileDataAt(x, y);
+                                    if (td != null) {
+                                        tileAtXY = new Tile();
+                                        tileAtXY.X = x;
+                                        tileAtXY.Y = y;
+                                        tileAtXY.TileData = td;
+                                        _tiles.Add(tileAtXY);
+                                    }
                                 }
-                                if (CanTraverse(tileAtXY.TileData)) {
+                                if (tileAtXY != null && CanTraverse(tileAtXY.TileData)) {
+                                    if (t.ConnectedTiles == null) {
+                                        t.ConnectedTiles = new List<Tile>();
+                                    }
                                     t.ConnectedTiles.Add(tileAtXY);
                                 }
                             }
                         }
                     }
                 }
-                
-
             }
         }
+        OnGenerate();
     }
 
-    private void buildGraph(int x, int y) {
-
+    public Vector2 GetBoardSize() {
+        int arrayWidth = Data.Data.Length,
+           arrayHeight = Data.Data[0].Data.Length;
+        return new Vector2(arrayWidth, arrayHeight);
     }
 
     public GameObject GetTerrain(TerrainType tt) {
-        if (Terrains.Length < (int)tt) {
+        if (TileTypeData.Terrains.Length < (int)tt) {
             Debug.LogError("TerrainType is out of sync with the terrain GameObjects!");
         }
-        return Terrains[(int)tt];
+        return TileTypeData.Terrains[(int)tt];
     }
 
     public GameObject GetBuilding(BuildingType bt) {
-        if (Terrains.Length < (int)bt) {
+        if (TileTypeData.Buildings.Length < (int)bt) {
             Debug.LogError("BuildingType is out of sync with the building GameObjects!");
         }
-        return Buildings[(int)bt];
+        return TileTypeData.Buildings[(int)bt];
     }
 
     public TileData GetTileDataAt(int x, int y) {
@@ -110,22 +123,19 @@ public class Board : MonoBehaviour {
         if (t == null) {
             return false;
         }
-        // List NON traversable TerrainTypes here.
-        BuildingType[] nonTrav = { BuildingType.Castle };
-        return ~System.Array.IndexOf(nonTrav, t.Building) != 0;
-
+        return ~System.Array.IndexOf(TileTypeData.NonTraversableTerrain, t.Terrain) != 0;
     }
 
-}
+    public float GetTileHeight(TileData t, bool random = true) {
+        if (random) {
+            Vector2 r = TileTypeData.TerrainHeights[(int)t.Terrain];
+            return Random.Range(r.x, r.y);
+        }
+        else {
+            return t.Height;
+        }
+    }
 
-public enum TerrainType {
-    Basic
-}
-
-public enum BuildingType {
-    None,
-    Basic,
-    Castle
 }
 
 public class Tile {
