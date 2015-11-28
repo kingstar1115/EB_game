@@ -4,7 +4,6 @@ using System.Linq;
 
 public class Board : MonoBehaviour {
 
-    public Vector3 Origin;
     public BoardData Data;
     public float TileWidth = 1;
     public TileTypeData TileTypeData;
@@ -17,10 +16,7 @@ public class Board : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         _tiles = new List<Tile>();
-        Generate(Origin);
-        foreach (Tile t in _tiles) {
-            Debug.Log(t.TileData.Height + "," + t.TileObject.transform.position.y);
-        }
+        Generate(this.gameObject.transform.position);
 	}
 
     public void Generate(Vector3 origin, bool loadHeights = false) {
