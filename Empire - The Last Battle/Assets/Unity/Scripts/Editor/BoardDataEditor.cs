@@ -10,7 +10,7 @@ public class BoardDataEditor : Editor
     {
         //get a save location
         string path = EditorUtility.SaveFilePanel("Create The BoardData",
-                                                  "Assets/Unity/ScriptableObjects/Board/", "defualt.asset", "asset");
+                                                  "Assets/Unity/ScriptableObjects/Board/", "default.asset", "asset");
 
         if (path == "")
             return;

@@ -9,7 +9,7 @@ public class BoardColumnEditor : Editor
     {
         //get a save location
         string path = EditorUtility.SaveFilePanel("Create The New BoardColumn",
-                                                  "Assets/Unity/ScriptableObjects/Board/BoardColumns/", "defualt.asset", "asset");
+                                                  "Assets/Unity/ScriptableObjects/Board/BoardColumns/", "default.asset", "asset");
 
         if (path == "")
             return;

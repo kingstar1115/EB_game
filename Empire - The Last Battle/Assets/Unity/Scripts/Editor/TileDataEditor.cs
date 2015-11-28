@@ -9,7 +9,7 @@ public class TileDataEditor : Editor
     {
         //get a save location
         string path = EditorUtility.SaveFilePanel("Create The New TileData",
-                                                  "Assets/Unity/ScriptableObjects/Board/Tiles/", "defualt.asset", "asset");
+                                                  "Assets/Unity/ScriptableObjects/Board/Tiles/", "default.asset", "asset");
 
         if (path == "")
             return;
