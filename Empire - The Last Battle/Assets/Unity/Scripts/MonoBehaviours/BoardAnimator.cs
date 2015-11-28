@@ -20,7 +20,6 @@ public class BoardAnimator : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (_loaded && _totalLanded < _boardSize.x * _boardSize.y) {
-            Vector2 boardSize = BoardManager.GetBoardSize();
             for(int i = 0; i < _boardSize.x; i++) {
                 for (int j = 0; j < _boardSize.y; j++) {
                     Tile t = BoardManager.GetTileAt(i, j);
