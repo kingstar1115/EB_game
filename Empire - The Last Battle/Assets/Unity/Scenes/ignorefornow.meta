@@ -1,6 +1,11 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: e52c855bc85ee154f8195bef598329b7
 timeCreated: 1448714257
+=======
+guid: 17ebb5afd49d53244a394105358a614a
+timeCreated: 1448643971
+>>>>>>> ewan/master
 licenseType: Free
 DefaultImporter:
   userData: 
