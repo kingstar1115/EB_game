@@ -1,15 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(LerpPosition), typeof(Collider))]
 public class CommanderUI : MonoBehaviour
 {
-
-    Collider collider;
+    Collider _collider;
+    LerpPosition _lerpPosition; 
 
 	// Use this for initialization
 	void Start () 
     {
-        collider = this.GetComponent<Collider>();
+        _collider = this.GetComponent<Collider>();
+        _lerpPosition = this.GetComponent<LerpPosition>();
 	}
 	
 	// Update is called once per frame
@@ -26,10 +28,16 @@ public class CommanderUI : MonoBehaviour
         Collider hoveredCollider;
         if (BoardUI.GetTileHovered_Position(out hoveredCollider))
         {
-            Debug.Log("Dragging over a tile");
-            this.transform.position = new Vector3(hoveredCollider.transform.position.x, 
-                hoveredCollider.bounds.max.y + collider.bounds.extents.y, 
+            //this.transform.position = new Vector3(hoveredCollider.transform.position.x,
+           //     hoveredCollider.bounds.max.y + _collider.bounds.extents.y, 
+            //    hoveredCollider.transform.position.z);
+
+            Vector3 toGoTo = new Vector3(hoveredCollider.transform.position.x,
+                hoveredCollider.bounds.max.y + _collider.bounds.extents.y,
                 hoveredCollider.transform.position.z);
+
+            if(_lerpPosition.GetEndPosition() != toGoTo)
+                _lerpPosition.LerpTo(toGoTo);
         }
     }
 }

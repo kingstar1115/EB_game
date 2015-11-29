@@ -13,7 +13,6 @@ public class BoardUI : MonoBehaviour
         {
             if (hit.collider.gameObject.tag == "Tile")
             {
-                Debug.Log("TileHovered");
                 tileCollider = hit.collider;
                 return true;
             }
