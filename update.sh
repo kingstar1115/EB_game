@@ -3,9 +3,11 @@ if [ ! -d ".git" ]; then
 		cd ELB
 		if [ -d ".git" ]; then
 			git reset --hard
-			git checkout master
-			git fetch http://github.com/eharris93/ELB
-			git merge eharris93/master
+			git clean -fd
+			git checkout master	
+			git remote add ewan http://github.com/eharris93/ELB 
+			git fetch ewan
+			git merge ewan/master
 			echo "Build updated"
 		else
 			cd..
@@ -19,8 +21,10 @@ if [ ! -d ".git" ]; then
 	fi
 elif [ -d ".git" ]; then
 	git reset --hard
-	git checkout master
-	git fetch http://github.com/eharris93/ELB
-	git merge eharris93/master
+	git clean -fd
+	git checkout master	
+	git remote add ewan http://github.com/eharris93/ELB 
+	git fetch ewan
+	git merge ewan/master
 	echo "Build updated"
 fi
