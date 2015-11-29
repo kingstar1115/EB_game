@@ -4,40 +4,82 @@ using System.Collections;
 [RequireComponent(typeof(LerpPosition), typeof(Collider))]
 public class CommanderUI : MonoBehaviour
 {
+    public float _LiftedHeight;
+    public float _LiftTime;
+    public float _MoveTime;
     Collider _collider;
-    LerpPosition _lerpPosition; 
+    Collider _prevHovered;
+    LerpPosition _lerpPosition;
+    bool _liftingPiece;
+    bool _hasBeenLifted;
+    float _targetY;
+    Vector3 _toGoTo;
 
 	// Use this for initialization
 	void Start () 
     {
         _collider = this.GetComponent<Collider>();
         _lerpPosition = this.GetComponent<LerpPosition>();
+
+        //event listener
+        _lerpPosition.OnLerpFinished += _lerpPosition_OnLerpFinished;
 	}
+
+    void _lerpPosition_OnLerpFinished()
+    {
+        //if lifting piece then not doin it anymore
+        if (_liftingPiece)
+        {
+            _liftingPiece = false;
+            _hasBeenLifted = true;
+        }
+        else if(this.transform.position.y != _LiftedHeight)
+            _hasBeenLifted = false;
+    }
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void Update () 
+    {
+        //update the lerp goto point
+        if (_hasBeenLifted && _lerpPosition.GetEndPosition() != _toGoTo)
+        {
+            _lerpPosition._LerpTime = _MoveTime;
+            _lerpPosition.LerpTo(_toGoTo);
+        }
 	}
 
     void OnMouseDrag()
     {
-        //float distance_to_screen = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
-        //transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
-
-        //if hovered a tile then move player to that place
+        //if hovered a tile then move have the player move there
         Collider hoveredCollider;
         if (BoardUI.GetTileHovered_Position(out hoveredCollider))
         {
-            //this.transform.position = new Vector3(hoveredCollider.transform.position.x,
-           //     hoveredCollider.bounds.max.y + _collider.bounds.extents.y, 
-            //    hoveredCollider.transform.position.z);
-
-            Vector3 toGoTo = new Vector3(hoveredCollider.transform.position.x,
-                hoveredCollider.bounds.max.y + _collider.bounds.extents.y,
+            _toGoTo = new Vector3(hoveredCollider.transform.position.x,
+                //hoveredCollider.bounds.max.y + _collider.bounds.extents.y,
+                _LiftedHeight,
                 hoveredCollider.transform.position.z);
 
-            if(_lerpPosition.GetEndPosition() != toGoTo)
-                _lerpPosition.LerpTo(toGoTo);
+            _targetY = hoveredCollider.bounds.max.y + _collider.bounds.extents.y;
+
+            _prevHovered = hoveredCollider;                
         }
+
+        if (!_hasBeenLifted && !_liftingPiece && (hoveredCollider == null || _prevHovered != hoveredCollider))
+            LiftPiece();
+    }
+
+    void OnMouseUp()
+    {
+        //drop the commander
+        _toGoTo.y = _targetY;
+    }
+
+    public void LiftPiece()
+    {
+        _liftingPiece = true;
+        _lerpPosition._LerpTime = _LiftTime;
+        _toGoTo = this.transform.position;
+        _targetY = this.transform.position.y;
+        _lerpPosition.LerpTo(new Vector3(this.transform.position.x, _LiftedHeight, this.transform.position.z));
     }
 }

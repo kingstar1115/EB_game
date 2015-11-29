@@ -3,6 +3,8 @@ using System.Collections;
 
 public class LerpPosition : MonoBehaviour 
 {
+    public event System.Action OnLerpFinished = delegate { };
+
     public LerpType _lerpType;
     public float _LerpTime = 1f;
     float _currentLerpTime;
@@ -26,9 +28,10 @@ public class LerpPosition : MonoBehaviour
             _currentLerpTime += Time.deltaTime;
             if (_currentLerpTime > _LerpTime)
             {
-                _startPosition = _endPosition;
+                this.transform.position = _endPosition;
                 _currentLerpTime = 0;
                 _isLerping = false;
+                OnLerpFinished();
             }
             else
             {
@@ -110,6 +113,11 @@ public class LerpPosition : MonoBehaviour
     public Vector3 GetEndPosition()
     {
         return _endPosition;
+    }
+
+    public bool IsLerping()
+    {
+        return _isLerping;
     }
 }
 
