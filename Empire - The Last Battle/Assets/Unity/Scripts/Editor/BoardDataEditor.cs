@@ -5,7 +5,7 @@ using System.Collections;
 public class BoardDataEditor : Editor
 {
 
-    [MenuItem("Assets/Create/ELB/BoardData")]
+    [MenuItem("Assets/Create/ELB/Board/BoardData")]
     public static void CreateBuilding()
     {
         //get a save location

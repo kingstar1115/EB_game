@@ -1,15 +1,30 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEditor;
 
-public class UnitTypeEditpr : MonoBehaviour {
+public class UnitTypeEditor : Editor 
+{
 
-	// Use this for initialization
-	void Start () {
-	
+	[MenuItem("Assets/Create/ELB/Units/UnitTypeData")]
+	public static void CreateUnit()
+	{
+		//get a save location
+		string path = EditorUtility.SaveFilePanel("Create The New Asset",
+		                                          "Assets/Unity/ScriptableObjects/Units/Types", "default.asset", "asset");
+		
+		if (path == "")
+			return;
+		
+		//get the location relative to the project
+		path = FileUtil.GetProjectRelativePath(path);
+		
+		CreateUnitTypeDataAt(path);
 	}
 	
-	// Update is called once per frame
-	void Update () {
-	
+	public static UnitTypeData CreateUnitTypeDataAt(string path)
+	{
+		UnitTypeData UnitType = CreateInstance<UnitTypeData>();
+		AssetDatabase.CreateAsset(UnitType, path);
+		AssetDatabase.SaveAssets();
+		return UnitType;
 	}
 }

@@ -3,7 +3,7 @@ using UnityEditor;
 
 public class UnitBaseDataEditor : Editor
 {
-    [MenuItem("Assets/Create/ELB/UnitBaseData")]
+    [MenuItem("Assets/Create/ELB/Units/UnitBaseData")]
     public static void CreateUnit()
     {
         //get a save location

@@ -4,7 +4,7 @@ using System.Collections;
 
 public class TerrainTypeDataEditor : Editor
 {
-    [MenuItem("Assets/Create/ELB/tileTypeDataBase")]
+	[MenuItem("Assets/Create/ELB/Tile/TileTypeData")]
     public static void CreateBuilding()
     {
         //get a save location
