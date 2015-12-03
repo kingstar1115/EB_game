@@ -3,28 +3,6 @@ using System.Collections;
 
 public class BoardUI : MonoBehaviour 
 {
-<<<<<<< HEAD
-=======
-
-
-	public static Tile GetTileHovered()
-	{
-		Collider outCollider;
-		if (GetTileHovered_Position (out outCollider)) {
-			TileHolder th;
-			if((th = outCollider.GetComponent<TileHolder>()) != null)
-				return th._Tile;
-			else
-			{
-				Debug.LogError("Game Object Labeled Tile with no TileHolder!!! :O");
-				return null;
-			}
-		} else {
-			return null;
-		}
-	}
-
->>>>>>> origin/origin/P11_CommanderMovement
     public static bool GetTileHovered_Position(out Collider tileCollider)
     {
         //raycast for a collider tagged tile and return position

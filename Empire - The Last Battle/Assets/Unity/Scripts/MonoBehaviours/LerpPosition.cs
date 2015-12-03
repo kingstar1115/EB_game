@@ -8,7 +8,7 @@ public class LerpPosition : MonoBehaviour
     public LerpType _lerpType;
     public float _LerpTime = 1f;
     float _currentLerpTime;
-    float _prevPercent;
+    float _prevPercent = 0;
     Vector3 _startPosition;
     Vector3 _endPosition;
     bool _isLerping;
