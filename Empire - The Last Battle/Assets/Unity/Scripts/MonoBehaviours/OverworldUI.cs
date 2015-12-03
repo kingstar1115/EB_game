@@ -30,4 +30,9 @@ public class OverworldUI : MonoBehaviour
     {
         _CommanderUI.DisablePlayerMovement();
     }
+
+    public void UpdateCommanderPosition()
+    {
+        _CommanderUI.UpdateToPlayerPosition();
+    }
 }

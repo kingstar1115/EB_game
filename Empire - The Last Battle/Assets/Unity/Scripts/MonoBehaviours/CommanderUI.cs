@@ -66,8 +66,6 @@ public class CommanderUI : MonoBehaviour
 			//if hovered a tile that is reachable then move have the player move there
             Collider hoveredCollider  = null;
             TileHolder tileHolder = BoardUI.GetTileHovered();
-
-            if (tileHolder != null) Debug.Log("tileHolder: "+tileHolder._Tile.X+tileHolder._Tile.Y);
             if (tileHolder != null && _reachableTiles.Contains(tileHolder._Tile))
             {
                 hoveredCollider = tileHolder.GetComponent<Collider>();
@@ -88,6 +86,15 @@ public class CommanderUI : MonoBehaviour
                     OnDraggingCommander();
                 }
             }
+            else
+            {
+                _destinationTile = null;
+
+                //hover over players current tile
+                _toGoTo = new Vector3(_Player.CommanderPosition.TileObject.transform.position.x,
+                    _LiftedHeight,
+                    _Player.CommanderPosition.TileObject.transform.position.z);
+            }
 
             if (!_hasBeenLifted && !_liftingPiece && (hoveredCollider == null || _prevHovered != hoveredCollider))
 				LiftPiece ();
@@ -101,6 +108,7 @@ public class CommanderUI : MonoBehaviour
         {
             //commander not moved
             _toGoTo = _Player.CommanderPosition.TileObject.transform.position;
+            _targetY = _Player.CommanderPosition.TileObject.GetComponent<Collider>().bounds.max.y + _collider.bounds.extents.y;
         }
         else
         {
@@ -119,7 +127,7 @@ public class CommanderUI : MonoBehaviour
     {
         _liftingPiece = true;
         _lerpPosition._LerpTime = _LiftTime;
-		_targetY = _Player.CommanderPosition.TileObject.GetComponent<Collider>().bounds.max.y + _collider.bounds.extents.y;
+		//_targetY = _Player.CommanderPosition.TileObject.GetComponent<Collider>().bounds.max.y + _collider.bounds.extents.y;
         _lerpPosition.LerpTo(new Vector3(this.transform.position.x, _LiftedHeight, this.transform.position.z));
         _toGoTo = _lerpPosition.GetEndPosition();
     }
@@ -144,4 +152,11 @@ public class CommanderUI : MonoBehaviour
 	{
 		_lerpPosition.StartLerp ();
 	}
+
+    public void UpdateToPlayerPosition()
+    {
+        this.transform.position = new Vector3(_Player.CommanderPosition.TileObject.transform.position.x, 
+            _targetY = _Player.CommanderPosition.TileObject.GetComponent<Collider>().bounds.max.y + _collider.bounds.extents.y,
+            _Player.CommanderPosition.TileObject.transform.position.z);
+    }
 }

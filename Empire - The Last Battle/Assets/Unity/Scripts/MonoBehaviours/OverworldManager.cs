@@ -17,10 +17,15 @@ public class OverworldManager : MonoBehaviour
 
 		//try get the player start tile
 		Tile startTile1 = _Board.GetTileAt (_Player1StartX, _Player1StartY);
-		if (startTile1 != null)
-			_Player1.CommanderPosition = _Board.GetTileAt (_Player1StartX, _Player1StartY);
-		else
-			Debug.LogError ("Player start tile indexes are out of bounds");
+        if (startTile1 != null)
+        {
+            _Player1.CommanderPosition = _Board.GetTileAt(_Player1StartX, _Player1StartY);
+        }
+        else
+            Debug.LogError("Player start tile indexes are out of bounds");
+        
+        //snap player to start position
+        _OverworldUI.UpdateCommanderPosition();
 
         //event listeners
         _OverworldUI.OnCommanderMove += _OverworldUI_OnCommanderMove;
