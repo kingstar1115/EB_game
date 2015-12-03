@@ -6,7 +6,10 @@ using System.Collections.Generic;
 public class CommanderUI : MonoBehaviour
 {
     public event System.Action OnDraggingCommander = delegate { };
-    public event System.Action OnDropCommander = delegate { };
+
+    public delegate void BoardAction(Tile tile);
+    public event BoardAction OnDropCommander = delegate { };
+    public event BoardAction OnCommanderMoved = delegate { };
 
 	public Player _Player; 
     public float _LiftedHeight;
@@ -21,6 +24,7 @@ public class CommanderUI : MonoBehaviour
 	Vector3 _toGoTo;
 	bool _allowMovement;
 	HashSet<Tile> _reachableTiles;
+    TileHolder _destinationTile;
 
 	// Use this for initialization
 	void Start () 
@@ -59,23 +63,33 @@ public class CommanderUI : MonoBehaviour
     {
 		//only if movement is allowed
 		if (_allowMovement) {
-			//if hovered a tile then move have the player move there
-			Collider hoveredCollider;
-			if (BoardUI.GetTileHovered_Position (out hoveredCollider)) {
-				_toGoTo = new Vector3 (hoveredCollider.transform.position.x,
-                //hoveredCollider.bounds.max.y + _collider.bounds.extents.y,
-                _LiftedHeight,
-                hoveredCollider.transform.position.z);
+			//if hovered a tile that is reachable then move have the player move there
+            Collider hoveredCollider  = null;
+            TileHolder tileHolder = BoardUI.GetTileHovered();
 
-				_targetY = hoveredCollider.bounds.max.y + _collider.bounds.extents.y;
+            if (tileHolder != null) Debug.Log("tileHolder: "+tileHolder._Tile.X+tileHolder._Tile.Y);
+            if (tileHolder != null && _reachableTiles.Contains(tileHolder._Tile))
+            {
+                hoveredCollider = tileHolder.GetComponent<Collider>();
+                if (hoveredCollider != null)
+                {
+                    _toGoTo = new Vector3(hoveredCollider.transform.position.x,
+                        //hoveredCollider.bounds.max.y + _collider.bounds.extents.y,
+                    _LiftedHeight,
+                    hoveredCollider.transform.position.z);
 
-                _prevHovered = hoveredCollider;   
-            
-                //dragging
-                OnDraggingCommander();
+                    _targetY = hoveredCollider.GetComponent<Collider>().bounds.max.y + _collider.bounds.extents.y;
+
+                    _prevHovered = hoveredCollider;
+
+                    _destinationTile = tileHolder;
+
+                    //dragging
+                    OnDraggingCommander();
+                }
             }
 
-			if (!_hasBeenLifted && !_liftingPiece && (hoveredCollider == null || _prevHovered != hoveredCollider))
+            if (!_hasBeenLifted && !_liftingPiece && (hoveredCollider == null || _prevHovered != hoveredCollider))
 				LiftPiece ();
 		}
     }
@@ -83,19 +97,31 @@ public class CommanderUI : MonoBehaviour
     void OnMouseUp()
     {
 		//if the tile hovered is not in the reachable set then back to origional tile
+        if (_destinationTile == null)
+        {
+            //commander not moved
+            _toGoTo = _Player.CommanderPosition.TileObject.transform.position;
+        }
+        else
+        {
+            //cammander moved
+            _toGoTo = _destinationTile.transform.position;
+            OnCommanderMoved(_destinationTile._Tile);
+            _destinationTile = null;
+        }
 
         //drop the commander
         _toGoTo.y = _targetY;
-        OnDropCommander();
+        OnDropCommander(_Player.CommanderPosition);
     }
 
     public void LiftPiece()
     {
         _liftingPiece = true;
         _lerpPosition._LerpTime = _LiftTime;
-        _toGoTo = _Player.CommanderPosition.TileObject.transform.position;
-		_targetY = _Player.CommanderPosition.TileObject.GetComponent<Collider>().bounds.max.y + _collider.bounds.extents.y;;
+		_targetY = _Player.CommanderPosition.TileObject.GetComponent<Collider>().bounds.max.y + _collider.bounds.extents.y;
         _lerpPosition.LerpTo(new Vector3(this.transform.position.x, _LiftedHeight, this.transform.position.z));
+        _toGoTo = _lerpPosition.GetEndPosition();
     }
 
 	public void AllowPlayerMovement(HashSet<Tile> reachableTiles)

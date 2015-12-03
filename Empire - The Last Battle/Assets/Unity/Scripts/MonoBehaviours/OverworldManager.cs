@@ -22,9 +22,21 @@ public class OverworldManager : MonoBehaviour
 		else
 			Debug.LogError ("Player start tile indexes are out of bounds");
 
-		//allow player movement for the start 
+        //event listeners
+        _OverworldUI.OnCommanderMove += _OverworldUI_OnCommanderMove;
+
+		//allow player movement for the start ****JUST FOR TESTING****
 		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_Player1.CommanderPosition, 1));
 	}
+
+    void _OverworldUI_OnCommanderMove(Tile tile)
+    {
+        //set new position for the player (should depend on whose players turn it is)
+        _Player1.CommanderPosition = tile;
+
+        //****JUST FOR TESTING**** set new reachable tiles
+        _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_Player1.CommanderPosition, 1));
+    }
 	
 	// Update is called once per frame
 	void Update () {

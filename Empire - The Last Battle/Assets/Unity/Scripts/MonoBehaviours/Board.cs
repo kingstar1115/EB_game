@@ -64,6 +64,7 @@ public class Board : MonoBehaviour {
                 }
                 t.TileObject = tileGO;
 				// add tile reference to game object
+                tileGO.GetComponentInChildren<TileHolder>()._Tile = t;
 
                 if(!CanTraverse(t.TileData)) {
                     continue;

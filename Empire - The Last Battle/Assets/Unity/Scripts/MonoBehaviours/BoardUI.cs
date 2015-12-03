@@ -3,13 +3,13 @@ using System.Collections;
 
 public class BoardUI : MonoBehaviour 
 {
-	public static Tile GetTileHovered()
+	public static TileHolder GetTileHovered()
 	{
 		Collider outCollider;
 		if (GetTileHovered_Position (out outCollider)) {
 			TileHolder th;
 			if((th = outCollider.GetComponent<TileHolder>()) != null)
-				return th._Tile;
+				return th;
 			else
 			{
 				Debug.LogError("Game Object Labeled Tile with no TileHolder!!! :O");
