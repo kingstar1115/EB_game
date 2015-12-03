@@ -17,6 +17,10 @@ public class Board : MonoBehaviour {
 	void Start () {
         _tiles = new List<Tile>();
         Generate(this.gameObject.transform.position);
+		//HashSet<Tile> reachableTiles = GetReachableTiles(GetTileAt (0, 1), 2);
+		//foreach (Tile t in reachableTiles) {
+		//	Debug.Log(t.X + "," + t.Y);
+		//}
 	}
 
     public void Generate(Vector3 origin, bool loadHeights = false) {
@@ -54,6 +58,8 @@ public class Board : MonoBehaviour {
                         _tiles.Add(t);
                     }
                     t.TileObject = tileGO;
+					// add t to tileGO
+					tileGO.GetComponent<TileHolder>()._Tile = t;
 
                     if(CanTraverse(t.TileData)) {
                         for (int x = i - 1; x <= i + 1; x++) {
@@ -131,6 +137,23 @@ public class Board : MonoBehaviour {
             return t.Height;
         }
     }
+
+	public HashSet<Tile> GetReachableTiles(Tile fromTile, int distance)
+	{
+		HashSet<Tile> foundTiles = new HashSet<Tile>();
+		if (distance == 0 || fromTile == null || fromTile.ConnectedTiles == null) {
+			return foundTiles;
+		}
+		foreach (Tile t in fromTile.ConnectedTiles) {
+			foundTiles.Add(t);
+			HashSet<Tile> tilesForT = GetReachableTiles(t, distance - 1);
+			foreach(Tile tt in tilesForT) {
+				foundTiles.Add(tt);
+			}
+		}
+		return foundTiles;
+	}
+
 
 }
 
