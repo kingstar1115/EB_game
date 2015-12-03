@@ -15,13 +15,13 @@ public class Board : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        _tiles = new List<Tile>();
-        _tileLookup = new Dictionary<TileData, Tile>();
-        Generate(this.gameObject.transform.position);
-		//HashSet<Tile> reachableTiles = GetReachableTiles(GetTileAt (0, 1), 2);
-		//foreach (Tile t in reachableTiles) {
-		//	Debug.Log(t.X + "," + t.Y);
-		//}
+	}
+
+	public void Init()
+	{		
+		_tiles = new List<Tile>();
+		_tileLookup = new Dictionary<TileData, Tile>();
+		Generate(this.gameObject.transform.position);
 	}
 
     public void Generate(Vector3 origin, bool loadHeights = false) {
@@ -36,54 +36,7 @@ public class Board : MonoBehaviour {
             for (int j = 0; j < arrayHeight; j++) {
                 TileData tile = GetTileDataAt(i, j);
                 GameObject tileGO;
-<<<<<<< HEAD
-                if (tile != null) {
-                    float height = GetTileHeight(tile, !loadHeights);
-                    if (tile.Height != height) {
-                        tile.Height = height;
-                    }
-                    Vector3 position = new Vector3(i * TileWidth, height, j * TileWidth) + boardStart;
-                    tileGO = (GameObject)Instantiate(GetTerrain(tile.Terrain), position, Quaternion.identity);
-                    tileGO.name = "Tile " + "[" + i + "," + j + "]";
-                    if (tile.Building != BuildingType.None) {
-                        GameObject buildingGO = (GameObject)Instantiate(GetBuilding(tile.Building), position, Quaternion.identity);
-                        // Set building name??
-                        buildingGO.transform.parent = tileGO.transform;
-                    }
-                    // Build graph
-                    Tile t = GetTileAt(i, j);
-                    if (t == null) {
-                        t = new Tile();
-                        t.X = i;
-                        t.Y = j;
-                        t.TileData = tile;
-                        _tiles.Add(t);
-                    }
-                    t.TileObject = tileGO;
-					// add t to tileGO
-					tileGO.GetComponent<TileHolder>()._Tile = t;
 
-                    if(CanTraverse(t.TileData)) {
-                        for (int x = i - 1; x <= i + 1; x++) {
-                            for (int y = j - 1; y <= j + 1; y++) {
-                                Tile tileAtXY = GetTileAt(x, y);
-                                if (tileAtXY == null) {
-                                    TileData td = GetTileDataAt(x, y);
-                                    if (td != null) {
-                                        tileAtXY = new Tile();
-                                        tileAtXY.X = x;
-                                        tileAtXY.Y = y;
-                                        tileAtXY.TileData = td;
-                                        _tiles.Add(tileAtXY);
-                                    }
-                                }
-                                if (tileAtXY != null && CanTraverse(tileAtXY.TileData)) {
-                                    if (t.ConnectedTiles == null) {
-                                        t.ConnectedTiles = new List<Tile>();
-                                    }
-                                    t.ConnectedTiles.Add(tileAtXY);
-                                }
-=======
                 if (tile == null) {
                     continue;
                 }
@@ -110,6 +63,7 @@ public class Board : MonoBehaviour {
                     _tileLookup.Add(tile, t);
                 }
                 t.TileObject = tileGO;
+				// add tile reference to game object
 
                 if(!CanTraverse(t.TileData)) {
                     continue;
@@ -130,7 +84,6 @@ public class Board : MonoBehaviour {
                                 tileAtXY.TileData = td;
                                 _tiles.Add(tileAtXY);
                                 _tileLookup.Add(td, tileAtXY);
->>>>>>> ewan/master
                             }
                         }
                         if (tileAtXY != null && CanTraverse(tileAtXY.TileData)) {
