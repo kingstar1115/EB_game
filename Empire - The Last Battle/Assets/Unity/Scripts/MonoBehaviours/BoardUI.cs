@@ -3,7 +3,6 @@ using System.Collections;
 
 public class BoardUI : MonoBehaviour 
 {
-
     public static bool GetTileHovered_Position(out Collider tileCollider)
     {
         //raycast for a collider tagged tile and return position

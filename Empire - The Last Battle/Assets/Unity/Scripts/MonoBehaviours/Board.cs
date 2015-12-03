@@ -134,7 +134,8 @@ public class Board : MonoBehaviour {
 
 }
 
-public class Tile {
+public class Tile
+{
     public GameObject TileObject;
     public TileData TileData;
     public List<Tile> ConnectedTiles;

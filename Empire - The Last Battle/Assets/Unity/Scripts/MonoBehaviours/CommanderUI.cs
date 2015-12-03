@@ -4,6 +4,9 @@ using System.Collections;
 [RequireComponent(typeof(LerpPosition), typeof(Collider))]
 public class CommanderUI : MonoBehaviour
 {
+    public event System.Action OnDraggingCommander = delegate { };
+    public event System.Action OnDropCommander = delegate { };
+
     public float _LiftedHeight;
     public float _LiftTime;
     public float _MoveTime;
@@ -61,7 +64,10 @@ public class CommanderUI : MonoBehaviour
 
             _targetY = hoveredCollider.bounds.max.y + _collider.bounds.extents.y;
 
-            _prevHovered = hoveredCollider;                
+            _prevHovered = hoveredCollider;   
+            
+            //dragging
+            OnDraggingCommander();
         }
 
         if (!_hasBeenLifted && !_liftingPiece && (hoveredCollider == null || _prevHovered != hoveredCollider))
@@ -72,6 +78,7 @@ public class CommanderUI : MonoBehaviour
     {
         //drop the commander
         _toGoTo.y = _targetY;
+        OnDropCommander();
     }
 
     public void LiftPiece()
