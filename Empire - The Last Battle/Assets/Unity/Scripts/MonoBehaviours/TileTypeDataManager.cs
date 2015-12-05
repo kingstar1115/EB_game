@@ -10,7 +10,7 @@ public class TileTypeDataManager : MonoBehaviour {
         _terrainData = new Dictionary<TerrainType, TerrainTypeData>();
         _buildingData = new Dictionary<BuildingType, BuildingTypeData>();
         foreach (TileTypeDataBase data in BaseData) {
-            if (data.TileType == TileType.Terrain) {
+            if (data.Tile == TileType.Terrain) {
                 TerrainTypeData tData = (TerrainTypeData)data;
                 _terrainData.Add(tData.Type, tData);
             }
@@ -29,7 +29,7 @@ public class TileTypeDataManager : MonoBehaviour {
 
     public BuildingTypeData GetBuildingData(BuildingType t) {
         if (t == BuildingType.None) {
-            return new BuildingTypeData();
+            return ScriptableObject.CreateInstance<BuildingTypeData>();
         }
         BuildingTypeData data;
         _buildingData.TryGetValue(t, out data);

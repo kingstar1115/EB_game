@@ -4,8 +4,8 @@
 
 echo "Looks good to publish to gh-page"
 
-mv Build/GameJam/GameJam.html ./index.html
-mv Build/GameJam/GameJam.unity3d ./index.unity3d
+cp Build/ELB/ELB.html ./ELB.html
+cp Build/ELB/ELB.unity3d ./ELB.unity3d
 
 git config --global user.email "ewanharris93@gmail.com"
 git config --global user.name "travis-ci"
@@ -13,7 +13,7 @@ git config --global user.name "travis-ci"
 git add .
 git commit -m "Push to github pages"
 
-git push --force --quiet "https://github.com/eharris93/GameJam.git" master:gh-pages
+git push --force --quiet "https://github.com/eharris93/ELB.git" gh-pages
 
 echo "Publish done"
 # fi

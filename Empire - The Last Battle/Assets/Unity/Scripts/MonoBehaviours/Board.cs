@@ -1,19 +1,14 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class Board : MonoBehaviour {
 
     public BoardData Data;
     public float TileWidth = 1;
-    public TileTypeDataManager TileTypeDataManager;
-
-	// Use this for initialization
-	void Start () {
-        Initialise();
-	}
+    public TileTypeDataManager TTDataManager;
 
     public void Initialise() {
-        TileTypeDataManager.Initialise();
+        TTDataManager.Initialise();
         Generate(this.gameObject.transform.position);
     }
 
@@ -44,7 +39,9 @@ public class Board : MonoBehaviour {
                     // Set building name??
                     buildingGO.transform.parent = tile.TileObject.transform;
                 }
-                if (!CanTraverse(tile)) {
+                // add tile reference to game object
+                tile.TileObject.GetComponentInChildren<TileHolder>()._Tile = tile;
+                if (!CanTraverse(tile)) {   
                     continue;
                 }
                 for (int x = i - 1; x <= i + 1; x++) {
@@ -71,11 +68,11 @@ public class Board : MonoBehaviour {
     }
 
     public GameObject GetTerrain(TileData t) {
-        return TileTypeDataManager.GetTerrainData(t.Terrain).Prefab;
+        return TTDataManager.GetTerrainData(t.Terrain).Prefab;
     }
 
     public GameObject GetBuilding(TileData t) {
-        return TileTypeDataManager.GetBuildingData(t.Building).Prefab;
+        return TTDataManager.GetBuildingData(t.Building).Prefab;
     }
 
     public TileData GetTileAt(int x, int y) {
@@ -86,16 +83,15 @@ public class Board : MonoBehaviour {
     }
 
     public bool CanTraverse(TileData t) {
-        bool terrain = TileTypeDataManager.GetTerrainData(t.Terrain).IsTraversable,
-             building = TileTypeDataManager.GetBuildingData(t.Building).IsTraversable;
+        bool terrain = TTDataManager.GetTerrainData(t.Terrain).IsTraversable,
+             building = TTDataManager.GetBuildingData(t.Building).IsTraversable;
         return terrain && building;
     }
 
     public float GetRandomHeight(TileData t) {
-        TerrainTypeData tD = TileTypeDataManager.GetTerrainData(t.Terrain);
-        BuildingTypeData bD = TileTypeDataManager.GetBuildingData(t.Building);
+        TerrainTypeData tD = TTDataManager.GetTerrainData(t.Terrain);
+        BuildingTypeData bD = TTDataManager.GetBuildingData(t.Building);
         Vector2 range;
-        Debug.Log(t.X + "," + t.Y);
         if (bD.SetHeight) {
             range = bD.Height;
         }
@@ -108,5 +104,22 @@ public class Board : MonoBehaviour {
 
         return Random.Range(range.x, range.y);
     }
+
+	public HashSet<TileData> GetReachableTiles(TileData fromTile, int distance)
+	{
+		HashSet<TileData> foundTiles = new HashSet<TileData>();
+		if (distance == 0 || fromTile == null) {
+			return foundTiles;
+		}
+		foreach (TileData t in fromTile.GetConnectedTiles()) {
+			foundTiles.Add(t);
+            HashSet<TileData> tilesForT = GetReachableTiles(t, distance - 1);
+            foreach (TileData tt in tilesForT) {
+				foundTiles.Add(tt);
+			}
+		}
+		return foundTiles;
+	}
+
 
 }
