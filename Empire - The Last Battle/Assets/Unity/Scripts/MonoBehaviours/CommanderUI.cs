@@ -66,7 +66,7 @@ public class CommanderUI : MonoBehaviour
 			//if hovered a tile that is reachable then move have the player move there
             Collider hoveredCollider  = null;
             TileHolder tileHolder = BoardUI.GetTileHovered();
-            if (tileHolder != null && _reachableTiles.Contains(tileHolder._Tile))
+            if (tileHolder != null)
             {
                 hoveredCollider = tileHolder.GetComponent<Collider>();
                 if (hoveredCollider != null)
@@ -89,11 +89,6 @@ public class CommanderUI : MonoBehaviour
             else
             {
                 _destinationTile = null;
-
-                //hover over players current tile
-                _toGoTo = new Vector3(_Player.CommanderPosition.TileObject.transform.position.x,
-                    _LiftedHeight,
-                    _Player.CommanderPosition.TileObject.transform.position.z);
             }
 
             if (!_hasBeenLifted && !_liftingPiece && (hoveredCollider == null || _prevHovered != hoveredCollider))
@@ -104,7 +99,7 @@ public class CommanderUI : MonoBehaviour
     void OnMouseUp()
     {
 		//if the tile hovered is not in the reachable set then back to origional tile
-        if (_destinationTile == null)
+        if (_destinationTile == null || !_reachableTiles.Contains(_destinationTile._Tile))
         {
             //commander not moved
             _toGoTo = _Player.CommanderPosition.TileObject.transform.position;
