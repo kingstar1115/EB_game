@@ -30,7 +30,7 @@ echo "Attempting to build $project for Web"
   -silent-crashes \
   -logFile $(pwd)/unity.log \
   -projectPath "$projectPath" \
-  -buildWebPlayer  "$(pwd)/Build/GameJam" \
+  -buildWebPlayer  "$(pwd)/Build/ELB" \
   -quit
 
 echo 'Logs from build'
