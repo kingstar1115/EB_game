@@ -15,9 +15,13 @@ public class Board : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        _tiles = new List<Tile>();
-        _tileLookup = new Dictionary<TileData, Tile>();
-        Generate(this.gameObject.transform.position);
+	}
+
+	public void Init()
+	{		
+		_tiles = new List<Tile>();
+		_tileLookup = new Dictionary<TileData, Tile>();
+		Generate(this.gameObject.transform.position);
 	}
 
     public void Generate(Vector3 origin, bool loadHeights = false) {
@@ -32,6 +36,7 @@ public class Board : MonoBehaviour {
             for (int j = 0; j < arrayHeight; j++) {
                 TileData tile = GetTileDataAt(i, j);
                 GameObject tileGO;
+
                 if (tile == null) {
                     continue;
                 }
@@ -58,6 +63,8 @@ public class Board : MonoBehaviour {
                     _tileLookup.Add(tile, t);
                 }
                 t.TileObject = tileGO;
+				// add tile reference to game object
+                tileGO.GetComponentInChildren<TileHolder>()._Tile = t;
 
                 if(!CanTraverse(t.TileData)) {
                     continue;
@@ -149,9 +156,27 @@ public class Board : MonoBehaviour {
         }
     }
 
+	public HashSet<Tile> GetReachableTiles(Tile fromTile, int distance)
+	{
+		HashSet<Tile> foundTiles = new HashSet<Tile>();
+		if (distance == 0 || fromTile == null || fromTile.ConnectedTiles == null) {
+			return foundTiles;
+		}
+		foreach (Tile t in fromTile.ConnectedTiles) {
+			foundTiles.Add(t);
+			HashSet<Tile> tilesForT = GetReachableTiles(t, distance - 1);
+			foreach(Tile tt in tilesForT) {
+				foundTiles.Add(tt);
+			}
+		}
+		return foundTiles;
+	}
+
+
 }
 
-public class Tile {
+public class Tile
+{
     public GameObject TileObject;
     public TileData TileData;
     public List<Tile> ConnectedTiles;
