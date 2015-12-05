@@ -3,23 +3,25 @@ using System.Collections.Generic;
 
 public class Board : MonoBehaviour {
 
-    public BoardData Data;
-    public float TileWidth = 1;
-    public TileTypeDataManager TTDataManager;
+    public BoardData _Data;
+    public float _TileWidth = 1;
+    public TileTypeDataManager _TileTypeDataManager;
+    public FlagManager _FlagManager;
 
     public void Initialise() {
-        TTDataManager.Initialise();
+        _TileTypeDataManager.Initialise();
+        _FlagManager.Initialise();
         Generate(this.gameObject.transform.position);
     }
 
-    public void Generate(Vector3 origin, bool newHeights = true) {
+    public void Generate(Vector3 origin, bool loadGame = false) {
         Vector2 arraySize = GetBoardSize();
         int arrayWidth = (int)arraySize.x,
             arrayHeight = (int)arraySize.y;
            
         // get start position
-        Vector3 centreOffset = new Vector3(TileWidth / 2, 0, TileWidth / 2),
-                boardStart = origin - new Vector3((arrayWidth * TileWidth)/2, 0, (arrayHeight * TileWidth)/2) + centreOffset;
+        Vector3 centreOffset = new Vector3(_TileWidth / 2, 0, _TileWidth / 2),
+                boardStart = origin - new Vector3((arrayWidth * _TileWidth) / 2, 0, (arrayHeight * _TileWidth) / 2) + centreOffset;
         for (int i = 0; i < arrayWidth; i++) {
             for (int j = 0; j < arrayHeight; j++) {
                 TileData tile = GetTileAt(i, j);
@@ -28,10 +30,10 @@ public class Board : MonoBehaviour {
                 }
                 tile.X = i;
                 tile.Y = j;
-                if (newHeights) {
+                if (!loadGame) {
                     tile.Height = GetRandomHeight(tile);
                 }
-                Vector3 position = new Vector3(i * TileWidth, tile.Height, j * TileWidth) + boardStart;
+                Vector3 position = new Vector3(i * _TileWidth, tile.Height, j * _TileWidth) + boardStart;
                 tile.TileObject = (GameObject)Instantiate(GetTerrain(tile), position, Quaternion.identity);
                 tile.TileObject.name = "Tile " + "[" + i + "," + j + "]";
                 if (GetBuilding(tile) != null) {
@@ -39,6 +41,9 @@ public class Board : MonoBehaviour {
                     // Set building name??
                     buildingGO.transform.parent = tile.TileObject.transform;
                 }
+                // set owner flag
+                _FlagManager.SetFlagForTile(tile);
+
                 // add tile reference to game object
                 tile.TileObject.GetComponentInChildren<TileHolder>()._Tile = tile;
                 if (!CanTraverse(tile)) {   
@@ -59,38 +64,43 @@ public class Board : MonoBehaviour {
         }
     }
 
+    public void SetTileOwner(TileData t, PlayerType p) {
+        t.Owner = p;
+        _FlagManager.SetFlagForTile(t);
+    }
+
     public Vector2 GetBoardSize() {
         // We REALLY expect the board to be a square.
         //We will run into issues if the first column is longer than the others
-        int arrayWidth = Data.Data.Length,
-           arrayHeight = Data.Data[0].Data.Length;
+        int arrayWidth = _Data.Data.Length,
+           arrayHeight = _Data.Data[0].Data.Length;
         return new Vector2(arrayWidth, arrayHeight);
     }
 
     public GameObject GetTerrain(TileData t) {
-        return TTDataManager.GetTerrainData(t.Terrain).Prefab;
+        return _TileTypeDataManager.GetTerrainData(t.Terrain).Prefab;
     }
 
     public GameObject GetBuilding(TileData t) {
-        return TTDataManager.GetBuildingData(t.Building).Prefab;
+        return _TileTypeDataManager.GetBuildingData(t.Building).Prefab;
     }
 
     public TileData GetTileAt(int x, int y) {
-        if (x < 0 || x >= Data.Data.Length || y < 0 || y >= Data.Data[x].Data.Length) {
+        if (x < 0 || x >= _Data.Data.Length || y < 0 || y >= _Data.Data[x].Data.Length) {
             return null;
         }
-        return Data.Data[x].Data[y];
+        return _Data.Data[x].Data[y];
     }
 
     public bool CanTraverse(TileData t) {
-        bool terrain = TTDataManager.GetTerrainData(t.Terrain).IsTraversable,
-             building = TTDataManager.GetBuildingData(t.Building).IsTraversable;
+        bool terrain = _TileTypeDataManager.GetTerrainData(t.Terrain).IsTraversable,
+             building = _TileTypeDataManager.GetBuildingData(t.Building).IsTraversable;
         return terrain && building;
     }
 
     public float GetRandomHeight(TileData t) {
-        TerrainTypeData tD = TTDataManager.GetTerrainData(t.Terrain);
-        BuildingTypeData bD = TTDataManager.GetBuildingData(t.Building);
+        TerrainTypeData tD = _TileTypeDataManager.GetTerrainData(t.Terrain);
+        BuildingTypeData bD = _TileTypeDataManager.GetBuildingData(t.Building);
         Vector2 range;
         if (bD.SetHeight) {
             range = bD.Height;
@@ -104,6 +114,8 @@ public class Board : MonoBehaviour {
 
         return Random.Range(range.x, range.y);
     }
+
+
 
 	public HashSet<TileData> GetReachableTiles(TileData fromTile, int distance)
 	{
