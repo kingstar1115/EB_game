@@ -1,26 +1,23 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections;
 
 public class Board : MonoBehaviour {
 
     public BoardData Data;
     public float TileWidth = 1;
-    public TileTypeData TileTypeData;
-    private List<Tile> _tiles;
-    private Dictionary<TileData, Tile> _tileLookup;
-
-    public event System.Action OnGenerate = delegate { };
-
+    public TileTypeDataManager TileTypeDataManager;
 
 	// Use this for initialization
 	void Start () {
-        _tiles = new List<Tile>();
-        _tileLookup = new Dictionary<TileData, Tile>();
-        Generate(this.gameObject.transform.position);
+        Initialise();
 	}
 
-    public void Generate(Vector3 origin, bool loadHeights = false) {
+    public void Initialise() {
+        TileTypeDataManager.Initialise();
+        Generate(this.gameObject.transform.position);
+    }
+
+    public void Generate(Vector3 origin, bool newHeights = true) {
         Vector2 arraySize = GetBoardSize();
         int arrayWidth = (int)arraySize.x,
             arrayHeight = (int)arraySize.y;
@@ -30,67 +27,39 @@ public class Board : MonoBehaviour {
                 boardStart = origin - new Vector3((arrayWidth * TileWidth)/2, 0, (arrayHeight * TileWidth)/2) + centreOffset;
         for (int i = 0; i < arrayWidth; i++) {
             for (int j = 0; j < arrayHeight; j++) {
-                TileData tile = GetTileDataAt(i, j);
-                GameObject tileGO;
+                TileData tile = GetTileAt(i, j);
                 if (tile == null) {
                     continue;
                 }
-                float height = GetTileHeight(tile, !loadHeights);
-                if (tile.Height != height) {
-                    tile.Height = height;
+                tile.X = i;
+                tile.Y = j;
+                if (newHeights) {
+                    tile.Height = GetRandomHeight(tile);
                 }
-                Vector3 position = new Vector3(i * TileWidth, height, j * TileWidth) + boardStart;
-                tileGO = (GameObject)Instantiate(GetTerrain(tile.Terrain), position, Quaternion.identity);
-                tileGO.name = "Tile " + "[" + i + "," + j + "]";
-                if (tile.Building != BuildingType.None) {
-                    GameObject buildingGO = (GameObject)Instantiate(GetBuilding(tile.Building), position, Quaternion.identity);
+                Vector3 position = new Vector3(i * TileWidth, tile.Height, j * TileWidth) + boardStart;
+                tile.TileObject = (GameObject)Instantiate(GetTerrain(tile), position, Quaternion.identity);
+                tile.TileObject.name = "Tile " + "[" + i + "," + j + "]";
+                if (GetBuilding(tile) != null) {
+                    GameObject buildingGO = (GameObject)Instantiate(GetBuilding(tile), position, Quaternion.identity);
                     // Set building name??
-                    buildingGO.transform.parent = tileGO.transform;
+                    buildingGO.transform.parent = tile.TileObject.transform;
                 }
-                // Build graph
-                Tile t = GetTileAt(i, j);
-                if (t == null) {
-                    t = new Tile();
-                    t.X = i;
-                    t.Y = j;
-                    t.TileData = tile;
-                    _tiles.Add(t);
-                    _tileLookup.Add(tile, t);
-                }
-                t.TileObject = tileGO;
-
-                if(!CanTraverse(t.TileData)) {
+                if (!CanTraverse(tile)) {
                     continue;
                 }
-
                 for (int x = i - 1; x <= i + 1; x++) {
                     for (int y = j - 1; y <= j + 1; y++) {
                         if (x == i && y == j) {
                             continue;
                         }
-                        Tile tileAtXY = GetTileAt(x, y);
-                        if (tileAtXY == null) {
-                            TileData td = GetTileDataAt(x, y);
-                            if (td != null) {
-                                tileAtXY = new Tile();
-                                tileAtXY.X = x;
-                                tileAtXY.Y = y;
-                                tileAtXY.TileData = td;
-                                _tiles.Add(tileAtXY);
-                                _tileLookup.Add(td, tileAtXY);
-                            }
-                        }
-                        if (tileAtXY != null && CanTraverse(tileAtXY.TileData)) {
-                            if (t.ConnectedTiles == null) {
-                                t.ConnectedTiles = new List<Tile>();
-                            }
-                            t.ConnectedTiles.Add(tileAtXY);
+                        TileData tileAtXY = GetTileAt(x, y);
+                        if (tileAtXY != null && CanTraverse(tileAtXY)) {
+                            tile.AddConnectedTile(tileAtXY);
                         }
                     }
                 }
             }
         }
-        OnGenerate();
     }
 
     public Vector2 GetBoardSize() {
@@ -101,60 +70,43 @@ public class Board : MonoBehaviour {
         return new Vector2(arrayWidth, arrayHeight);
     }
 
-    public GameObject GetTerrain(TerrainType tt) {
-        if (TileTypeData.Terrains.Length < (int)tt) {
-            Debug.LogError("TerrainType is out of sync with the terrain GameObjects!");
-        }
-        return TileTypeData.Terrains[(int)tt];
+    public GameObject GetTerrain(TileData t) {
+        return TileTypeDataManager.GetTerrainData(t.Terrain).Prefab;
     }
 
-    public GameObject GetBuilding(BuildingType bt) {
-        if (TileTypeData.Buildings.Length < (int)bt) {
-            Debug.LogError("BuildingType is out of sync with the building GameObjects!");
-        }
-        return TileTypeData.Buildings[(int)bt];
+    public GameObject GetBuilding(TileData t) {
+        return TileTypeDataManager.GetBuildingData(t.Building).Prefab;
     }
 
-    public TileData GetTileDataAt(int x, int y) {
+    public TileData GetTileAt(int x, int y) {
         if (x < 0 || x >= Data.Data.Length || y < 0 || y >= Data.Data[x].Data.Length) {
             return null;
         }
         return Data.Data[x].Data[y];
     }
 
-    public Tile GetTileAt(int x, int y) {
-        TileData td = GetTileDataAt(x,y);
-        if (td == null) {
-            return null;
-        }
-        Tile t;
-        _tileLookup.TryGetValue(td, out t);
-        return t;
-    }
-
     public bool CanTraverse(TileData t) {
-        if (t == null) {
-            return false;
-        }
-        return System.Array.IndexOf(TileTypeData.NonTraversableTerrain, t.Terrain) == -1;
+        bool terrain = TileTypeDataManager.GetTerrainData(t.Terrain).IsTraversable,
+             building = TileTypeDataManager.GetBuildingData(t.Building).IsTraversable;
+        return terrain && building;
     }
 
-    public float GetTileHeight(TileData t, bool random = true) {
-        if (random) {
-            Vector2 r = TileTypeData.TerrainHeights[(int)t.Terrain];
-            return Random.Range(r.x, r.y);
+    public float GetRandomHeight(TileData t) {
+        TerrainTypeData tD = TileTypeDataManager.GetTerrainData(t.Terrain);
+        BuildingTypeData bD = TileTypeDataManager.GetBuildingData(t.Building);
+        Vector2 range;
+        Debug.Log(t.X + "," + t.Y);
+        if (bD.SetHeight) {
+            range = bD.Height;
+        }
+        else if (tD.SetHeight) {
+            range = tD.Height;
         }
         else {
-            return t.Height;
+            range = new Vector2();
         }
+
+        return Random.Range(range.x, range.y);
     }
 
-}
-
-public class Tile {
-    public GameObject TileObject;
-    public TileData TileData;
-    public List<Tile> ConnectedTiles;
-    public int X;
-    public int Y;
 }

@@ -5,15 +5,22 @@ using System.Collections.Generic;
 public class TileData : ScriptableObject {
     public TerrainType Terrain;
     public BuildingType Building;
+    public PlayerType Owner;
+    public float Height;
 
-	[System.NonSerialized]
-	public List<TileData> ConnectedTiles;
-	public int X;
-	public int Y;
-
-
-	public PlayerType Owner = PlayerType.Neutral;
-	public float Height;
+	private List<TileData>ConnectedTiles;
+    public GameObject TileObject {
+        get;
+        set;
+    }
+    public int X {
+        get;
+        set;
+    }
+	public int Y {
+        get;
+        set;
+    }
 
 	public void AddConnectedTile(TileData t) {
 		if (ConnectedTiles == null) {

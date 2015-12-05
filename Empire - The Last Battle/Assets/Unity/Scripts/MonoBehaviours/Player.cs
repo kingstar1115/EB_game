@@ -19,7 +19,7 @@ public class Player : MonoBehaviour {
 }
 public enum PlayerType
 {
+    None,
 	Battlebeard,
-	Stormshaper,
-	Neutral
+	Stormshaper
 }
