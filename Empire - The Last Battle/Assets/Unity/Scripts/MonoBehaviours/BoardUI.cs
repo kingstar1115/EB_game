@@ -25,7 +25,7 @@ public class BoardUI : MonoBehaviour
         //raycast for a collider tagged tile and return position
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray, out hit, (1 << LayerMask.NameToLayer("Tiles"))))
         {
             if (hit.collider.gameObject.tag == "Tile")
             {

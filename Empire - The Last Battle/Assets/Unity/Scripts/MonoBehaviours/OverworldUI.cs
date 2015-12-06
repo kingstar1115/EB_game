@@ -9,11 +9,24 @@ public class OverworldUI : MonoBehaviour
 
     public bool _TileHover;
     public CommanderUI _CommanderUI;
+    public CameraMovement _CameraMovement;
 
     // Use this for initialization
     void Start()
     {
         _CommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
+        _CommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
+        _CommanderUI.OnCommanderNewDestination += _CommanderUI_OnCommanderNewDestination;
+    }
+
+    void _CommanderUI_OnCommanderNewDestination(Vector3 vec)
+    {
+        _CameraMovement.EnableCameraMovement(vec);
+    }
+
+    void _CommanderUI_OnStartDrag()
+    {
+        _CameraMovement.DisableCameraMovement();
     }
 
     void _CommanderUI_OnCommanderMoved(Tile tile)
