@@ -17,7 +17,7 @@ public class CameraMovement : MonoBehaviour
 	void Start () 
     {
         //start half way zoomed
-        _radius = Mathf.Lerp(5,20,0.5f);
+        _radius = Mathf.Lerp(_MinZoom, _MaxZoom, 0.5f);
         UpdateTransform(Vector3.zero);
 	}
 	
