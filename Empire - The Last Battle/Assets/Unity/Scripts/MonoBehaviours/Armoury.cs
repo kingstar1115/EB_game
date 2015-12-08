@@ -4,58 +4,39 @@ using UnityEngine;
 
 public abstract class PurchasableItem : ScriptableObject
 {
-    public int Cost { get; set; }
+    public int cost;
 }
 
 public class PurchasableUnit : PurchasableItem
 {
     //Change to UnitType once units are in
-    public int Id { get; set; }
-
+    public int id;
     //This is 0-4, and depends on how many 
     //castle pieces player has
-    public int PurchaseLevel { get; set; }
+    public int purchaseLevel;
 }
 
-public class PurchasbleCard : PurchasableItem
+public class PurchasableCard : PurchasableItem
 {
-    public int Id { get; set; }
+    public int id;
 }
 
-public class PurchasbleCastlePiece : PurchasableItem
+public class PurchasableCastlePiece : PurchasableItem
 {
-    public int Id { get; set; }
+    public int id;
+    //This is 0-4
+    public int purchaseLevel;
+    public bool b_AlreadyPurchased;
 }
 
 public class Armoury : MonoBehaviour
 {
-    public List<PurchasableUnit> PurchasbleUnits { get; set; }
-    public List<PurchasbleCard> PurchasbleCards { get; set; }
-    public List<PurchasbleCastlePiece> PurchasableCastlePieces { get; set; }
+    public List<PurchasableUnit> purchasbleUnits;
+    public List<PurchasableCard> purchasbleCards;
+    public List<PurchasableCastlePiece> purchasableCastlePieces;
 
     public delegate void PurchasedItemCallback(PurchasableItem purchasedItem);
     public event PurchasedItemCallback OnPurchasedItem = delegate { };
-
-    void Initialise()
-    {
-        PurchasbleUnits = new List<PurchasableUnit>
-        {
-            //Add units here when unit class is in
-        };
-
-        PurchasbleCards = new List<PurchasbleCard>
-        {
-            //Add cards here when cards class is in 
-        };
-
-        PurchasableCastlePieces = new List<PurchasbleCastlePiece>
-        {
-            new PurchasbleCastlePiece(){ Id = 0, Cost = 2000 },
-            new PurchasbleCastlePiece(){ Id = 1, Cost = 2000 },
-            new PurchasbleCastlePiece(){ Id = 2, Cost = 2000 },
-            new PurchasbleCastlePiece(){ Id = 3, Cost = 2000 },
-        };
-    }
 
     public List<PurchasableUnit> AvailableUnits(Player player)
     {
@@ -64,32 +45,32 @@ public class Armoury : MonoBehaviour
         throw new NotImplementedException();
     }
 
-    public List<PurchasbleCard> AvailableCards(Player player)
+    public List<PurchasableCard> AvailableCards(Player player)
     {
         //Do checks to see if buyable
-
-        return PurchasbleCards;
+        return purchasbleCards;
     }
 
-    public void BuyUnit(int unitId, Player player)
+    public List<PurchasableCastlePiece> AvailableCastlePieces(Player player)
     {
-        var unitToBuy = PurchasbleUnits[unitId];
+        //Castle pieces unlock after lost immortals die
+        //return purchasableCastlePieces.Where(x => (player.LostImmortalKillCount >= x.purchaseLevel) && (x.b_AlreadyPurchased == false));      
+        throw new NotImplementedException();
+    }
 
+    public void BuyUnit(PurchasableUnit purchasableUnit)
+    {
         //Call Delegate
-        OnPurchasedItem(unitToBuy);
+        OnPurchasedItem(purchasableUnit);
     }
 
-    public void BuyCard(int cardId)
+    public void BuyCard(PurchasableCard purchasableCard)
     {
-        var cardToBuy = PurchasbleCards[cardId];
-
-        OnPurchasedItem(cardToBuy);
+        OnPurchasedItem(purchasableCard);
     }
 
-    public void BuyCastlePiece(int cardId)
+    public void BuyCastlePiece(PurchasableCastlePiece purchasableCastlePiece)
     {
-        var castlePieceToBuy = PurchasableCastlePieces[cardId];
-
-        OnPurchasedItem(castlePieceToBuy);
+        OnPurchasedItem(purchasableCastlePiece);
     }
 }
