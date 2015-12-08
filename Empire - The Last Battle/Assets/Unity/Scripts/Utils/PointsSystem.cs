@@ -104,17 +104,6 @@ public class PointsSystem : MonoBehaviour
         OnChange(_currentValue);
     }
 
-    public void removePoints(int value, string id)
-    {
-        _currentValue -= (int)((float)value * _currentModifier);
-        if (UseBreakdown)
-        {
-            _incrementBreakdown(id);
-        }
-        _currentValue = (int)Mathf.Clamp((float)_currentValue, pointsMin, pointsMax);
-        OnChange(_currentValue);
-    }
-
     public Dictionary<string, Dictionary<float, int>> getBreakdown()
     {
         // Make a deep copy of the breakdown dictionary.

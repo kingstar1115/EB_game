@@ -1,104 +1,95 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+
+public abstract class PurchasableItem : ScriptableObject
+{
+    public int Cost { get; set; }
+}
+
+public class PurchasableUnit : PurchasableItem
+{
+    //Change to UnitType once units are in
+    public int Id { get; set; }
+
+    //This is 0-4, and depends on how many 
+    //castle pieces player has
+    public int PurchaseLevel { get; set; }
+}
+
+public class PurchasbleCard : PurchasableItem
+{
+    public int Id { get; set; }
+}
+
+public class PurchasbleCastlePiece : PurchasableItem
+{
+    public int Id { get; set; }
+}
 
 public class Armoury : MonoBehaviour
 {
-    public Player player;
-    public PointsSystem currency;
+    public List<PurchasableUnit> PurchasbleUnits { get; set; }
+    public List<PurchasbleCard> PurchasbleCards { get; set; }
+    public List<PurchasbleCastlePiece> PurchasableCastlePieces { get; set; }
 
-    IList<int> GetBuyableUnits; //Change to UnitType once Units are in
-    IList<int> GetBuyableCards;
-    bool b_IsCastlePieceBuyable;
-
-    IDictionary<int, int> UnitPrices { get; set; } //Change key to UnitType once Units are in
-    IDictionary<int, int> CardPrices { get; set; }
-    IDictionary<int, int> CastlePiecePrices { get; set; }
-
-    public delegate void PurchasedItemCallback(int id);
+    public delegate void PurchasedItemCallback(PurchasableItem purchasedItem);
     public event PurchasedItemCallback OnPurchasedItem = delegate { };
 
-    // Use this for initialization
-    void Start()
+    void Initialise()
     {
+        PurchasbleUnits = new List<PurchasableUnit>
+        {
+            //Add units here when unit class is in
+        };
 
+        PurchasbleCards = new List<PurchasbleCard>
+        {
+            //Add cards here when cards class is in 
+        };
+
+        PurchasableCastlePieces = new List<PurchasbleCastlePiece>
+        {
+            new PurchasbleCastlePiece(){ Id = 0, Cost = 2000 },
+            new PurchasbleCastlePiece(){ Id = 1, Cost = 2000 },
+            new PurchasbleCastlePiece(){ Id = 2, Cost = 2000 },
+            new PurchasbleCastlePiece(){ Id = 3, Cost = 2000 },
+        };
     }
 
-    // Update is called once per frame
-    void Update()
+    public List<PurchasableUnit> AvailableUnits(Player player)
     {
-
+        //Do checks to see if buyable
+        //return (List<PurchasableUnit>)PurchasbleUnits.Where(x => x.PurchaseLevel <= player.castlePieceNumber);
+        throw new NotImplementedException();
     }
 
-    public void PurchaseUnit(int unitId)
+    public List<PurchasbleCard> AvailableCards(Player player)
     {
-        var unitPrice = UnitPrices.First(x => x.Key == unitId).Value;
+        //Do checks to see if buyable
 
-        if (GetBuyableUnits.Contains(unitId))
-        {
-            if (currency.getPoints() < unitPrice)
-            {
-                //Call UI, saying that player hasn't enough coins
-                //Return from function and don't call purchaseItem delegate
-                return;
-            }
-
-            //Give player the unit
-
-            //Remove currency
-            currency.removePoints(unitPrice, unitId.ToString());
-
-            //Call Delegate
-            var purchasedItem = new PurchasedItemCallback(PurchaseUnit);
-            purchasedItem(unitId);
-        }
-        else
-        {
-            Debug.Log("unitId outside of list range");
-        }
+        return PurchasbleCards;
     }
 
-    public void PurchaseCard(int cardId)
+    public void BuyUnit(int unitId, Player player)
     {
-        var cardPrice = CardPrices.First(x => x.Key == cardId).Value;
+        var unitToBuy = PurchasbleUnits[unitId];
 
-        if (GetBuyableCards.Contains(cardId))
-        {
-            if (currency.getPoints() < cardPrice)
-            {
-                return;
-            }
-
-            currency.removePoints(cardPrice, cardId.ToString());
-
-            var purchasedItem = new PurchasedItemCallback(PurchaseCard);
-            purchasedItem(cardId);
-        }
-        else
-        {
-            Debug.Log("cardId outside of list range");
-        }
+        //Call Delegate
+        OnPurchasedItem(unitToBuy);
     }
 
-    public void PurchaseCastlePiece(int castlePieceId)
+    public void BuyCard(int cardId)
     {
-        var castlePiecePrice = CastlePiecePrices.First(x => x.Key == castlePieceId).Value;
+        var cardToBuy = PurchasbleCards[cardId];
 
-        if (b_IsCastlePieceBuyable)
-        {
-            if (currency.getPoints() < castlePiecePrice)
-            {
-                return;
-            }
+        OnPurchasedItem(cardToBuy);
+    }
 
-            currency.removePoints(castlePiecePrice, castlePieceId.ToString());
+    public void BuyCastlePiece(int cardId)
+    {
+        var castlePieceToBuy = PurchasableCastlePieces[cardId];
 
-            var purchasedItem = new PurchasedItemCallback(PurchaseCastlePiece);
-            purchasedItem(castlePieceId);
-        }
-        else
-        {
-            Debug.Log("castlePieceId outside of list range");
-        }
+        OnPurchasedItem(castlePieceToBuy);
     }
 }
