@@ -79,7 +79,8 @@ public class PointsSystem : MonoBehaviour
     public void setPoints(int value, string id)
     {
         _currentValue = Mathf.Clamp(value, pointsMin, pointsMax);
-        if (UseBreakdown) {
+        if (UseBreakdown)
+        {
             Dictionary<float, int> modDic = new Dictionary<float, int>();
             modDic.Add(modifierBase, 1);
             _breakdown.Add(id, modDic);
@@ -95,7 +96,8 @@ public class PointsSystem : MonoBehaviour
     public void addPoints(int value, string id)
     {
         _currentValue += (int)((float)value * _currentModifier);
-        if (UseBreakdown) {
+        if (UseBreakdown)
+        {
             _incrementBreakdown(id);
         }
         _currentValue = (int)Mathf.Clamp((float)_currentValue, pointsMin, pointsMax);
