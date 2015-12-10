@@ -10,10 +10,12 @@ public class OverworldUI : MonoBehaviour
     public bool _TileHover;
     public CommanderUI _CommanderUI;
     public CameraMovement _CameraMovement;
+    public BoardUI _BoardUI;
 
     // Use this for initialization
     public void Initialise()
     {
+        _BoardUI.Init();
 		_CommanderUI.Initialise();
         _CommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
         _CommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
@@ -40,12 +42,14 @@ public class OverworldUI : MonoBehaviour
 
     void _CommanderUI_OnCommanderMoved(TileData tile)
     {
+        _BoardUI.PlayerPrompt_DefualtTiles();
         OnCommanderMove(tile);
     }
 
     public void AllowPlayerMovement(HashSet<TileData> reachableTiles)
     {
         _CommanderUI.AllowPlayerMovement(reachableTiles);
+        _BoardUI.PlayerPrompt_MovableTiles(reachableTiles);
     }
 
     public void DisablePlayerMovement()
