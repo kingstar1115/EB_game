@@ -7,8 +7,6 @@ public class OverworldManager : MonoBehaviour
 	public CardSystem _CardSystem;
 	public Board _Board;
 	public Player _Player1;
-	public int _Player1StartX;
-	public int _Player1StartY;
 
 	// Use this for initialization
 	void Start () 
@@ -18,13 +16,10 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.Initialise();
 
 		//try get the player start tile
-		TileData startTile1 = _Board.GetTileAt (_Player1StartX, _Player1StartY);
-        if (startTile1 != null)
-        {
-            _Player1.CommanderPosition = _Board.GetTileAt(_Player1StartX, _Player1StartY);
-        }
+		if (_Board._P1StartTile != null)
+			_Player1.CommanderPosition =_Board._P1StartTile;
         else
-            Debug.LogError("Player start tile indexes are out of bounds");
+            Debug.LogError("Player1 start tile not set");
         
         //snap player to start position
         _OverworldUI.UpdateCommanderPosition();

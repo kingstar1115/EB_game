@@ -7,6 +7,8 @@ public class Board : MonoBehaviour {
     public float _TileWidth = 1;
     public TileTypeDataManager _TileTypeDataManager;
     public FlagManager _FlagManager;
+	public TileData _P1StartTile;
+	public TileData _P2StartTile;
 
     public void Initialise() {
         _TileTypeDataManager.Initialise();
@@ -60,6 +62,13 @@ public class Board : MonoBehaviour {
                         }
                     }
                 }
+			
+				//if the tile is a start tile set them up
+				if(tile.Building == BuildingType.StartTileBattlebeard)
+					_P1StartTile = tile;
+				else if(tile.Building == BuildingType.StartTileStormshaper)
+					_P2StartTile = tile;
+				 
             }
         }
     }
