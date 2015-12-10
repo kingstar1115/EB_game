@@ -14,7 +14,7 @@ public class CommanderUI : MonoBehaviour
     public event BoardAction OnCommanderMoved = delegate { };
 
     public delegate void V3Action(Vector3 vec);
-    public event V3Action OnCommanderNewDestination = delegate { };
+    public event V3Action OnCommanderDrop = delegate { };
 
 	public Player _Player; 
     public float _LiftedHeight;
@@ -120,22 +120,25 @@ public class CommanderUI : MonoBehaviour
 		//if the tile hovered is not in the reachable set then back to origional tile
         if (_destinationTile == null || !_reachableTiles.Contains(_destinationTile._Tile))
         {
-            //commander not moved
+			//commander not moved
             _toGoTo = _Player.CommanderPosition.TileObject.transform.position;
-            _targetY = _Player.CommanderPosition.TileObject.GetComponent<Collider>().bounds.max.y + _collider.bounds.extents.y;
+			_targetY = _Player.CommanderPosition.TileObject.GetComponent<Collider>().bounds.max.y + _collider.bounds.extents.y;
+			//OnCommanderDrop (new Vector3(_toGoTo.x, _targetY, _toGoTo.z));
         }
         else
         {
             //cammander moved
             _toGoTo = _destinationTile.transform.position;
             OnCommanderMoved(_destinationTile._Tile);
-            OnCommanderNewDestination(new Vector3(_destinationTile.transform.position.x, _targetY, _destinationTile.transform.position.z));
+            //OnCommanderNewDestination(new Vector3(_destinationTile.transform.position.x, _targetY, _destinationTile.transform.position.z));
+			OnCommanderDrop (new Vector3(_destinationTile.transform.position.x, _targetY, _destinationTile.transform.position.z));
             _destinationTile = null;
         }
 
         //drop the commander
         _toGoTo.y = _targetY;
         OnDropCommander(_Player.CommanderPosition);
+
 
         //raycast 
         this.gameObject.layer = _defualtLayer;

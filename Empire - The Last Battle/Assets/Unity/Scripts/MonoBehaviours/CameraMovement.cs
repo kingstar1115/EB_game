@@ -88,9 +88,19 @@ public class CameraMovement : MonoBehaviour
 
     public void EnableCameraMovement(Vector3 newFocusPoint)
     {
-        Debug.Log("Camera Movement: " + (newFocusPoint - _targetPrevPosition));
-        //lerp to new camera position
+        //lerp to new camera position else handle it 
         if (_targetPrevPosition != newFocusPoint)
-            this.GetComponent<LerpPosition>().LerpTo((newFocusPoint - _targetPrevPosition) + this.transform.position);
+			this.GetComponent<LerpPosition> ().LerpTo ((newFocusPoint - _targetPrevPosition) + this.transform.position);
+
     }
+
+	public void EnableCameraMovement()
+	{
+		_canMoveCamera = true;
+	}
+
+	public bool IsLerping()
+	{
+		return this.GetComponent<LerpPosition> ().IsLerping();
+	}
 }

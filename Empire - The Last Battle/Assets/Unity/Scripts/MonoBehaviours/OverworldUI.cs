@@ -16,13 +16,21 @@ public class OverworldUI : MonoBehaviour
     {
         _CommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
         _CommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
-        _CommanderUI.OnCommanderNewDestination += _CommanderUI_OnCommanderNewDestination;
+		_CommanderUI.OnCommanderDrop += _CommanderUI_OnCommanderDrop;
+		_CommanderUI.OnCommanderGrounded += _CommanderUI_Grounded;
     }
 
-    void _CommanderUI_OnCommanderNewDestination(Vector3 vec)
-    {
-        _CameraMovement.EnableCameraMovement(vec);
-    }
+	void _CommanderUI_Grounded()
+	{
+		//if camera is not moving to a new position then enable it 
+		if (!_CameraMovement.IsLerping ())
+			_CameraMovement.EnableCameraMovement ();
+	}
+
+	void _CommanderUI_OnCommanderDrop(Vector3 vec)
+	{
+		_CameraMovement.EnableCameraMovement(vec);
+	}
 
     void _CommanderUI_OnStartDrag()
     {
