@@ -101,7 +101,7 @@ public class CardSystem : MonoBehaviour
 		default:
 			break;
 		}
-		player.playersHand.Discard (card);
+
 		OnEffectApplied(card);
 	}
 	

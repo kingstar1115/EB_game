@@ -17,8 +17,4 @@ public class Hand : MonoBehaviour {
 	void Update () {
 	
 	}
-
-	public void Discard(int cardId){
-		throw new NotImplementedException ();
-	}
 }
