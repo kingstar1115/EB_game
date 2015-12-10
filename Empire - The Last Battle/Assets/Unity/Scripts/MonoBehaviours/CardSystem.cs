@@ -101,7 +101,7 @@ public class CardSystem : MonoBehaviour
 		default:
 			break;
 		}
-		
+		player.playersHand.Discard (card);
 		OnEffectApplied(card);
 	}
 	
@@ -112,7 +112,7 @@ public class CardSystem : MonoBehaviour
 	
 	private void UseResourceCard(int amount, Player player)
 	{
-		throw new NotImplementedException();
+		player.currency.addPoints (amount);
 	}
 	
 	private void UseBattleCard(int amount, Player player)
