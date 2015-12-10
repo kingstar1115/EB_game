@@ -7,6 +7,8 @@ public class Board : MonoBehaviour {
     public float _TileWidth = 1;
     public TileTypeDataManager _TileTypeDataManager;
     public FlagManager _FlagManager;
+	public TileData _BBStartTile;
+	public TileData _SSStartTile;
 
     public void Initialise() {
         _TileTypeDataManager.Initialise();
@@ -44,6 +46,14 @@ public class Board : MonoBehaviour {
                 // set owner flag
                 _FlagManager.SetFlagForTile(tile);
 
+				//if the tile is a start tile set them up
+				if(tile.Building == BuildingType.StartTileBattlebeard) {
+					_BBStartTile = tile;
+				}
+				else if(tile.Building == BuildingType.StartTileStormshaper) {
+					_SSStartTile = tile;	 
+				}
+				
                 // add tile reference to game object
                 tile.TileObject.GetComponentInChildren<TileHolder>()._Tile = tile;
                 if (!CanTraverse(tile)) {   
