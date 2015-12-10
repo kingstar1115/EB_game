@@ -6,7 +6,7 @@ public class OverworldManager : MonoBehaviour
 	public OverworldUI _OverworldUI;
 	public CardSystem _CardSystem;
 	public Board _Board;
-	public Player _Player1;
+	public Player _BattlebeardPlayer;
 
 	// Use this for initialization
 	void Start () 
@@ -15,11 +15,11 @@ public class OverworldManager : MonoBehaviour
 		_Board.Initialise();
 		_OverworldUI.Initialise();
 
-		//try get the player start tile
-		if (_Board._P1StartTile != null)
-			_Player1.CommanderPosition =_Board._P1StartTile;
+		//try get the battleboard start tile
+		if (_Board._BBStartTile != null)
+			_BattlebeardPlayer.CommanderPosition =_Board._BBStartTile;
         else
-            Debug.LogError("Player1 start tile not set");
+            Debug.LogError("Battleboard start tile not set");
         
         //snap player to start position
         _OverworldUI.UpdateCommanderPosition();
@@ -28,16 +28,16 @@ public class OverworldManager : MonoBehaviour
         _OverworldUI.OnCommanderMove += _OverworldUI_OnCommanderMove;
 
 		//allow player movement for the start ****JUST FOR TESTING****
-		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_Player1.CommanderPosition, 1));
+		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.CommanderPosition, 1));
 	}
 
     void _OverworldUI_OnCommanderMove(TileData tile)
     {
         //set new position for the player (should depend on whose players turn it is)
-        _Player1.CommanderPosition = tile;
+        _BattlebeardPlayer.CommanderPosition = tile;
 
         //****JUST FOR TESTING**** set new reachable tiles
-        _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_Player1.CommanderPosition, 1));
+        _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.CommanderPosition, 1));
     }
 	
 	// Update is called once per frame
