@@ -2,10 +2,10 @@
 
 public class Player : MonoBehaviour
 {
-
-    public Tile CommanderPosition;
+    public Tile commanderPosition;
     public PointsSystem currency;
-    public PlayerType Type;
+    public PlayerType type;
+	public Hand playersHand;
 
     // Use this for initialization
     void Start()

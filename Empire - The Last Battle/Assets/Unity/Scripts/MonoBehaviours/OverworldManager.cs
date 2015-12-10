@@ -4,6 +4,7 @@ using System.Collections;
 public class OverworldManager : MonoBehaviour
 {
 	public OverworldUI _OverworldUI;
+	public CardSystem _CardSystem;
 	public Board _Board;
 	public Player _Player1;
 	public int _Player1StartX;
