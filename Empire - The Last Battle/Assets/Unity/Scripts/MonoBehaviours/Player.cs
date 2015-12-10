@@ -1,26 +1,16 @@
-﻿using UnityEngine;
-using System.Collections;
+using UnityEngine;
 
-public class Player : MonoBehaviour {
+public class Player : MonoBehaviour
+{
+    public TileData CommanderPosition;
+    public PlayerType Type;
+	public PointsSystem currency;
+	public Hand hand;
 
-	public TileData CommanderPosition;
-	public PointsSystem Points;
-	public PlayerType Type;
+    public void SetPosition()
+    {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
-	public void SetPosition()
-	{
-
-	}
+    }
 }
 public enum PlayerType
 {
