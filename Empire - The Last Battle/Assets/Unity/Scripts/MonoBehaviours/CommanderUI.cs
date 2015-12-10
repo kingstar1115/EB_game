@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -9,7 +9,7 @@ public class CommanderUI : MonoBehaviour
     public event System.Action OnStartDrag = delegate { };
     public event System.Action OnCommanderGrounded = delegate { };
 
-    public delegate void BoardAction(Tile tile);
+    public delegate void BoardAction(TileData tile);
     public event BoardAction OnDropCommander = delegate { };
     public event BoardAction OnCommanderMoved = delegate { };
 
@@ -24,20 +24,19 @@ public class CommanderUI : MonoBehaviour
     Collider _prevHovered;
     LerpPosition _lerpPosition;
     Vector3 _toGoTo;
-    HashSet<Tile> _reachableTiles;
+	HashSet<TileData> _reachableTiles;
     TileHolder _destinationTile;
     bool _liftingPiece;
     bool _hasBeenLifted;
     bool _allowMovement;
     float _targetY;
-    int _defualtLayer;
-
+    int _defaultLayer;
 	// Use this for initialization
-	void Start () 
+	public void Initialise () 
     {
         _collider = this.GetComponent<Collider>();
         _lerpPosition = this.GetComponent<LerpPosition>();
-        _defualtLayer = this.gameObject.layer;
+        _defaultLayer = this.gameObject.layer;
 
         //event listener
         _lerpPosition.OnLerpFinished += _lerpPosition_OnLerpFinished;
@@ -141,7 +140,7 @@ public class CommanderUI : MonoBehaviour
 
 
         //raycast 
-        this.gameObject.layer = _defualtLayer;
+        this.gameObject.layer = _defaultLayer;
     }
 
     public void LiftPiece()
@@ -152,7 +151,7 @@ public class CommanderUI : MonoBehaviour
         _toGoTo = _lerpPosition.GetEndPosition();
     }
 
-	public void AllowPlayerMovement(HashSet<Tile> reachableTiles)
+    public void AllowPlayerMovement(HashSet<TileData> reachableTiles)
 	{
 		_allowMovement = true;
 		_reachableTiles = reachableTiles;
@@ -176,7 +175,7 @@ public class CommanderUI : MonoBehaviour
     public void UpdateToPlayerPosition()
     {
         this.transform.position = new Vector3(_Player.CommanderPosition.TileObject.transform.position.x, 
-            _targetY = _Player.CommanderPosition.TileObject.GetComponent<Collider>().bounds.max.y + _collider.bounds.extents.y,
+            _targetY = _Player.CommanderPosition.Height + _collider.bounds.extents.y,
             _Player.CommanderPosition.TileObject.transform.position.z);
     }
 }

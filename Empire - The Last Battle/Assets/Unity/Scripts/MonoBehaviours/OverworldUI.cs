@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class OverworldUI : MonoBehaviour
 {
-    public delegate void BoardAction(Tile tile);
+    public delegate void BoardAction(TileData tile);
     public event BoardAction OnCommanderMove = delegate { };
 
     public bool _TileHover;
@@ -12,8 +12,9 @@ public class OverworldUI : MonoBehaviour
     public CameraMovement _CameraMovement;
 
     // Use this for initialization
-    void Start()
+    public void Initialise()
     {
+		_CommanderUI.Initialise();
         _CommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
         _CommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
 		_CommanderUI.OnCommanderDrop += _CommanderUI_OnCommanderDrop;
@@ -37,12 +38,12 @@ public class OverworldUI : MonoBehaviour
         _CameraMovement.DisableCameraMovement();
     }
 
-    void _CommanderUI_OnCommanderMoved(Tile tile)
+    void _CommanderUI_OnCommanderMoved(TileData tile)
     {
         OnCommanderMove(tile);
     }
 
-    public void AllowPlayerMovement(HashSet<Tile> reachableTiles)
+    public void AllowPlayerMovement(HashSet<TileData> reachableTiles)
     {
         _CommanderUI.AllowPlayerMovement(reachableTiles);
     }

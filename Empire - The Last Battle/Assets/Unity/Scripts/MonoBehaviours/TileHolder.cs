@@ -3,5 +3,5 @@ using System.Collections;
 
 public class TileHolder : MonoBehaviour 
 {
-	public Tile _Tile;
+	public TileData _Tile;
 }

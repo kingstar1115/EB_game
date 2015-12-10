@@ -14,10 +14,11 @@ public class OverworldManager : MonoBehaviour
 	void Start () 
 	{
 		//new game setup
-		_Board.Init ();
+		_Board.Initialise();
+		_OverworldUI.Initialise();
 
 		//try get the player start tile
-		Tile startTile1 = _Board.GetTileAt (_Player1StartX, _Player1StartY);
+		TileData startTile1 = _Board.GetTileAt (_Player1StartX, _Player1StartY);
         if (startTile1 != null)
         {
             _Player1.CommanderPosition = _Board.GetTileAt(_Player1StartX, _Player1StartY);
@@ -35,7 +36,7 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_Player1.CommanderPosition, 1));
 	}
 
-    void _OverworldUI_OnCommanderMove(Tile tile)
+    void _OverworldUI_OnCommanderMove(TileData tile)
     {
         //set new position for the player (should depend on whose players turn it is)
         _Player1.CommanderPosition = tile;
@@ -48,4 +49,6 @@ public class OverworldManager : MonoBehaviour
 	void Update () {
 	
 	}
+
+
 }
