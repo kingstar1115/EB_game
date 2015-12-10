@@ -3,12 +3,12 @@ using UnityEditor;
 
 public class UnitBaseDataEditor : Editor
 {
-    [MenuItem("Assets/Create/ELB/Units/UnitBaseData")]
+    [MenuItem("Assets/Create/ELB/Units/BaseData")]
     public static void CreateUnit()
     {
         //get a save location
         string path = EditorUtility.SaveFilePanel("Create The New Asset",
-                                                  "Assets/Unity/ScriptableObjects/Units/", "default.asset", "asset");
+                                                  "Assets/Unity/ScriptableObjects/Units/BaseData", "default.asset", "asset");
 
         if (path == "")
             return;

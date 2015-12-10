@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[System.Serializable]
 public class Unit : MonoBehaviour {
 
-	public UnitBaseData UnitBaseData;
+	public static UnitBaseData UnitBaseData;
 	//TODO: Decide if this is the best way to handle an upgrade. Is it better to have a separate Upgrade class?
 	public UnitBaseData Upgrade;
 	public TileData Position;
-	public UnitType UnitType;
+	public static UnitType Type;
 
 	void Start () {
 	
