@@ -30,7 +30,7 @@ public class BoardUI : MonoBehaviour
         }
     }
 
-    public void PlayerPrompt_DefualtTiles()
+    public void PlayerPrompt_DefaultTiles()
     {
         foreach (var tile in _animatingTiles)
         {

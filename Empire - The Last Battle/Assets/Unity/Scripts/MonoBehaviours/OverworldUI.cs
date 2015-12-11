@@ -26,7 +26,7 @@ public class OverworldUI : MonoBehaviour
 
     void _CommanderUI_OnDropCommander(TileData tile)
     {
-        _BoardUI.PlayerPrompt_DefualtTiles();
+        _BoardUI.PlayerPrompt_DefaultTiles();
     }
 
 	void _CommanderUI_Grounded()
