@@ -21,6 +21,12 @@ public class OverworldUI : MonoBehaviour
         _CommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
 		_CommanderUI.OnCommanderDrop += _CommanderUI_OnCommanderDrop;
 		_CommanderUI.OnCommanderGrounded += _CommanderUI_Grounded;
+        _CommanderUI.OnDropCommander += _CommanderUI_OnDropCommander;
+    }
+
+    void _CommanderUI_OnDropCommander(TileData tile)
+    {
+        _BoardUI.PlayerPrompt_DefualtTiles();
     }
 
 	void _CommanderUI_Grounded()
@@ -33,7 +39,6 @@ public class OverworldUI : MonoBehaviour
 	void _CommanderUI_OnCommanderDrop(Vector3 vec)
 	{
 		_CameraMovement.EnableCameraMovement(vec);
-        _BoardUI.PlayerPrompt_DefualtTiles();
 	}
 
     void _CommanderUI_OnStartDrag()
