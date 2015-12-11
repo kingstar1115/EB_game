@@ -33,23 +33,23 @@ public class OverworldUI : MonoBehaviour
 	void _CommanderUI_OnCommanderDrop(Vector3 vec)
 	{
 		_CameraMovement.EnableCameraMovement(vec);
+        _BoardUI.PlayerPrompt_DefualtTiles();
 	}
 
     void _CommanderUI_OnStartDrag()
     {
         _CameraMovement.DisableCameraMovement();
+        _BoardUI.PlayerPrompt_MovableTiles(_CommanderUI.GetReachableTiles());
     }
 
     void _CommanderUI_OnCommanderMoved(TileData tile)
     {
-        _BoardUI.PlayerPrompt_DefualtTiles();
         OnCommanderMove(tile);
     }
 
     public void AllowPlayerMovement(HashSet<TileData> reachableTiles)
     {
         _CommanderUI.AllowPlayerMovement(reachableTiles);
-        _BoardUI.PlayerPrompt_MovableTiles(reachableTiles);
     }
 
     public void DisablePlayerMovement()
