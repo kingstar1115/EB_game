@@ -1,8 +1,43 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class BoardUI : MonoBehaviour 
 {
+    public Board _Board;
+    HashSet<Animator> _animatingTiles;
+
+    public void Init()
+    {
+        _animatingTiles = new HashSet<Animator>();
+    }
+
+    public void PlayerPrompt_MovableTiles(HashSet<TileData> reachableTiles)
+    {
+        //for each of the tiles set animator variable 
+        Animator nextAnimator;
+        foreach (var tile in reachableTiles)
+        {
+            //grab animator
+            nextAnimator = tile.TileObject.GetComponentInChildren<Animator>();
+
+            //if already animating then reset it
+            if (nextAnimator.GetTime() > 0)
+                nextAnimator.SetTime(0);
+
+            nextAnimator.SetBool("CanBeMovedTo", true);
+            _animatingTiles.Add(nextAnimator);
+        }
+    }
+
+    public void PlayerPrompt_DefaultTiles()
+    {
+        foreach (var tile in _animatingTiles)
+        {
+            tile.SetBool("CanBeMovedTo", false);
+        }
+    }
+
 	public static TileHolder GetTileHovered()
 	{
 		Collider outCollider;
@@ -37,4 +72,6 @@ public class BoardUI : MonoBehaviour
         tileCollider = null;
         return false;
     }
+
+    
 }

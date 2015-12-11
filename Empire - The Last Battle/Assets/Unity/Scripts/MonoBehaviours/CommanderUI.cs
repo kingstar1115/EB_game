@@ -31,6 +31,7 @@ public class CommanderUI : MonoBehaviour
     bool _allowMovement;
     float _targetY;
     int _defaultLayer;
+
 	// Use this for initialization
 	public void Initialise () 
     {
@@ -177,5 +178,10 @@ public class CommanderUI : MonoBehaviour
         this.transform.position = new Vector3(_Player.CommanderPosition.TileObject.transform.position.x, 
             _targetY = _Player.CommanderPosition.Height + _collider.bounds.extents.y,
             _Player.CommanderPosition.TileObject.transform.position.z);
+    }
+
+    public HashSet<TileData> GetReachableTiles()
+    {
+        return _reachableTiles;
     }
 }
