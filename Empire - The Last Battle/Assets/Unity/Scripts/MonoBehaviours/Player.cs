@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
 
     public void SetPosition()
     {
-
+    
     }
 }
 public enum PlayerType
