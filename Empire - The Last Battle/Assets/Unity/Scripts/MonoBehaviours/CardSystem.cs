@@ -17,9 +17,6 @@ public enum Cards
     Tactic_Card_3,
     Alliance_Card_1,
     Scout_Card_1,
-    Scout_Card_2,
-    Scout_Card_3,
-    Scout_Card_4,
     Priority_Card_1,
     Upgrade_Card_1,
     Upgrade_Card_2
@@ -28,25 +25,9 @@ public enum Cards
 public class CardSystem : MonoBehaviour
 {
     public Dictionary<int, GameObject> cardsLinker;
-    public List<Cards> availableCaveCards;
 
     public delegate void CardEffectCallback(Cards card);
     public event CardEffectCallback OnEffectApplied = delegate { };
-
-    void Start()
-    {
-        InitCards();
-    }
-
-    void InitCards()
-    {
-        //Add the available cards to list
-        availableCaveCards.Add(Cards.Resource_Card_100);
-        availableCaveCards.Add(Cards.Resource_Card_200);
-        availableCaveCards.Add(Cards.Resource_Card_300);
-        availableCaveCards.Add(Cards.Resource_Card_400);
-        availableCaveCards.Add(Cards.Resource_Card_500);
-    }
 
     public void ApplyEffect(Cards card, Player player)
     {
@@ -90,15 +71,6 @@ public class CardSystem : MonoBehaviour
                 break;
             case Cards.Scout_Card_1:
                 UseScoutCard(1, player);
-                break;
-            case Cards.Scout_Card_2:
-                UseScoutCard(2, player);
-                break;
-            case Cards.Scout_Card_3:
-                UseScoutCard(3, player);
-                break;
-            case Cards.Scout_Card_4:
-                UseScoutCard(4, player);
                 break;
             case Cards.Priority_Card_1:
                 UsePriorityCard(1, player);
