@@ -1,13 +1,5 @@
 fileFormatVersion: 2
-<<<<<<< HEAD
 guid: 3a04f63fa8b7b494784fc1f5a4243e02
-timeCreated: 1448994195
-licenseType: Free
-=======
-guid: 31739f3c5de2a5045a438c5470617e84
-timeCreated: 1449136848
-licenseType: Pro
->>>>>>> origin/origin/P11_CommanderMovement
 MonoImporter:
   serializedVersion: 2
   defaultReferences: []
