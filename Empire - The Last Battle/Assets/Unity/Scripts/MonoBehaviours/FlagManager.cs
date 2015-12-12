@@ -6,6 +6,7 @@ public class FlagManager : MonoBehaviour {
     public GameObject BattlebeardFlag;
     public GameObject StormshaperFlag;
     Dictionary<TileData, FlagData> flagLookup;
+    public GameObject BillboardTarget;
 
 	// Use this for initialization
 	public void Initialise () {
@@ -32,6 +33,7 @@ public class FlagManager : MonoBehaviour {
         if (t.Owner == PlayerType.None) {
             if (fd.CurrentFlag != null) {
                 Destroy(fd.CurrentFlag.gameObject);
+                fd.CurrentFlag = null;
             }
             return null;
         } else {
@@ -41,11 +43,26 @@ public class FlagManager : MonoBehaviour {
                 }
                 else {
                     Destroy(fd.CurrentFlag.gameObject);
+                    fd.CurrentFlag = null;
                 }
             }
             GameObject flagToSet = t.Owner == PlayerType.Battlebeard ? BattlebeardFlag : StormshaperFlag;
             return (GameObject)Instantiate(flagToSet, fd.Marker.transform.position, fd.Marker.transform.rotation);
         }   
+    }
+
+    void Update() {
+        // Billboard the flags to always face the target (target usually == camera)
+        if (BillboardTarget != null) {
+            foreach (FlagData f in flagLookup.Values) {
+                if (f.CurrentFlag != null && f.Marker != null) {
+                    Vector3 targetPostition = new Vector3(BillboardTarget.transform.position.x,
+                             f.CurrentFlag.transform.position.y,
+                             BillboardTarget.transform.position.z);
+                    f.CurrentFlag.transform.LookAt(targetPostition);
+                }
+            }
+        }
     }
 }
 
