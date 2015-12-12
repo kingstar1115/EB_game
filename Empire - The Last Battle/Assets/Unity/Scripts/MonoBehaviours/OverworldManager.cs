@@ -4,7 +4,7 @@ using UnityEngine;
 public class OverworldManager : MonoBehaviour
 {
     public OverworldUI _OverworldUI;
-    public CardsData _CardsData;
+    public CardData _AvailableCaveCards;
     public Board _Board;
     public Player _BattlebeardPlayer;
 
@@ -58,7 +58,7 @@ public class OverworldManager : MonoBehaviour
             case BuildingType.CastleStormshaper:
                 break;
             case BuildingType.Cave:
-                GenerateRandomCard(_CardsData.availableCaveCards);
+                GenerateRandomCard(_AvailableCaveCards.cards);
                 break;
             case BuildingType.Fortress:
                 break;
