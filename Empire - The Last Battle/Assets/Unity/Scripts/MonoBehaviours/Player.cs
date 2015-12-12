@@ -5,7 +5,7 @@ public class Player : MonoBehaviour
     public TileData CommanderPosition;
     public PlayerType Type;
 	public PointsSystem currency;
-	public Hand hand;
+	public CardData hand;
 
     public void SetPosition()
     {
