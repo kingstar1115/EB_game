@@ -6,27 +6,44 @@ public class Unit : MonoBehaviour {
 
 	public UnitBaseData BaseData;
 	//TODO: Decide if this is the best way to handle an upgrade. Is it better to have a separate Upgrade class?
-	public UnitBaseData Upgrade;
+	UnitBaseData CurrentUpgrade;
 	public TileData Position;
 	public UnitType Type;
+	public int CurrentHP;
 
 	void Start () {
 		
 	}
 
 	public bool IsKO() {
-		return GetHP() <= 0;
+		return GetCurrentHP() <= 0;
 	}
 
-	public int GetHP() {
-		return Upgrade == null ? BaseData.HP : BaseData.HP + Upgrade.HP;
+	public int GetCurrentHP() {
+		return CurrentUpgrade == null ? CurrentHP : CurrentHP + CurrentUpgrade.HP;
 	}
 
 	public int GetStrength() {
-		return Upgrade == null ? BaseData.Strength : BaseData.Strength + Upgrade.Strength;
+		return CurrentUpgrade == null ? BaseData.Strength : BaseData.Strength + CurrentUpgrade.Strength;
 	}
 
 	public int GetSpeed() {
-		return Upgrade == null ? BaseData.Speed : BaseData.Speed + Upgrade.Speed;
+		return CurrentUpgrade == null ? BaseData.Speed : BaseData.Speed + CurrentUpgrade.Speed;
+	}
+
+	public void ReduceHP(int HP) {
+		CurrentHP -= HP;
+	}
+
+	public void Heal(int HP) {
+		CurrentHP = BaseData.HP; 
+	}
+
+	public void AddUpgrade(UnitBaseData Upgrade) {
+		CurrentUpgrade = Upgrade;
+	}
+
+	public void RemoveUpgrade() { 
+		CurrentUpgrade = null;
 	}
 }
