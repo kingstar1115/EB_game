@@ -10,9 +10,9 @@ public class Army : MonoBehaviour {
 	}
 
 	public List<Unit> GetUnits(UnitType Type){
-		List<Unit> SpecificUnits;
 
-		SpecificUnits = Units.FindAll( x => Unit.Type == Type);
+		List<Unit> SpecificUnits;
+		SpecificUnits = Units.FindAll(_Unit => _Unit.Type == Type);
 
 		return SpecificUnits;
 	}
