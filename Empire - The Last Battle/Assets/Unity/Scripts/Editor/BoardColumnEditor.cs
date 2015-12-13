@@ -4,7 +4,7 @@ using System.Collections;
 
 public class BoardColumnEditor : Editor
 {
-    [MenuItem("Assets/Create/ELB/BoardColumn")]
+	[MenuItem("Assets/Create/ELB/Board/BoardColumn")]
     public static void CreateBuilding()
     {
         //get a save location

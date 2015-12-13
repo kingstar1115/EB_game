@@ -3,7 +3,7 @@
 public class CardDataEditor : Editor
 {
 
-    [MenuItem("Assets/Create/ELB/CardData")]
+    [MenuItem("Assets/Create/ELB/Cards/CardData")]
     public static void CreateCardData()
     {
         //get a save location

@@ -4,12 +4,12 @@ using System.Collections;
 
 public class BuildingTypeDataEditor : Editor
 {
-    [MenuItem("Assets/Create/ELB/buildingTypeData")]
+    [MenuItem("Assets/Create/ELB/Buildings/BuildingTypeData")]
     public static void CreateBuilding()
     {
         //get a save location
         string path = EditorUtility.SaveFilePanel("Create The New buildingTypeData",
-                                                  "Assets/Unity/ScriptableObjects/Board/", "default.asset", "asset");
+                                                  "Assets/Unity/ScriptableObjects/Board/Buildings", "default.asset", "asset");
 
         if (path == "")
             return;

@@ -4,7 +4,7 @@ using System.Collections;
 
 public class TileDataEditor : Editor
 {
-    [MenuItem("Assets/Create/ELB/TileData")]
+	[MenuItem("Assets/Create/ELB/Tile/TileData")]
     public static void CreateBuilding()
     {
         //get a save location
