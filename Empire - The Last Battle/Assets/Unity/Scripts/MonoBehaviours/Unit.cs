@@ -35,7 +35,7 @@ public class Unit : MonoBehaviour {
 
 	public float GetHPPercentage() {
 		int MaxHp = CurrentUpgrade == null ? BaseData.HP : BaseData.HP + CurrentUpgrade.HP;
-		float Percentage = (GetCurrentHP() / MaxHp) * 100;
+		float Percentage = ((float)GetCurrentHP() / (float)MaxHp) * 100;
 		return Percentage;
 	}
 
