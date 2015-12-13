@@ -12,8 +12,9 @@ public class Unit : MonoBehaviour {
 	public TileData Position;
 	public UnitType Type;
 
-	void Start () {
-		CurrentBaseHP = BaseData.HP;
+	public void Initialise(UnitBaseData data){
+		BaseData = data;
+		CurrentBaseHP = data.HP;
 	}
 
 	public bool IsKO() {
