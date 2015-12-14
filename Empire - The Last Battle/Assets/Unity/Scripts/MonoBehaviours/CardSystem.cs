@@ -90,7 +90,7 @@ public class CardSystem : MonoBehaviour
 	}
 
 	private void UseResourceCard(int amount, Player player) {
-		player.currency.addPoints(amount);
+		player.Currency.addPoints(amount);
 	}
 
 	private void UseBattleCard(int amount, Player player) {

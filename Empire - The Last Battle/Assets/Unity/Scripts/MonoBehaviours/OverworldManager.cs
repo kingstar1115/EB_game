@@ -7,6 +7,7 @@ public class OverworldManager : MonoBehaviour
 	public CardData _AvailableCaveCards;
 	public Board _Board;
 	public Player _BattlebeardPlayer;
+    public Inn _Inn;
 
 	// Use this for initialization
 	void Start() {
@@ -59,6 +60,8 @@ public class OverworldManager : MonoBehaviour
 			case BuildingType.Fortress:
 				break;
 			case BuildingType.Inn:
+				//Needs changing to current player once both players are in this class
+                _Inn.HealTroops(_BattlebeardPlayer);
 				break;
 			case BuildingType.StartTileBattlebeard:
 				break;
