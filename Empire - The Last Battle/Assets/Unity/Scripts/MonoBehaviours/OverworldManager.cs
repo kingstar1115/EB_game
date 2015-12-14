@@ -77,8 +77,10 @@ public class OverworldManager : MonoBehaviour
 		if (player.CastleProgress >= 4)
 			return;
 
+		var rnd = UnityEngine.Random.Range(0, 3);
 		List<Unit> units;
-		units = player.PlayerArmy.GetRandomUnits(3);
+
+		units = player.PlayerArmy.GetRandomUnits(rnd, true);
 
 		foreach (var unit in units)
 		{
