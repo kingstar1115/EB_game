@@ -59,6 +59,8 @@ public class OverworldManager : MonoBehaviour
 			case BuildingType.Fortress:
 				break;
 			case BuildingType.Inn:
+				//Needs changing to current player once both players are in this class
+                HealTroops(_BattlebeardPlayer);
 				break;
 			case BuildingType.StartTileBattlebeard:
 				break;
@@ -66,6 +68,23 @@ public class OverworldManager : MonoBehaviour
 				break;
 			default:
 				break;
+		}
+	}
+
+	public void HealTroops(Player player)
+	{
+		//Change magic number to function once more castle code is in
+		if (player.CastleProgress >= 4)
+			return;
+
+		var rnd = UnityEngine.Random.Range(0, 3);
+		List<Unit> units;
+
+		units = player.PlayerArmy.GetRandomUnits(rnd, true);
+
+		foreach (var unit in units)
+		{
+			unit.Heal();
 		}
 	}
 
