@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class Army : MonoBehaviour
-{
+public class Army : MonoBehaviour {
 
 	public List<Unit> Units;
 
@@ -20,16 +19,28 @@ public class Army : MonoBehaviour
 		return SpecificUnits;
 	}
 
-	public List<Unit> GetRandomUnits(int maxNumber)
+	public List<Unit> GetRandomUnits(int maxNumber, bool b_ShouldBeKo = false)
 	{
 		var RandomUnits = new List<Unit>();
+		List<Unit> AllUnits = Units;
 
-		for (int i = 0; i < maxNumber; i++)
+		int i = 0;
+
+		while (i < maxNumber)
 		{
-			var randomNumber = UnityEngine.Random.Range(0, Units.Count - 1);
-			RandomUnits.Add(Units[randomNumber]);
-		}
+			var randomNumber = UnityEngine.Random.Range(0, AllUnits.Count - 1);
 
+			if (b_ShouldBeKo)
+			{
+				//Unit isn't KO then start loop again until we get KO troop
+				if (!Units[randomNumber].IsKO())
+					continue;					
+			}
+
+			RandomUnits.Add(Units[randomNumber]);
+			AllUnits.RemoveAt(randomNumber);
+			i++;
+		}
 		return RandomUnits;
 	}
 

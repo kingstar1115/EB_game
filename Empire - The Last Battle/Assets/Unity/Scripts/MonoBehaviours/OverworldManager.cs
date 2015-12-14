@@ -7,7 +7,6 @@ public class OverworldManager : MonoBehaviour
 	public CardData _AvailableCaveCards;
 	public Board _Board;
 	public Player _BattlebeardPlayer;
-    public Inn _Inn;
 
 	// Use this for initialization
 	void Start() {
@@ -61,7 +60,7 @@ public class OverworldManager : MonoBehaviour
 				break;
 			case BuildingType.Inn:
 				//Needs changing to current player once both players are in this class
-                _Inn.HealTroops(_BattlebeardPlayer);
+                HealTroops(_BattlebeardPlayer);
 				break;
 			case BuildingType.StartTileBattlebeard:
 				break;
@@ -69,6 +68,21 @@ public class OverworldManager : MonoBehaviour
 				break;
 			default:
 				break;
+		}
+	}
+
+	public void HealTroops(Player player)
+	{
+		//Change magic number to function once more castle code is in
+		if (player.CastleProgress >= 4)
+			return;
+
+		List<Unit> units;
+		units = player.PlayerArmy.GetRandomUnits(3);
+
+		foreach (var unit in units)
+		{
+			unit.Heal();
 		}
 	}
 
