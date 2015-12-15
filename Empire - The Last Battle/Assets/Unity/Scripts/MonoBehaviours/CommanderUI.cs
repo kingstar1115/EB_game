@@ -20,6 +20,7 @@ public class CommanderUI : MonoBehaviour
     public float _LiftedHeight;
     public float _LiftTime;
     public float _MoveTime;
+
     Collider _collider;
     Collider _prevHovered;
     LerpPosition _lerpPosition;
@@ -31,6 +32,31 @@ public class CommanderUI : MonoBehaviour
     bool _allowMovement;
     float _targetY;
     int _defaultLayer;
+
+    bool _paused;
+    public bool _Paused
+    {
+        get
+        {
+            return _paused;
+        }
+
+        set
+        {
+            if (value)
+            {
+                PausePlayerMovement();
+                _allowMovement = false;
+            }
+            else
+            {
+                ContinuePlayerMovement();
+                _allowMovement = true;
+            }
+
+            _paused = value;
+        }
+    }
 
 	// Use this for initialization
 	public void Initialise () 
@@ -178,6 +204,8 @@ public class CommanderUI : MonoBehaviour
         this.transform.position = new Vector3(_Player.CommanderPosition.TileObject.transform.position.x, 
             _targetY = _Player.CommanderPosition.Height + _collider.bounds.extents.y,
             _Player.CommanderPosition.TileObject.transform.position.z);
+
+        _lerpPosition.StopLerp();
     }
 
     public HashSet<TileData> GetReachableTiles()

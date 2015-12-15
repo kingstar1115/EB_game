@@ -4,30 +4,34 @@ using System.Collections.Generic;
 public class Army : MonoBehaviour {
 
 	public List<Unit> Units;
+	public UnitDataManager _UnitDataManager;
 
-	void Start()
-	{
-
+	public void Initialise() {
+		Units = new List<Unit>();
 	}
 
-	public List<Unit> GetUnits(UnitType Type)
-	{
+	public void AddUnit(UnitType type) {
+		Units.Add(new Unit(_UnitDataManager.GetData(type)));
+	}
 
+	public List<Unit> GetUnits(UnitType type) {
 		List<Unit> SpecificUnits;
-		SpecificUnits = Units.FindAll(_Unit => _Unit.Type == Type);
+		SpecificUnits = Units.FindAll(_Unit => _Unit.Type == type);
 
 		return SpecificUnits;
 	}
 
-	public List<Unit> GetRandomUnits(int maxNumber, bool b_ShouldBeKo = false)
-	{
+	public List<Unit> GetActiveUnits(UnitType type) {
+		return GetUnits(type).FindAll(x => !x.IsKO());
+	}
+
+	public List<Unit> GetRandomUnits(int maxNumber, bool b_ShouldBeKo = false) {
 		var RandomUnits = new List<Unit>();
 		List<Unit> AllUnits = Units;
 
 		int i = 0;
 
-		while (i < maxNumber)
-		{
+		while (i < maxNumber) {
 			var randomNumber = UnityEngine.Random.Range(0, AllUnits.Count - 1);
 
 			if (b_ShouldBeKo)
@@ -44,8 +48,7 @@ public class Army : MonoBehaviour {
 		return RandomUnits;
 	}
 
-	public List<Unit> GetAllUnits()
-	{
+	public List<Unit> GetAllUnits() {
 		return Units;
 	}
 }

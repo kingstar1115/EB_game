@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class OverworldManager : MonoBehaviour
 {
 	public OverworldUI _OverworldUI;
 	public CardList _AvailableCaveCards;
+	public CardSystem _CardSystem;
 	public Board _Board;
 	public Player _BattlebeardPlayer;
 
@@ -13,22 +14,52 @@ public class OverworldManager : MonoBehaviour
 		//new game setup
 		_Board.Initialise();
 		_OverworldUI.Initialise();
+		_BattlebeardPlayer.Initialise();
 
 		//try get the battleboard start tile
 		if (_Board._BBStartTile != null)
 			_BattlebeardPlayer.CommanderPosition = _Board._BBStartTile;
 		else
-			Debug.LogError("Battleboard start tile not set");
+			Debug.LogError("Battlebeard start tile not set");
 
 		//snap player to start position
 		_OverworldUI.UpdateCommanderPosition();
 
 		//event listeners
 		_OverworldUI.OnCommanderMove += _OverworldUI_OnCommanderMove;
+        _OverworldUI.OnPause += _OverworldUI_OnPause;
+        _OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
 
 		//allow player movement for the start ****JUST FOR TESTING****
-		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.CommanderPosition, 1));
+		//_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.CommanderPosition, 1));
+
+
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+
+		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
+		// TEST
+		UseCard(_AvailableCaveCards.cards[0]);
 	}
+
+	void _CardSystem_OnEffectApplied(CardData card, Player player) {
+		if (card.Type == CardType.Scout_Card) {       _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(player.CommanderPosition, card.Value));
+		}
+	}
+
+	void UseCard(CardData card) {
+		_CardSystem.ApplyEffect(card, _BattlebeardPlayer);
+	}
+
+    void _OverworldUI_OnUnPause()
+    {
+        _OverworldUI._Paused = false;
+    }
+
+    void _OverworldUI_OnPause()
+    {
+        _OverworldUI._Paused = true;
+    }
 
 	void _OverworldUI_OnCommanderMove(TileData tile) {
 		//set new position for the player (should depend on whose players turn it is)
@@ -42,6 +73,10 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void HandleTileEvent(TileData tile) {
+		if (_BattlebeardPlayer.IsScouting) {
+			_BattlebeardPlayer.IsScouting = false;
+			return;
+		}
 		switch (tile.Building) {
 			case BuildingType.None:
 				break;
@@ -95,6 +130,16 @@ public class OverworldManager : MonoBehaviour
 
 		return card;
 	}
+
+    public void Pause()
+    {
+        _OverworldUI.Disable();
+    }
+
+    public void UnPause()
+    {
+        _OverworldUI.Enable();
+    }
 
 	// Update is called once per frame
 	void Update() {

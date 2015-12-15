@@ -26,13 +26,14 @@ public class CardSystem : MonoBehaviour {
 	public delegate void CardCallback(CardData card, Player player);
 	public event CardCallback OnEffectApplied = delegate { };
 	public event CardCallback OnHealingCardUsed = delegate { };
+    public event CardCallback OnCardUseFailed = delegate { };
 	
 	public void Start(){
 
 	}
 
 	public void ApplyEffect(CardData card, Player player) {
-		switch (card.CardType) {
+		switch (card.Type) {
 		case CardType.Healing_Card:
 			RegisterCardHeal(card, player);
 			break;
@@ -53,8 +54,7 @@ public class CardSystem : MonoBehaviour {
 			OnEffectApplied (card, player);
 			break;
 		case CardType.Scout_Card:
-			UseScoutCard(player);
-			OnEffectApplied (card, player);
+			UseScoutCard(card, player);
 			break;
 		case CardType.Priority_Card:
 			UsePriorityCard(player);
@@ -76,7 +76,7 @@ public class CardSystem : MonoBehaviour {
 	public void UseHealingCard(CardData card, Player player, List<Unit> unitsToHeal) {
 		foreach (var unit in unitsToHeal) {
 			unit.Heal();
-		}	
+		}
 
 		OnEffectApplied (card, player);
 	}
@@ -128,9 +128,18 @@ public class CardSystem : MonoBehaviour {
 		//Change to Alasdar's GetUnit function later
 		//player.PlayerArmy.Units.Add (randomUnit);
 	}
-	
-	private void UseScoutCard(Player player) {
-		throw new NotImplementedException();
+
+	private void UseScoutCard(CardData card, Player player) {
+		int availableScouts = player.PlayerArmy.GetActiveUnits(UnitType.Scout).Count;
+        if (availableScouts > 0) {
+            Mathf.Clamp(availableScouts++, 2, 4);
+            player.IsScouting = true;
+            card.Value = availableScouts;
+            OnEffectApplied(card, player);
+            return;
+        }
+        OnCardUseFailed(card, player);
+        return;
 	}
 	
 	private void UsePriorityCard(Player player) {
