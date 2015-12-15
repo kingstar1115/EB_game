@@ -50,8 +50,8 @@ public class CardSystem : MonoBehaviour {
 			OnEffectApplied (card, player);
 			break;
 		case CardType.Alliance_Card:
-			UseAllianceCard(card, player);        
-            OnEffectApplied (card, player);
+			UseAllianceCard(card, player);
+			OnEffectApplied (card, player);
 			break;
 		case CardType.Scout_Card:
 			UseScoutCard(card, player);
