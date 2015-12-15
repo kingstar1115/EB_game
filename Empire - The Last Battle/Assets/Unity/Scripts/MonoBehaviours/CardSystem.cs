@@ -16,11 +16,11 @@ public enum CardType {
 public class CardSystem : MonoBehaviour {	
 
 	public CardList cardList;
-    public List<Unit> castleZeroUnits;
-	public List<Unit> castleOneUnits;
-	public List<Unit> castleTwoUnits;
-	public List<Unit> castleThreeUnits;
-	public List<Unit> castleFourUnits;
+    public List<UnitType> castleZeroUnits;
+	public List<UnitType> castleOneUnits;
+	public List<UnitType> castleTwoUnits;
+	public List<UnitType> castleThreeUnits;
+	public List<UnitType> castleFourUnits;
 
 	public delegate void CardCallback(CardData card, Player player);
 	public event CardCallback OnEffectApplied = delegate { };
@@ -93,7 +93,7 @@ public class CardSystem : MonoBehaviour {
 	}
 
 	private void UseAllianceCard(CardData card, Player player) {	
-		List<Unit>[] totalUnits = 
+		List<UnitType>[] totalUnits = 
 		{
 			castleZeroUnits,
 			castleOneUnits,
@@ -102,12 +102,11 @@ public class CardSystem : MonoBehaviour {
 			castleFourUnits
 		};
 
-		var units = new List<Unit>();
+		var units = new List<UnitType>();
 		Unit randomUnit;
-		float rand = UnityEngine.Random.Range(0, 4);
+		float rand = UnityEngine.Random.Range(0, 100);
 
-		if (rand < totalUnits[player.CastleProgress].Count) {
-			// pick from
+		if (rand >= totalUnits[player.CastleProgress].Count) {
 			for(int i = 0; i <= player.CastleProgress; i++)
 			{
 				units.AddRange (totalUnits[i]);
@@ -115,8 +114,7 @@ public class CardSystem : MonoBehaviour {
 			int randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
 			randomUnit = units[randomUnitIndex];
 		} else {
-			// pick from
-			units = totalUnits[player.CastleProgress + 1];
+			units = (totalUnits[player.CastleProgress] >= (totalUnits.Length - 1)) ? totalUnits[player.CastleProgress] : totalUnits[player.CastleProgress + 1];
 			int randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
 			randomUnit = units[randomUnitIndex];
 		}
