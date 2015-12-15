@@ -25,10 +25,22 @@ public class OverworldManager : MonoBehaviour
 
 		//event listeners
 		_OverworldUI.OnCommanderMove += _OverworldUI_OnCommanderMove;
+        _OverworldUI.OnPause += _OverworldUI_OnPause;
+        _OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
 
 		//allow player movement for the start ****JUST FOR TESTING****
 		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.CommanderPosition, 1));
 	}
+
+    void _OverworldUI_OnUnPause()
+    {
+        _OverworldUI._Paused = false;
+    }
+
+    void _OverworldUI_OnPause()
+    {
+        _OverworldUI._Paused = true;
+    }
 
 	void _OverworldUI_OnCommanderMove(TileData tile) {
 		//set new position for the player (should depend on whose players turn it is)
@@ -95,6 +107,16 @@ public class OverworldManager : MonoBehaviour
 		var card = (Cards)randomCardIndex;
 		return card;
 	}
+
+    public void Pause()
+    {
+        _OverworldUI.Disable();
+    }
+
+    public void UnPause()
+    {
+        _OverworldUI.Enable();
+    }
 
 	// Update is called once per frame
 	void Update() {
