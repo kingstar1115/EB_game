@@ -142,17 +142,20 @@ public class Board : MonoBehaviour {
 
 
 
-	public HashSet<TileData> GetReachableTiles(TileData fromTile, int distance)
+	public HashSet<TileData> GetReachableTiles(PlayerType pType, TileData fromTile, int distance)
 	{
 		HashSet<TileData> foundTiles = new HashSet<TileData>();
 		if (distance == 0 || fromTile == null) {
 			return foundTiles;
 		}
 		foreach (TileData t in fromTile.GetConnectedTiles()) {
-			foundTiles.Add(t);
-            HashSet<TileData> tilesForT = GetReachableTiles(t, distance - 1);
+            if ((pType == PlayerType.Battlebeard && t != _SSStartTile) || (pType == PlayerType.Stormshaper && t != _BBStartTile))
+			    foundTiles.Add(t);
+            HashSet<TileData> tilesForT = GetReachableTiles(pType, t, distance - 1);
             foreach (TileData tt in tilesForT) {
-				foundTiles.Add(tt);
+                //check that thetile is not the oponents start tile 
+                if((pType == PlayerType.Battlebeard && tt != _SSStartTile) || (pType == PlayerType.Stormshaper && tt != _BBStartTile))
+				    foundTiles.Add(tt);
 			}
 		}
 		return foundTiles;

@@ -29,7 +29,7 @@ public class OverworldManager : MonoBehaviour
         _OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
 
 		//allow player movement for the start ****JUST FOR TESTING****
-		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.CommanderPosition, 1));
+        _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.Type, _BattlebeardPlayer.CommanderPosition, 1));
 	}
 
     void _OverworldUI_OnUnPause()
@@ -47,7 +47,7 @@ public class OverworldManager : MonoBehaviour
 		_BattlebeardPlayer.CommanderPosition = tile;
 
 		//****JUST FOR TESTING**** set new reachable tiles
-		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.CommanderPosition, 1));
+        _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.Type, _BattlebeardPlayer.CommanderPosition, 1));
 
 		//Handles events that happen when player lands on that tile
 		HandleTileEvent(tile);
