@@ -47,8 +47,14 @@ public class BoardUI : MonoBehaviour
 				return th;
 			else
 			{
-				Debug.LogError("Game Object Labeled Tile with no TileHolder!!! :O");
-				return null;
+                //as a back up try get from children
+                if ((th = outCollider.GetComponentInChildren<TileHolder>()) != null)
+                    return th;
+                else
+                {
+                    Debug.LogError("Game Object Labeled Tile with no TileHolder!!! :O");
+                    return null;
+                }
 			}
 		} else {
 			return null;

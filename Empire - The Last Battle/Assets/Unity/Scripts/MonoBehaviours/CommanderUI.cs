@@ -16,16 +16,19 @@ public class CommanderUI : MonoBehaviour
     public delegate void V3Action(Vector3 vec);
     public event V3Action OnCommanderDrop = delegate { };
 
-	public Player _Player; 
+	public Player _Player;
+    //public string BBPosMarkerTag;
+    //public string SSPosMarkerTag;
     public float _LiftedHeight;
     public float _LiftTime;
     public float _MoveTime;
     Collider _collider;
-    Collider _prevHovered;
+    //Collider _prevHovered;
     LerpPosition _lerpPosition;
     Vector3 _toGoTo;
 	HashSet<TileData> _reachableTiles;
     TileHolder _destinationTile;
+    Vector3 _destination;
     bool _liftingPiece;
     bool _hasBeenLifted;
     bool _allowMovement;
@@ -79,22 +82,44 @@ public class CommanderUI : MonoBehaviour
 		//only if movement is allowed
 		if (_allowMovement) {
 			//if hovered a tile that is reachable then move have the player move there
-            Collider hoveredCollider  = null;
-            TileHolder tileHolder = BoardUI.GetTileHovered();
+            //Collider hoveredCollider  = null;
+            Collider tileParent;
+            TileHolder tileHolder = null;
+            if (BoardUI.GetTileHovered_Position(out tileParent))
+                tileHolder = tileParent.GetComponentInChildren<TileHolder>();
+
             if (tileHolder != null)
             {
 
-                hoveredCollider = tileHolder.GetComponent<Collider>();
-                if (hoveredCollider != null)
+                //hoveredCollider = tileHolder.GetComponent<Collider>();
+                //if (hoveredCollider != null)
                 {
+                    /*
                     _toGoTo = new Vector3(hoveredCollider.transform.position.x,
                         //hoveredCollider.bounds.max.y + _collider.bounds.extents.y,
                     _LiftedHeight,
                     hoveredCollider.transform.position.z);
 
                     _targetY = hoveredCollider.GetComponent<Collider>().bounds.max.y + _collider.bounds.extents.y;
+                    */
+                    //_prevHovered = hoveredCollider;
 
-                    _prevHovered = hoveredCollider;
+                    //try get the commander position marker
+                    GameObject posMarker = getCommanderMarker(tileHolder);
+                    if (posMarker != null)
+                    {
+                        _toGoTo = posMarker.transform.position;
+                        _destination = _toGoTo;
+                    }
+                    else
+                    {
+                        _toGoTo = tileHolder.transform.position;
+                        _destination = _toGoTo;
+                    }
+
+                    _toGoTo.y = _LiftedHeight;
+
+                    _targetY = tileHolder._Tile.Height + _collider.bounds.extents.y;
 
                     _destinationTile = tileHolder;
 
@@ -107,7 +132,7 @@ public class CommanderUI : MonoBehaviour
                 _destinationTile = null;
             }
 
-            if (!_hasBeenLifted && !_liftingPiece && (hoveredCollider == null || _prevHovered != hoveredCollider))
+            if (!_hasBeenLifted && !_liftingPiece && _destinationTile == null )//|| _prevHovered != hoveredCollider))
 				LiftPiece ();
 
             //block raycast 
@@ -121,17 +146,16 @@ public class CommanderUI : MonoBehaviour
         if (_destinationTile == null || !_reachableTiles.Contains(_destinationTile._Tile))
         {
 			//commander not moved
-            _toGoTo = _Player.CommanderPosition.TileObject.transform.position;
-			_targetY = _Player.CommanderPosition.TileObject.GetComponent<Collider>().bounds.max.y + _collider.bounds.extents.y;
-			//OnCommanderDrop (new Vector3(_toGoTo.x, _targetY, _toGoTo.z));
+            GameObject posMarker = getCommanderMarker(_Player.CommanderPosition.TileObject.GetComponentInChildren<TileHolder>());
+            _toGoTo = (posMarker!=null) ? posMarker.transform.position: _Player.CommanderPosition.TileObject.transform.position;
+			_targetY = _Player.CommanderPosition.Height + _collider.bounds.extents.y;
         }
         else
         {
             //cammander moved
-            _toGoTo = _destinationTile.transform.position;
+            _toGoTo = _destination;
             OnCommanderMoved(_destinationTile._Tile);
-            //OnCommanderNewDestination(new Vector3(_destinationTile.transform.position.x, _targetY, _destinationTile.transform.position.z));
-			OnCommanderDrop (new Vector3(_destinationTile.transform.position.x, _targetY, _destinationTile.transform.position.z));
+            OnCommanderDrop(new Vector3(_destination.x, _targetY, _destination.z));
             _destinationTile = null;
         }
 
@@ -175,13 +199,42 @@ public class CommanderUI : MonoBehaviour
 
     public void UpdateToPlayerPosition()
     {
+        /*
         this.transform.position = new Vector3(_Player.CommanderPosition.TileObject.transform.position.x, 
             _targetY = _Player.CommanderPosition.Height + _collider.bounds.extents.y,
             _Player.CommanderPosition.TileObject.transform.position.z);
+        */
+
+        GameObject posMarker = getCommanderMarker(_Player.CommanderPosition.TileObject.GetComponentInChildren<TileHolder>());
+        Vector3 newPosition = (posMarker != null) ? posMarker.transform.position : _Player.CommanderPosition.TileObject.transform.position;
+        newPosition.y = _Player.CommanderPosition.Height + _collider.bounds.extents.y;
+        this.transform.position = newPosition;
     }
 
     public HashSet<TileData> GetReachableTiles()
     {
         return _reachableTiles;
+    }
+
+    GameObject getCommanderMarker(TileHolder tHolder)
+    {
+        if (tHolder == null)
+            return null;
+
+        switch (_Player.Type)
+        {
+            case PlayerType.None:
+                Debug.LogError("Cannot get marker for player type None");
+                break;
+            case PlayerType.Battlebeard:
+                return tHolder._MarkerCommanderBB;
+            case PlayerType.Stormshaper:
+                return tHolder._MarkerCommanderSS;
+            default:
+                Debug.LogError("Unhandled player type getting position marker");
+                break;
+        }
+
+        return null;
     }
 }
