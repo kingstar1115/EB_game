@@ -7,4 +7,5 @@ public class TileTypeDataBase : ScriptableObject {
     public bool IsTraversable = true;
     public TileType Tile;
     public GameObject Prefab;
+    public bool IsRotatable = true;
 }

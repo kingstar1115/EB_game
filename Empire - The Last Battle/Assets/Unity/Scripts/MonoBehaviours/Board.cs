@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 public class Board : MonoBehaviour {
 
-    public BoardData _Data;
-    public float _TileWidth = 1;
-    public TileTypeDataManager _TileTypeDataManager;
-    public FlagManager _FlagManager;
+	public BoardData _Data;
+	public float _TileWidth = 1;
+	public TileTypeDataManager _TileTypeDataManager;
+	public FlagManager _FlagManager;
 	public TileData _BBStartTile;
 	public TileData _SSStartTile;
     public string _MarkerCommanderBB_Tag;
@@ -41,7 +41,9 @@ public class Board : MonoBehaviour {
                 Vector3 position = new Vector3(i * _TileWidth, tile.Height, j * _TileWidth) + boardStart;
                 tile.TileObject = (GameObject)Instantiate(GetTerrain(tile), position, Quaternion.identity);
                 tile.TileObject.name = "Tile " + "[" + i + "," + j + "]";
-
+				if (_TileTypeDataManager.GetTerrainData(tile.Terrain).IsRotatable) {
+					rotateRandom(tile.TileObject);
+				}
                 //grab the tile holder 
                 TileHolder tileHolder = tile.TileObject.GetComponentInChildren<TileHolder>();
                 if (tileHolder == null)
@@ -52,7 +54,9 @@ public class Board : MonoBehaviour {
                     GameObject buildingGO = (GameObject)Instantiate(GetBuilding(tile), position, Quaternion.identity);
                     // Set building name??
                     buildingGO.transform.parent = tile.TileObject.transform;
-
+					if (_TileTypeDataManager.GetBuildingData(tile.Building).IsRotatable) {
+						rotateRandom(buildingGO);
+					}
                     //add building commander markers to tile holder
                     tileHolder._MarkerCommanderBB = Utils.GetFirstChildWithTag(_MarkerCommanderBB_Tag, tile.TileObject);
                     tileHolder._MarkerCommanderSS = Utils.GetFirstChildWithTag(_MarkerCommanderSS_Tag, tile.TileObject);
@@ -88,6 +92,11 @@ public class Board : MonoBehaviour {
             }
         }
     }
+
+	void rotateRandom(GameObject obj) {
+		int i = Random.Range (0, 3) * 90;
+		obj.transform.Rotate (new Vector3 (0, i, 0));
+	}
 
     public void SetTileOwner(TileData t, PlayerType p) {
         t.Owner = p;
@@ -142,6 +151,7 @@ public class Board : MonoBehaviour {
 
 
 
+
 	public HashSet<TileData> GetReachableTiles(PlayerType pType, TileData fromTile, int distance)
 	{
 		HashSet<TileData> foundTiles = new HashSet<TileData>();
@@ -149,12 +159,12 @@ public class Board : MonoBehaviour {
 			return foundTiles;
 		}
 		foreach (TileData t in fromTile.GetConnectedTiles()) {
-            if ((pType == PlayerType.Battlebeard && t != _SSStartTile) || (pType == PlayerType.Stormshaper && t != _BBStartTile))
+			if ((pType == PlayerType.Battlebeard && t.Building != BuildingType.StartTileStormshaper) || (pType == PlayerType.Stormshaper && t.Building != BuildingType.StartTileBattlebeard))
 			    foundTiles.Add(t);
             HashSet<TileData> tilesForT = GetReachableTiles(pType, t, distance - 1);
             foreach (TileData tt in tilesForT) {
                 //check that thetile is not the oponents start tile 
-                if((pType == PlayerType.Battlebeard && tt != _SSStartTile) || (pType == PlayerType.Stormshaper && tt != _BBStartTile))
+				if ((pType == PlayerType.Battlebeard && t.Building != BuildingType.StartTileStormshaper) || (pType == PlayerType.Stormshaper && t.Building != BuildingType.StartTileBattlebeard))
 				    foundTiles.Add(tt);
 			}
 		}
