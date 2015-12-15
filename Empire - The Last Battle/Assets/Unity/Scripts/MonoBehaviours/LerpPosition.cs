@@ -12,11 +12,6 @@ public class LerpPosition : MonoBehaviour
     Vector3 _startPosition;
     Vector3 _endPosition;
     bool _isLerping;
-
-	// Use this for initialization
-	void Start () {
-	
-	}
 	
 	// Update is called once per frame
 	void Update () 
@@ -29,8 +24,7 @@ public class LerpPosition : MonoBehaviour
             if (_currentLerpTime > _LerpTime)
             {
                 this.transform.position = _endPosition;
-                _currentLerpTime = 0;
-                _isLerping = false;
+                StopLerp();
                 OnLerpFinished();
             }
             else
