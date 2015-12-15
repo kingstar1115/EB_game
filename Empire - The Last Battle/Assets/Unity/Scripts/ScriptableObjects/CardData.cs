@@ -5,5 +5,6 @@ using UnityEngine;
 [Serializable]
 public class CardData : ScriptableObject
 {
-    public List<Cards> cards;
+	public CardType Type;
+	public int Value;
 }

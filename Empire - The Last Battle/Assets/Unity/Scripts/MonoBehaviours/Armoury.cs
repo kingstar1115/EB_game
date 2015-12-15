@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,7 +24,7 @@ public class PurchasableCard : PurchasableItem
 public class PurchasableCastlePiece : PurchasableItem
 {
     public int id;
-    //This is 0-4
+    //This is 0-3
     public int purchaseLevel;
     public bool b_AlreadyPurchased;
 }
@@ -53,9 +53,22 @@ public class Armoury : MonoBehaviour
 
     public List<PurchasableCastlePiece> AvailableCastlePieces(Player player)
     {
+        //return early if no purchasable castel pieces
+        if (purchasableCastlePieces.Count == 0)
+        {
+            Debug.LogError("No purchasable castle peices at all");
+            return null;
+        }
+
         //Castle pieces unlock after lost immortals die
-        //return purchasableCastlePieces.Where(x => (player.LostImmortalKillCount >= x.purchaseLevel) && (x.b_AlreadyPurchased == false));      
-        throw new NotImplementedException();
+        List<PurchasableCastlePiece> toReturn = new List<PurchasableCastlePiece>();
+        foreach (var castlePiece in purchasableCastlePieces)
+        {
+            if (player.LostImmortalKillCount >= castlePiece.purchaseLevel && castlePiece.b_AlreadyPurchased)
+                toReturn.Add(castlePiece);
+        }
+
+        return toReturn;
     }
 
     public void BuyUnit(PurchasableUnit purchasableUnit)
