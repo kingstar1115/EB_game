@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -64,7 +64,7 @@ public class Armoury : MonoBehaviour
         List<PurchasableCastlePiece> toReturn = new List<PurchasableCastlePiece>();
         foreach (var castlePiece in purchasableCastlePieces)
         {
-            if (player.LostImortalKillCount >= castlePiece.purchaseLevel && castlePiece.b_AlreadyPurchased)
+            if (player.LostImmortalKillCount >= castlePiece.purchaseLevel && castlePiece.b_AlreadyPurchased)
                 toReturn.Add(castlePiece);
         }
 

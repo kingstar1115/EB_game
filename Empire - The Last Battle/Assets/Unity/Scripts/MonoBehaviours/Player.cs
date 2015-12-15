@@ -9,27 +9,27 @@ public class Player : MonoBehaviour
 	public Army PlayerArmy;
 	public int CastleProgress;
 
-    int lostImortalKillCount;
-    public int LostImortalKillCount
+    int lostImmortalKillCount;
+    public int LostImmortalKillCount
     {
         get
         {
-            return lostImortalKillCount;
+            return lostImmortalKillCount;
         }
     }
 
     public void Reset()
     {
-        lostImortalKillCount = 0;
+        lostImmortalKillCount = 0;
     }
 
-    public void LostImortalKilled_Increment()
+    public void LostImmortalKilled_Increment()
     {
-        //limit the lost imortal kill count
-        if (lostImortalKillCount + 1 <= 4)
-            lostImortalKillCount++;
+        //limit the lost immortal kill count
+        if (lostImmortalKillCount < 3)
+            lostImmortalKillCount++;
         else
-            Debug.LogError("Trying to kill too many lost imiortals");
+            Debug.LogError("Trying to kill too many Lost Immortals");
     }
 }
 public enum PlayerType
