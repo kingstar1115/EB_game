@@ -6,6 +6,7 @@ public class LerpPosition : MonoBehaviour
     public event System.Action OnLerpFinished = delegate { };
 
     public LerpType _lerpType;
+    public bool _LocalPosition;
     public float _LerpTime = 1f;
     float _currentLerpTime;
     float _prevPercent = 0;
@@ -23,7 +24,8 @@ public class LerpPosition : MonoBehaviour
             _currentLerpTime += Time.deltaTime;
             if (_currentLerpTime > _LerpTime)
             {
-                this.transform.position = _endPosition;
+                //this.transform.position = _endPosition;
+                setPosition(_endPosition);
                 StopLerp();
                 OnLerpFinished();
             }
@@ -38,7 +40,8 @@ public class LerpPosition : MonoBehaviour
                 else if (_lerpType == LerpType.Smoothstep)
                     _prevPercent = GetSmoothstep(_prevPercent);
 
-                transform.position = Vector3.Lerp(_startPosition, _endPosition, _prevPercent);
+                //transform.position = Vector3.Lerp(_startPosition, _endPosition, _prevPercent);
+                setPosition(Vector3.Lerp(_startPosition, _endPosition, _prevPercent));
             }
         }
 	}
@@ -55,7 +58,8 @@ public class LerpPosition : MonoBehaviour
 
     public void LerpTo(Vector3 newPosition)
     {
-        LerpTo(this.transform.position, newPosition, 0);
+        //LerpTo(this.transform.position, newPosition, 0);
+        LerpTo(getPosition(), newPosition, 0);
     }
 
     public void LerpTo(Vector3 newStartPos, Vector3 newEndPos, float currentLerpTime)
@@ -112,6 +116,19 @@ public class LerpPosition : MonoBehaviour
     public bool IsLerping()
     {
         return _isLerping;
+    }
+
+    void setPosition(Vector3 newPosition)
+    {
+        if (_LocalPosition)
+            this.transform.localPosition = newPosition;
+        else
+            this.transform.position = newPosition;
+    }
+
+    Vector3 getPosition()
+    {
+        return (_LocalPosition) ? this.transform.localPosition : this.transform.position;
     }
 }
 
