@@ -102,7 +102,7 @@ public class CardSystem : MonoBehaviour {
 			castleFourUnits
 		};
 
-		List<Unit> units;
+		var units = new List<Unit>();
 		Unit randomUnit;
 		float rand = UnityEngine.Random.Range(0, 4);
 
@@ -110,14 +110,14 @@ public class CardSystem : MonoBehaviour {
 			// pick from
 			for(int i = 0; i <= player.CastleProgress; i++)
 			{
-				units.Add (totalUnits[i]);
+				units.AddRange (totalUnits[i]);
 			}
-			float randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
+			int randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
 			randomUnit = units[randomUnitIndex];
 		} else {
 			// pick from
 			units = totalUnits[player.CastleProgress + 1];
-			float randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
+			int randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
 			randomUnit = units[randomUnitIndex];
 		}
 		
