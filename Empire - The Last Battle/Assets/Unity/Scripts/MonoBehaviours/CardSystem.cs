@@ -50,8 +50,8 @@ public class CardSystem : MonoBehaviour {
 			OnEffectApplied (card, player);
 			break;
 		case CardType.Alliance_Card:
-			UseAllianceCard(card, player);
-			OnEffectApplied (card, player);
+			UseAllianceCard(card, player);        
+            OnEffectApplied (card, player);
 			break;
 		case CardType.Scout_Card:
 			UseScoutCard(card, player);
@@ -125,8 +125,7 @@ public class CardSystem : MonoBehaviour {
 			randomUnit = units[randomUnitIndex];
 		}
 
-		//Change to Alasdar's GetUnit function later
-		//player.PlayerArmy.Units.Add (randomUnit);
+		player.PlayerArmy.AddUnit(randomUnit);
 	}
 
 	private void UseScoutCard(CardData card, Player player) {
