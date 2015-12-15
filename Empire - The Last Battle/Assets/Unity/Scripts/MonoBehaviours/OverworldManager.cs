@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class OverworldManager : MonoBehaviour
 {
 	public OverworldUI _OverworldUI;
-	public CardData _AvailableCaveCards;
+	public CardList _AvailableCaveCards;
 	public CardSystem _CardSystem;
 	public Board _Board;
 	public Player _BattlebeardPlayer;
@@ -37,22 +37,15 @@ public class OverworldManager : MonoBehaviour
 
 		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
 		// TEST
-		UseCard(Cards.Scout_Card_1);
+		UseCard(_AvailableCaveCards.cards[0]);
 	}
 
-	void _CardSystem_OnEffectApplied(Cards card) {
-		if (card == Cards.Scout_Card_1) {
-			int availableScouts = _BattlebeardPlayer.PlayerArmy.GetUnits(UnitType.Scout).Count;
-			if (availableScouts > 0) {
-				Mathf.Clamp(availableScouts++, 2, 4);
-				// Make sure these are reset the next turn!
-				_BattlebeardPlayer.IsScouting = true;
-				_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.CommanderPosition, availableScouts));
-			}
+	void _CardSystem_OnEffectApplied(CardData card, Player player) {
+		if (card.Type == CardType.Scout_Card) {       _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(player.CommanderPosition, card.Value));
 		}
 	}
 
-	void UseCard(Cards card) {
+	void UseCard(CardData card) {
 		_CardSystem.ApplyEffect(card, _BattlebeardPlayer);
 	}
 
@@ -101,8 +94,7 @@ public class OverworldManager : MonoBehaviour
 		}
 	}
 
-	public void HealTroops(Player player)
-	{
+	public void HealTroops(Player player) {
 		//Change magic number to function once more castle code is in
 		if (player.CastleProgress >= 4)
 			return;
@@ -118,11 +110,12 @@ public class OverworldManager : MonoBehaviour
 		}
 	}
 
-	public Cards GenerateRandomCard(List<Cards> availableCards) {
+	public CardData GenerateRandomCard(List<CardData> availableCards) {
 		//Generate a random card (Warning: This is weighted heavily towards resource cards because 
 		//there are more of them in the enum, change this later?)
 		short randomCardIndex = (short)UnityEngine.Random.Range(0, availableCards.Count - 1);
-		var card = (Cards)randomCardIndex;
+		CardData card = availableCards [randomCardIndex];
+
 		return card;
 	}
 
