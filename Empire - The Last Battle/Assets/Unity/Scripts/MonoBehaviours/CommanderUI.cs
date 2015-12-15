@@ -17,13 +17,10 @@ public class CommanderUI : MonoBehaviour
     public event V3Action OnCommanderDrop = delegate { };
 
 	public Player _Player;
-    //public string BBPosMarkerTag;
-    //public string SSPosMarkerTag;
     public float _LiftedHeight;
     public float _LiftTime;
     public float _MoveTime;
     Collider _collider;
-    //Collider _prevHovered;
     LerpPosition _lerpPosition;
     Vector3 _toGoTo;
 	HashSet<TileData> _reachableTiles;
@@ -82,7 +79,6 @@ public class CommanderUI : MonoBehaviour
 		//only if movement is allowed
 		if (_allowMovement) {
 			//if hovered a tile that is reachable then move have the player move there
-            //Collider hoveredCollider  = null;
             Collider tileParent;
             TileHolder tileHolder = null;
             if (BoardUI.GetTileHovered_Position(out tileParent))
@@ -91,41 +87,27 @@ public class CommanderUI : MonoBehaviour
             if (tileHolder != null)
             {
 
-                //hoveredCollider = tileHolder.GetComponent<Collider>();
-                //if (hoveredCollider != null)
+                //try get the commander position marker
+                GameObject posMarker = getCommanderMarker(tileHolder);
+                if (posMarker != null)
                 {
-                    /*
-                    _toGoTo = new Vector3(hoveredCollider.transform.position.x,
-                        //hoveredCollider.bounds.max.y + _collider.bounds.extents.y,
-                    _LiftedHeight,
-                    hoveredCollider.transform.position.z);
-
-                    _targetY = hoveredCollider.GetComponent<Collider>().bounds.max.y + _collider.bounds.extents.y;
-                    */
-                    //_prevHovered = hoveredCollider;
-
-                    //try get the commander position marker
-                    GameObject posMarker = getCommanderMarker(tileHolder);
-                    if (posMarker != null)
-                    {
-                        _toGoTo = posMarker.transform.position;
-                        _destination = _toGoTo;
-                    }
-                    else
-                    {
-                        _toGoTo = tileHolder.transform.position;
-                        _destination = _toGoTo;
-                    }
-
-                    _toGoTo.y = _LiftedHeight;
-
-                    _targetY = tileHolder._Tile.Height + _collider.bounds.extents.y;
-
-                    _destinationTile = tileHolder;
-
-                    //dragging
-                    OnDraggingCommander();
+                    _toGoTo = posMarker.transform.position;
+                    _destination = _toGoTo;
                 }
+                else
+                {
+                    _toGoTo = tileHolder.transform.position;
+                    _destination = _toGoTo;
+                }
+
+                _toGoTo.y = _LiftedHeight;
+
+                _targetY = tileHolder._Tile.Height + _collider.bounds.extents.y;
+
+                _destinationTile = tileHolder;
+
+                //dragging
+                OnDraggingCommander();
             }
             else
             {
@@ -199,12 +181,6 @@ public class CommanderUI : MonoBehaviour
 
     public void UpdateToPlayerPosition()
     {
-        /*
-        this.transform.position = new Vector3(_Player.CommanderPosition.TileObject.transform.position.x, 
-            _targetY = _Player.CommanderPosition.Height + _collider.bounds.extents.y,
-            _Player.CommanderPosition.TileObject.transform.position.z);
-        */
-
         GameObject posMarker = getCommanderMarker(_Player.CommanderPosition.TileObject.GetComponentInChildren<TileHolder>());
         Vector3 newPosition = (posMarker != null) ? posMarker.transform.position : _Player.CommanderPosition.TileObject.transform.position;
         newPosition.y = _Player.CommanderPosition.Height + _collider.bounds.extents.y;
