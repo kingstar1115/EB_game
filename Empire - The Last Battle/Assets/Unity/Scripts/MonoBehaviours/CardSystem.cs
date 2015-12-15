@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,11 +16,12 @@ public enum CardType {
 public class CardSystem : MonoBehaviour {	
 
 	public CardList cardList;
-    public List<UnitType> castleZeroUnits;
-	public List<UnitType> castleOneUnits;
-	public List<UnitType> castleTwoUnits;
-	public List<UnitType> castleThreeUnits;
-	public List<UnitType> castleFourUnits;
+    // Units availiable from using alliance card at different castle levels.
+    public List<UnitType> allianceCardUnitsZero;
+	public List<UnitType> allianceCardUnitsOne;
+	public List<UnitType> allianceCardUnitsTwo;
+	public List<UnitType> allianceCardUnitsThree;
+	public List<UnitType> allianceCardUnitsFour;
 
 	public delegate void CardCallback(CardData card, Player player);
 	public event CardCallback OnEffectApplied = delegate { };
@@ -95,18 +96,23 @@ public class CardSystem : MonoBehaviour {
 	private void UseAllianceCard(CardData card, Player player) {	
 		List<UnitType>[] totalUnits = 
 		{
-			castleZeroUnits,
-			castleOneUnits,
-			castleTwoUnits,
-			castleThreeUnits,
-			castleFourUnits
+			allianceCardUnitsZero,
+			allianceCardUnitsOne,
+			allianceCardUnitsTwo,
+			allianceCardUnitsThree,
+			allianceCardUnitsFour
 		};
 
-		var units = new List<UnitType>();
+		List<UnitType> units = new List<UnitType>();
 		UnitType randomUnit;
-		float rand = UnityEngine.Random.Range(0, 100);
-
-		if (rand >= totalUnits[player.CastleProgress].Count) {
+		int rand = UnityEngine.Random.Range(0, 100);
+        
+        int totalNextUnits = 0;
+        if (player.CastleProgress < 4) {
+            totalNextUnits = totalUnits[player.CastleProgress+1].Count;
+        }
+        
+		if (rand >= totalNextUnits) {
 			for(int i = 0; i <= player.CastleProgress; i++)
 			{
 				units.AddRange (totalUnits[i]);
@@ -114,7 +120,7 @@ public class CardSystem : MonoBehaviour {
 			int randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
 			randomUnit = units[randomUnitIndex];
 		} else {
-			units = (totalUnits[player.CastleProgress].Count >= (totalUnits.Length - 1)) ? totalUnits[player.CastleProgress] : totalUnits[player.CastleProgress + 1];
+			units = totalUnits[player.CastleProgress + 1];
 			int randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
 			randomUnit = units[randomUnitIndex];
 		}
