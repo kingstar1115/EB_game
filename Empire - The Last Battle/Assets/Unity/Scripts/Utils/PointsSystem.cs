@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class PointsSystem : MonoBehaviour
+public class PointsSystem
 {
     public float modifierBase = 1;
     public int pointsMin = 0;
@@ -14,8 +14,7 @@ public class PointsSystem : MonoBehaviour
     int _currentValue;
     float _currentModifier;
 
-    void Start()
-    {
+    public PointsSystem() {
         _currentValue = pointsBase;
         _currentModifier = modifierBase;
     }

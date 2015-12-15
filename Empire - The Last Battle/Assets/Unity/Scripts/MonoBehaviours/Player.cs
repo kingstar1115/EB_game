@@ -5,9 +5,10 @@ public class Player : MonoBehaviour
     public TileData CommanderPosition;
     public PlayerType Type;
 	public PointsSystem Currency;
-	public CardData Hand;
+	public CardList Hand;
 	public Army PlayerArmy;
 	public int CastleProgress;
+	public bool IsScouting;
 
     int lostImmortalKillCount;
     public int LostImmortalKillCount
@@ -17,6 +18,11 @@ public class Player : MonoBehaviour
             return lostImmortalKillCount;
         }
     }
+
+	public void Initialise() {
+		PlayerArmy.Initialise();
+		Currency = new PointsSystem();
+	}
 
     public void Reset()
     {

@@ -2,7 +2,7 @@
 using System.Collections;
 
 [System.Serializable]
-public class Unit : MonoBehaviour {
+public class Unit {
 
 	UnitBaseData BaseData;
 	//TODO: Decide if this is the best way to handle an upgrade. Is it better to have a separate Upgrade class?
@@ -12,7 +12,8 @@ public class Unit : MonoBehaviour {
 	public TileData Position;
 	public UnitType Type;
 
-	public void Initialise(UnitBaseData data){
+	public Unit(UnitBaseData data){
+		Type = data.Type;
 		BaseData = data;
 		CurrentBaseHP = data.HP;
 	}
