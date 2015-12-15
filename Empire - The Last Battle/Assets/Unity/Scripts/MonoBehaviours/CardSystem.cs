@@ -103,7 +103,7 @@ public class CardSystem : MonoBehaviour {
 		};
 
 		var units = new List<UnitType>();
-		Unit randomUnit;
+		UnitType randomUnit;
 		float rand = UnityEngine.Random.Range(0, 100);
 
 		if (rand >= totalUnits[player.CastleProgress].Count) {
@@ -114,12 +114,13 @@ public class CardSystem : MonoBehaviour {
 			int randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
 			randomUnit = units[randomUnitIndex];
 		} else {
-			units = (totalUnits[player.CastleProgress] >= (totalUnits.Length - 1)) ? totalUnits[player.CastleProgress] : totalUnits[player.CastleProgress + 1];
+			units = (totalUnits[player.CastleProgress].Count >= (totalUnits.Length - 1)) ? totalUnits[player.CastleProgress] : totalUnits[player.CastleProgress + 1];
 			int randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
 			randomUnit = units[randomUnitIndex];
 		}
-		
-		player.PlayerArmy.Units.Add (randomUnit);
+
+		//Change to Alasdar's GetUnit function later
+		//player.PlayerArmy.Units.Add (randomUnit);
 	}
 	
 	private void UseScoutCard(Player player) {
