@@ -16,23 +16,50 @@ public class CommanderUI : MonoBehaviour
     public delegate void V3Action(Vector3 vec);
     public event V3Action OnCommanderDrop = delegate { };
 
-	public Player _Player;
+    public Player _Player;
     public float _LiftedHeight;
     public float _LiftTime;
     public float _MoveTime;
+
     Collider _collider;
     LerpPosition _lerpPosition;
     Vector3 _toGoTo;
-	HashSet<TileData> _reachableTiles;
+    HashSet<TileData> _reachableTiles;
     TileHolder _destinationTile;
     Vector3 _destination;
     bool _liftingPiece;
     bool _hasBeenLifted;
     bool _allowMovement;
+    bool _dragging;
     float _targetY;
     int _defaultLayer;
 
-	// Use this for initialization
+    bool _paused;
+    public bool _Paused
+    {
+        get
+        {
+            return _paused;
+        }
+
+        set
+        {
+            if (value)
+            {
+                PausePlayerMovement();
+                _allowMovement = false;
+            }
+            else
+            {
+                ContinuePlayerMovement();
+                _allowMovement = true;
+            }
+
+            _paused = value;
+        }
+    }
+    
+    // Use this for initialization
 	public void Initialise () 
     {
         _collider = this.GetComponent<Collider>();
@@ -71,11 +98,17 @@ public class CommanderUI : MonoBehaviour
 
     void OnMouseDown()
     {
-        OnStartDrag();
+        //OnStartDrag();
     }
 
     void OnMouseDrag()
     {
+        if (!_dragging)
+        {
+            OnStartDrag();
+            _dragging = true;
+        }
+
 		//only if movement is allowed
 		if (_allowMovement) {
 			//if hovered a tile that is reachable then move have the player move there
@@ -114,7 +147,7 @@ public class CommanderUI : MonoBehaviour
                 _destinationTile = null;
             }
 
-            if (!_hasBeenLifted && !_liftingPiece && _destinationTile == null )//|| _prevHovered != hoveredCollider))
+            if (!_hasBeenLifted && !_liftingPiece)// && _destinationTile == null )//|| _prevHovered != hoveredCollider))
 				LiftPiece ();
 
             //block raycast 
@@ -124,6 +157,8 @@ public class CommanderUI : MonoBehaviour
 
     void OnMouseUp()
     {
+        _dragging = false;
+
 		//if the tile hovered is not in the reachable set then back to origional tile
         if (_destinationTile == null || !_reachableTiles.Contains(_destinationTile._Tile))
         {
@@ -185,6 +220,8 @@ public class CommanderUI : MonoBehaviour
         Vector3 newPosition = (posMarker != null) ? posMarker.transform.position : _Player.CommanderPosition.TileObject.transform.position;
         newPosition.y = _Player.CommanderPosition.Height + _collider.bounds.extents.y;
         this.transform.position = newPosition;
+        
+        _lerpPosition.StopLerp();
     }
 
     public HashSet<TileData> GetReachableTiles()
