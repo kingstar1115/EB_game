@@ -1,24 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(LerpRotation))]
 public class CardUI : MonoBehaviour 
 {
     public LerpPosition _CardImage;
-
-    float _zRotation;
-    public float _ZRotation
-    {
-        get
-        {
-            return _zRotation;
-        }
-
-        set
-        {
-            this.transform.rotation = Quaternion.Euler(0, 0, value);
-            _zRotation = value;
-        }
-    }
+    LerpRotation _lerpRotation;
 
     Vector2 _pivotVector;
     public Vector2 _PivotVector
@@ -35,10 +22,23 @@ public class CardUI : MonoBehaviour
         }
     }
 
-	// Use this for initialization
-	void Start () 
+    public Quaternion _TargetRotation
     {
-        _PivotVector = new Vector2(0,12);
+        get
+        {
+            return _lerpRotation.GetEndRotation();
+        }
+
+        set
+        {
+            _lerpRotation.LerpTo(value);
+        }
+    }
+
+	// Use this for initialization
+	public void Init()
+    {
+        _lerpRotation = GetComponent<LerpRotation>();
 	}
 	
 	// Update is called once per frame

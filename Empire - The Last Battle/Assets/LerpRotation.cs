@@ -1,21 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LerpPosition : MonoBehaviour 
+public class LerpRotation : MonoBehaviour 
 {
     public event System.Action OnLerpFinished = delegate { };
 
     public LerpType _lerpType;
-    public bool _LocalPosition;
+    public bool _LocalRotation;
     public float _LerpTime = 1f;
     float _currentLerpTime;
     float _prevPercent = 0;
-    Vector3 _startPosition;
-    Vector3 _endPosition;
+    Quaternion _startRotation;
+    Quaternion _endRotation;
     bool _isLerping;
-	
-	// Update is called once per frame
-	void Update () 
+
+    // Update is called once per frame
+    void Update()
     {
         //get lerping
         if (_isLerping)
@@ -25,7 +25,7 @@ public class LerpPosition : MonoBehaviour
             if (_currentLerpTime > _LerpTime)
             {
                 //this.transform.position = _endPosition;
-                setPosition(_endPosition);
+                setRotation(_endRotation);
                 StopLerp();
                 OnLerpFinished();
             }
@@ -41,10 +41,10 @@ public class LerpPosition : MonoBehaviour
                     _prevPercent = GetSmoothstep(_prevPercent);
 
                 //transform.position = Vector3.Lerp(_startPosition, _endPosition, _prevPercent);
-                setPosition(Vector3.Lerp(_startPosition, _endPosition, _prevPercent));
+                setRotation(Quaternion.Lerp(_startRotation, _endRotation, _prevPercent));
             }
         }
-	}
+    }
 
     public float GetCurrentPercent()
     {
@@ -56,16 +56,16 @@ public class LerpPosition : MonoBehaviour
         return GetCurrentPercent() - _prevPercent;
     }
 
-    public void LerpTo(Vector3 newPosition)
+    public void LerpTo(Quaternion newRot)
     {
         //LerpTo(this.transform.position, newPosition, 0);
-        LerpTo(getPosition(), newPosition, 0);
+        LerpTo(getRotation(), newRot, 0);
     }
 
-    public void LerpTo(Vector3 newStartPos, Vector3 newEndPos, float currentLerpTime)
+    public void LerpTo(Quaternion newStartRot, Quaternion newEndRot, float currentLerpTime)
     {
-        _startPosition = newStartPos;
-        _endPosition = newEndPos;
+        _startRotation = newStartRot;
+        _endRotation = newEndRot;
         _currentLerpTime = currentLerpTime;
         _isLerping = true;
     }
@@ -89,8 +89,8 @@ public class LerpPosition : MonoBehaviour
     public void ResetLerp()
     {
         _currentLerpTime = 0;
-        _endPosition = getPosition();
-        _startPosition = getPosition();
+        _endRotation = getRotation();
+        _startRotation = getRotation();
     }
 
     public float GetEaseOut(float percent)
@@ -108,9 +108,9 @@ public class LerpPosition : MonoBehaviour
         return percent * percent * (3f - 2f * percent);
     }
 
-    public Vector3 GetEndPosition()
+    public Quaternion GetEndRotation()
     {
-        return _endPosition;
+        return _endRotation;
     }
 
     public bool IsLerping()
@@ -118,21 +118,16 @@ public class LerpPosition : MonoBehaviour
         return _isLerping;
     }
 
-    void setPosition(Vector3 newPosition)
+    void setRotation(Quaternion newRotation)
     {
-        if (_LocalPosition)
-            this.transform.localPosition = newPosition;
+        if (_LocalRotation)
+            this.transform.localRotation = newRotation;
         else
-            this.transform.position = newPosition;
+            this.transform.rotation = newRotation;
     }
 
-    Vector3 getPosition()
+    Quaternion getRotation()
     {
-        return (_LocalPosition) ? this.transform.localPosition : this.transform.position;
+        return (_LocalRotation) ? this.transform.localRotation : this.transform.rotation;
     }
-}
-
-public enum LerpType
-{
-    EaseOut, EaseIn, Smoothstep,
 }
