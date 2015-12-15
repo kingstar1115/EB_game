@@ -5,6 +5,7 @@ public class OverworldManager : MonoBehaviour
 {
 	public OverworldUI _OverworldUI;
 	public CardData _AvailableCaveCards;
+	public CardSystem _CardSystem;
 	public Board _Board;
 	public Player _BattlebeardPlayer;
 
@@ -13,12 +14,13 @@ public class OverworldManager : MonoBehaviour
 		//new game setup
 		_Board.Initialise();
 		_OverworldUI.Initialise();
+		_BattlebeardPlayer.Initialise();
 
 		//try get the battleboard start tile
 		if (_Board._BBStartTile != null)
 			_BattlebeardPlayer.CommanderPosition = _Board._BBStartTile;
 		else
-			Debug.LogError("Battleboard start tile not set");
+			Debug.LogError("Battlebeard start tile not set");
 
 		//snap player to start position
 		_OverworldUI.UpdateCommanderPosition();
@@ -27,7 +29,36 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.OnCommanderMove += _OverworldUI_OnCommanderMove;
 
 		//allow player movement for the start ****JUST FOR TESTING****
-		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.CommanderPosition, 1));
+		//_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.CommanderPosition, 1));
+
+
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+		foreach (Unit u in _BattlebeardPlayer.PlayerArmy.Units) {
+			Debug.Log(u.Type);
+			Debug.Log(u.GetHPPercentage());
+		}
+
+		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
+		UseCard(Cards.Scout_Card_1);
+	}
+
+	void _CardSystem_OnEffectApplied(Cards card) {
+		if (card == Cards.Scout_Card_1) {
+			Debug.Log(card);
+			int availableScouts = _BattlebeardPlayer.PlayerArmy.GetUnits(UnitType.Scout).Count;
+			Debug.Log(availableScouts);
+			if (availableScouts > 0) {
+				Mathf.Clamp(availableScouts++, 2, 4);
+				// Make sure these are reset the next turn!
+				_BattlebeardPlayer.IsScouting = true;
+				_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.CommanderPosition, availableScouts));
+			}
+		}
+	}
+
+	void UseCard(Cards card) {
+		_CardSystem.ApplyEffect(card, _BattlebeardPlayer);
 	}
 
 	void _OverworldUI_OnCommanderMove(TileData tile) {
@@ -42,6 +73,9 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void HandleTileEvent(TileData tile) {
+		if (_BattlebeardPlayer.IsScouting) {
+			return;
+		}
 		switch (tile.Building) {
 			case BuildingType.None:
 				break;

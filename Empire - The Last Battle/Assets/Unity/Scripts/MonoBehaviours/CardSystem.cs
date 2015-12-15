@@ -106,7 +106,7 @@ public class CardSystem : MonoBehaviour
 	}
 
 	private void UseScoutCard(int amount, Player player) {
-		throw new NotImplementedException();
+		
 	}
 
 	private void UsePriorityCard(int amount, Player player) {
