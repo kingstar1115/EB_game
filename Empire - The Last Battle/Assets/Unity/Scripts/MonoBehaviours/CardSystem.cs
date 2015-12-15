@@ -25,6 +25,11 @@ public enum Cards
 public class CardSystem : MonoBehaviour
 {
 	public Dictionary<int, GameObject> cardsLinker;
+	public List<Unit> castleZeroUnits;
+	public List<Unit> castleOneUnits;
+	public List<Unit> castleTwoUnits;
+	public List<Unit> castleThreeUnits;
+	public List<Unit> castleFourUnits;
 
 	public delegate void CardEffectCallback(Cards card);
 	public event CardEffectCallback OnEffectApplied = delegate { };
@@ -101,8 +106,36 @@ public class CardSystem : MonoBehaviour
 		throw new NotImplementedException();
 	}
 
-	private void UseAllianceCard(int amount, Player player) {
-		throw new NotImplementedException();
+	private void UseAllianceCard(CardData card, Player player) {	
+		List<Unit>[] totalUnits = 
+		{
+			castleZeroUnits,
+			castleOneUnits,
+			castleTwoUnits,
+			castleThreeUnits,
+			castleFourUnits
+		};
+
+		List<Unit> units;
+		Unit randomUnit;
+		float rand = UnityEngine.Random.Range(0, 4);
+
+		if (rand < totalUnits[player.CastleProgress].Count) {
+			// pick from
+			for(int i = 0; i <= player.CastleProgress; i++)
+			{
+				units.Add (totalUnits[i]);
+			}
+			float randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
+			randomUnit = units[randomUnitIndex];
+		} else {
+			// pick from
+			units = totalUnits[player.CastleProgress + 1];
+			float randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
+			randomUnit = units[randomUnitIndex];
+		}
+		
+		player.PlayerArmy.Units.Add (randomUnit);
 	}
 
 	private void UseScoutCard(int amount, Player player) {
