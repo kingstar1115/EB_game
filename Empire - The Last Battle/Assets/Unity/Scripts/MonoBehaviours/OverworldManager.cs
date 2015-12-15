@@ -4,7 +4,7 @@ using UnityEngine;
 public class OverworldManager : MonoBehaviour
 {
 	public OverworldUI _OverworldUI;
-	public CardData _AvailableCaveCards;
+	public CardList _AvailableCaveCards;
 	public Board _Board;
 	public Player _BattlebeardPlayer;
 
@@ -71,8 +71,7 @@ public class OverworldManager : MonoBehaviour
 		}
 	}
 
-	public void HealTroops(Player player)
-	{
+	public void HealTroops(Player player) {
 		//Change magic number to function once more castle code is in
 		if (player.CastleProgress >= 4)
 			return;
@@ -88,11 +87,12 @@ public class OverworldManager : MonoBehaviour
 		}
 	}
 
-	public Cards GenerateRandomCard(List<Cards> availableCards) {
+	public CardData GenerateRandomCard(List<CardData> availableCards) {
 		//Generate a random card (Warning: This is weighted heavily towards resource cards because 
 		//there are more of them in the enum, change this later?)
 		short randomCardIndex = (short)UnityEngine.Random.Range(0, availableCards.Count - 1);
-		var card = (Cards)randomCardIndex;
+		CardData card = availableCards [randomCardIndex];
+
 		return card;
 	}
 
