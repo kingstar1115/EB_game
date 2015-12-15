@@ -34,12 +34,9 @@ public class OverworldManager : MonoBehaviour
 
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-		foreach (Unit u in _BattlebeardPlayer.PlayerArmy.Units) {
-			Debug.Log(u.Type);
-			Debug.Log(u.GetHPPercentage());
-		}
 
 		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
+		// TEST
 		UseCard(Cards.Scout_Card_1);
 	}
 
@@ -74,6 +71,7 @@ public class OverworldManager : MonoBehaviour
 
 	void HandleTileEvent(TileData tile) {
 		if (_BattlebeardPlayer.IsScouting) {
+			_BattlebeardPlayer.IsScouting = false;
 			return;
 		}
 		switch (tile.Building) {
