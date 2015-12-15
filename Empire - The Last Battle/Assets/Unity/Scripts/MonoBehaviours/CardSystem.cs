@@ -16,6 +16,12 @@ public enum CardType {
 public class CardSystem : MonoBehaviour {	
 
 	public CardList cardList;
+    // Units availiable from using alliance card at different castle levels.
+    public List<UnitType> allianceCardUnitsZero;
+	public List<UnitType> allianceCardUnitsOne;
+	public List<UnitType> allianceCardUnitsTwo;
+	public List<UnitType> allianceCardUnitsThree;
+	public List<UnitType> allianceCardUnitsFour;
 
 	public delegate void CardCallback(CardData card, Player player);
 	public event CardCallback OnEffectApplied = delegate { };
@@ -86,9 +92,40 @@ public class CardSystem : MonoBehaviour {
 	private void UseTacticCard(CardData card, Player player) {
 		throw new NotImplementedException();
 	}
-	
-	private void UseAllianceCard(CardData card, Player player) {
-		throw new NotImplementedException();
+
+	private void UseAllianceCard(CardData card, Player player) {	
+		List<UnitType>[] totalUnits = 
+		{
+			allianceCardUnitsZero,
+			allianceCardUnitsOne,
+			allianceCardUnitsTwo,
+			allianceCardUnitsThree,
+			allianceCardUnitsFour
+		};
+
+		List<UnitType> units = new List<UnitType>();
+		UnitType randomUnit;
+		int rand = UnityEngine.Random.Range(0, 100);
+        
+        int totalNextUnits = 0;
+        if (player.CastleProgress < 4) {
+            totalNextUnits = totalUnits[player.CastleProgress+1].Count;
+        }
+        
+		if (rand >= totalNextUnits) {
+			for(int i = 0; i <= player.CastleProgress; i++)
+			{
+				units.AddRange (totalUnits[i]);
+			}
+			int randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
+			randomUnit = units[randomUnitIndex];
+		} else {
+			units = totalUnits[player.CastleProgress + 1];
+			int randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
+			randomUnit = units[randomUnitIndex];
+		}
+
+		player.PlayerArmy.AddUnit(randomUnit);
 	}
 
 	private void UseScoutCard(CardData card, Player player) {
