@@ -9,6 +9,8 @@ public class Board : MonoBehaviour {
     public FlagManager _FlagManager;
 	public TileData _BBStartTile;
 	public TileData _SSStartTile;
+    public string _MarkerCommanderBB_Tag;
+    public string _MarkerCommanderSS_Tag;
 
     public void Initialise() {
         _TileTypeDataManager.Initialise();
@@ -35,13 +37,25 @@ public class Board : MonoBehaviour {
                 if (!loadGame) {
                     tile.Height = GetRandomHeight(tile);
                 }
+
                 Vector3 position = new Vector3(i * _TileWidth, tile.Height, j * _TileWidth) + boardStart;
                 tile.TileObject = (GameObject)Instantiate(GetTerrain(tile), position, Quaternion.identity);
                 tile.TileObject.name = "Tile " + "[" + i + "," + j + "]";
+
+                //grab the tile holder 
+                TileHolder tileHolder = tile.TileObject.GetComponentInChildren<TileHolder>();
+                if (tileHolder == null)
+                    Debug.LogError("NO TILE HOLDER :O");
+
+                //if there is a building
                 if (GetBuilding(tile) != null) {
                     GameObject buildingGO = (GameObject)Instantiate(GetBuilding(tile), position, Quaternion.identity);
                     // Set building name??
                     buildingGO.transform.parent = tile.TileObject.transform;
+
+                    //add building commander markers to tile holder
+                    tileHolder._MarkerCommanderBB = Utils.GetFirstChildWithTag(_MarkerCommanderBB_Tag, tile.TileObject);
+                    tileHolder._MarkerCommanderSS = Utils.GetFirstChildWithTag(_MarkerCommanderSS_Tag, tile.TileObject);
                 }
                 // set owner flag
                 _FlagManager.SetFlagForTile(tile);
@@ -55,10 +69,11 @@ public class Board : MonoBehaviour {
 				}
 				
                 // add tile reference to game object
-                tile.TileObject.GetComponentInChildren<TileHolder>()._Tile = tile;
+                tileHolder._Tile = tile;
                 if (!CanTraverse(tile)) {   
                     continue;
                 }
+
                 for (int x = i - 1; x <= i + 1; x++) {
                     for (int y = j - 1; y <= j + 1; y++) {
                         if (x == i && y == j) {
@@ -127,17 +142,20 @@ public class Board : MonoBehaviour {
 
 
 
-	public HashSet<TileData> GetReachableTiles(TileData fromTile, int distance)
+	public HashSet<TileData> GetReachableTiles(PlayerType pType, TileData fromTile, int distance)
 	{
 		HashSet<TileData> foundTiles = new HashSet<TileData>();
 		if (distance == 0 || fromTile == null) {
 			return foundTiles;
 		}
 		foreach (TileData t in fromTile.GetConnectedTiles()) {
-			foundTiles.Add(t);
-            HashSet<TileData> tilesForT = GetReachableTiles(t, distance - 1);
+            if ((pType == PlayerType.Battlebeard && t != _SSStartTile) || (pType == PlayerType.Stormshaper && t != _BBStartTile))
+			    foundTiles.Add(t);
+            HashSet<TileData> tilesForT = GetReachableTiles(pType, t, distance - 1);
             foreach (TileData tt in tilesForT) {
-				foundTiles.Add(tt);
+                //check that thetile is not the oponents start tile 
+                if((pType == PlayerType.Battlebeard && tt != _SSStartTile) || (pType == PlayerType.Stormshaper && tt != _BBStartTile))
+				    foundTiles.Add(tt);
 			}
 		}
 		return foundTiles;
