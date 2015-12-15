@@ -38,10 +38,12 @@ public class Board : MonoBehaviour {
                 Vector3 position = new Vector3(i * _TileWidth, tile.Height, j * _TileWidth) + boardStart;
                 tile.TileObject = (GameObject)Instantiate(GetTerrain(tile), position, Quaternion.identity);
                 tile.TileObject.name = "Tile " + "[" + i + "," + j + "]";
+				rotateRandom(tile.TileObject);
                 if (GetBuilding(tile) != null) {
                     GameObject buildingGO = (GameObject)Instantiate(GetBuilding(tile), position, Quaternion.identity);
                     // Set building name??
                     buildingGO.transform.parent = tile.TileObject.transform;
+					rotateRandom(buildingGO);
                 }
                 // set owner flag
                 _FlagManager.SetFlagForTile(tile);
@@ -73,6 +75,11 @@ public class Board : MonoBehaviour {
             }
         }
     }
+
+	void rotateRandom(GameObject obj) {
+		int i = Random.Range (0, 3) * 90;
+		obj.transform.Rotate (new Vector3 (0, i, 0));
+	}
 
     public void SetTileOwner(TileData t, PlayerType p) {
         t.Owner = p;
