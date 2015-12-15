@@ -92,7 +92,7 @@ public class CardSystem : MonoBehaviour {
 	}
 
 	private void UseScoutCard(CardData card, Player player) {
-		int availableScouts = player.PlayerArmy.GetUnits(UnitType.Scout).Count;
+		int availableScouts = player.PlayerArmy.GetActiveUnits(UnitType.Scout).Count;
         if (availableScouts > 0) {
             Mathf.Clamp(availableScouts++, 2, 4);
             player.IsScouting = true;
