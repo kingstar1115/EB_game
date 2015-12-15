@@ -42,9 +42,7 @@ public class OverworldManager : MonoBehaviour
 
 	void _CardSystem_OnEffectApplied(Cards card) {
 		if (card == Cards.Scout_Card_1) {
-			Debug.Log(card);
 			int availableScouts = _BattlebeardPlayer.PlayerArmy.GetUnits(UnitType.Scout).Count;
-			Debug.Log(availableScouts);
 			if (availableScouts > 0) {
 				Mathf.Clamp(availableScouts++, 2, 4);
 				// Make sure these are reset the next turn!
