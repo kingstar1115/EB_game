@@ -12,6 +12,7 @@ public class OverworldManager : MonoBehaviour
     public Player _StormshapersPlayer;
     public Player _CurrentPlayer;
     public TurnManager _TurnManager;
+	public GameStateHolder _GameStateHolder;
 
 	// Use this for initialization
 	void Start() {
@@ -52,6 +53,10 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.OnCommanderMove += _OverworldUI_OnCommanderMove;
         _OverworldUI.OnPause += _OverworldUI_OnPause;
         _OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
+		_BattlebeardPlayer.OnCardAdded += _BattlebeardPlayer_OnCardAdded;
+		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
+		_StormshapersPlayer.OnCardAdded += _StormshapersPlayer_OnCardAdded;
+		_StormshapersPlayer.OnCardRemoved += _StormshapersPlayer_OnCardRemoved;
 
 		//allow player movement for the start ****JUST FOR TESTING****
         //_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.Type, _BattlebeardPlayer.CommanderPosition, 1));
@@ -67,6 +72,30 @@ public class OverworldManager : MonoBehaviour
         _TurnManager.StartTurn();
 	}
 
+	void _BattlebeardPlayer_OnCardAdded(CardData card)
+	{
+		//inform ui
+		_OverworldUI.AddPlayerCard (PlayerType.Battlebeard, card);
+	}
+
+	void _BattlebeardPlayer_OnCardRemoved(CardData card)
+	{
+		//inform ui
+		_OverworldUI.RemovePlayerCard (PlayerType.Battlebeard, card);
+	}
+
+	void _StormshapersPlayer_OnCardAdded(CardData card)
+	{
+		//inform ui
+		_OverworldUI.AddPlayerCard (PlayerType.Stormshaper, card);
+	}
+
+	void _StormshapersPlayer_OnCardRemoved(CardData card)
+	{
+		//inform ui
+		_OverworldUI.RemovePlayerCard (PlayerType.Stormshaper, card);
+	}
+
 	void _CardSystem_OnEffectApplied(CardData card, Player player) {
         if (card.Type == CardType.Scout_Card)
         {
@@ -76,7 +105,11 @@ public class OverworldManager : MonoBehaviour
 
 	void UseCard(CardData card) {
 		//use the card
-		_CardSystem.ApplyEffect(card, _BattlebeardPlayer);`
+		if (_CardSystem.CanUseCard (card, _GameStateHolder._gameState)) 
+		{
+			_CardSystem.ApplyEffect (card, _CurrentPlayer);
+			_CurrentPlayer.RemoveCard(card);
+		}
 	}
 
     void _OverworldUI_OnUnPause()

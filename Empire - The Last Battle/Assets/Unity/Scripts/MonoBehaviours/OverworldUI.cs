@@ -128,6 +128,16 @@ public class OverworldUI : MonoBehaviour
 		_CameraMovement.EnableCameraMovement(new Vector3(transform.position.x, transform.position.y, transform.position.z));
 	}
 
+	public void AddPlayerCard(PlayerType pType, CardData cData)
+	{
+		//update the hand ui here
+	}
+
+	public void RemovePlayerCard(PlayerType pType, CardData cData)
+	{
+		//update the hand ui here
+	}
+
     void Update()
     {
         //check for pause switch by key 

@@ -54,8 +54,10 @@ public class Player : MonoBehaviour
 	public void RemoveCard(CardData cardToRemove)
 	{
 		//update hand and trigger event
-		if(Hand.cards.Remove (cardToRemove))
+		if (Hand.cards.Remove (cardToRemove))
 			OnCardRemoved (cardToRemove);
+		else
+			Debug.LogError ("trying ot remove card that doesnt exist :O");
 		
 	}
 }

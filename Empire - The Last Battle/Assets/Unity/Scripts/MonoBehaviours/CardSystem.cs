@@ -32,6 +32,12 @@ public class CardSystem : MonoBehaviour {
 
 	}
 
+	public bool CanUseCard(CardData cData, GameState gameState)
+	{
+		//check that the card can use the game state 
+		return (cData.UseableGameState & gameState) == gameState;
+	}
+
 	public void ApplyEffect(CardData card, Player player) {
 		switch (card.Type) {
 		case CardType.Healing_Card:
