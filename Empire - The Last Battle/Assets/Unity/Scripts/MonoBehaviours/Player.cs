@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+	public delegate void CardAction(CardData cardData);
+	public event CardAction OnCardAdded = delegate {};
+	public event CardAction OnCardRemoved = delegate {};
+
     public TileData CommanderPosition;
     public PlayerType Type;
 	public PointsSystem Currency;
@@ -37,7 +41,25 @@ public class Player : MonoBehaviour
         else
             Debug.LogError("Trying to kill too many Lost Immortals");
     }
+
+	public void AddCard(CardData cardToAdd)
+	{
+		//update hand 
+		Hand.cards.Add (cardToAdd);
+
+		//event for adding card
+		OnCardAdded (cardToAdd);
+	}
+
+	public void RemoveCard(CardData cardToRemove)
+	{
+		//update hand and trigger event
+		if(Hand.cards.Remove (cardToRemove))
+			OnCardRemoved (cardToRemove);
+		
+	}
 }
+
 public enum PlayerType
 {
     None,

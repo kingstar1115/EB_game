@@ -50,7 +50,8 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void UseCard(CardData card) {
-		_CardSystem.ApplyEffect(card, _BattlebeardPlayer);
+		//use the card
+		_CardSystem.ApplyEffect(card, _BattlebeardPlayer);`
 	}
 
     void _OverworldUI_OnUnPause()

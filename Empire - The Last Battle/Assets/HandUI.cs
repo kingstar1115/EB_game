@@ -5,6 +5,7 @@ using System.Collections.Generic;
 [RequireComponent(typeof(LerpRotation))]
 public class HandUI : MonoBehaviour 
 {
+	public Pool m_CardPrefabPool;
     public List<CardUI> m_Cards;
     public float m_ZRotSpacing;
     public int m_focusedCardIndex;
@@ -44,6 +45,5 @@ public class HandUI : MonoBehaviour
 
         //rotate the hand ui minus half total
         m_lerpRotation.LerpTo(Quaternion.Euler(0,0,-totalRotation/2));
-
     }
 }
