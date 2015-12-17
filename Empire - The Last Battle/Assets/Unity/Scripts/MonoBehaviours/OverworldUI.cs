@@ -14,6 +14,7 @@ public class OverworldUI : MonoBehaviour
     public CommanderUI _CommanderUI;
     public CameraMovement _CameraMovement;
     public BoardUI _BoardUI;
+	public ArmyUI _ArmyUI;
     public GameObject _PauseScreen;
 
     bool _paused;

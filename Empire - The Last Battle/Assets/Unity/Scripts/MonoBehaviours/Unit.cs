@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 [System.Serializable]
@@ -47,6 +47,10 @@ public class Unit {
 
 	public void Heal() {
 		CurrentBaseHP = BaseData.HP; 
+	}
+
+	public bool HasUpgrade() {
+		return CurrentUpgrade != null;
 	}
 
 	public void AddUpgrade(UnitBaseData Upgrade) {
