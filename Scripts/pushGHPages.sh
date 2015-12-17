@@ -16,4 +16,4 @@ git commit -m "Push to github pages"
 git push --force --quiet "https://github.com/eharris93/ELB.git" gh-pages
 
 echo "Publish done"
-# fi
+fi
