@@ -15,6 +15,3 @@ deploy:
   skip_cleanup: true
   on:
     repo: eharris93/ELB
-env:
-  global:
-    GH_REF: github.com/eharris93/ELB.git
