@@ -11,9 +11,21 @@ public class HandUI : MonoBehaviour
     public int m_focusedCardIndex;
     LerpRotation m_lerpRotation;
 
+	public void Init(List<CardData> cardsToAdd)
+	{
+		//add new cards
+		foreach (var card in cardsToAdd) {
+			AddNewCard(card);
+		}
+
+		//update spacing 
+		UpdateRotations ();
+	}
+
 	// Use this for initialization
 	void Start () {
 
+		/*
         //init all the car ui
         foreach (var cardUI in m_Cards)
         {
@@ -22,11 +34,27 @@ public class HandUI : MonoBehaviour
 
         m_lerpRotation = this.GetComponent<LerpRotation>();
         UpdateRotations();
+        */
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
+	}
+
+	public void AddNewCard(CardData data)
+	{
+		//create the prefab 
+		GameObject newCard = m_CardPrefabPool.GetPooledObject ();
+		CardUI cardUI = newCard.GetComponent<CardUI>();
+		if (cardUI != null) {
+			//add as perent 
+			newCard.transform.parent = this.transform;
+			//add to the list
+			m_Cards.Add(cardUI);
+		} else {
+			Debug.LogError("No CarUI script on card ui pooled object prefab :O");
+		}
 	}
 
     public void UpdateRotations()

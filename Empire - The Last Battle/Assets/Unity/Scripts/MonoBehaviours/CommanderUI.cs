@@ -17,6 +17,7 @@ public class CommanderUI : MonoBehaviour
     public event V3Action OnCommanderDrop = delegate { };
 
     public Player _Player;
+	public HandUI _HandUI;
     public float _LiftedHeight;
     public float _LiftTime;
     public float _MoveTime;
@@ -68,6 +69,12 @@ public class CommanderUI : MonoBehaviour
 
         //event listener
         _lerpPosition.OnLerpFinished += _lerpPosition_OnLerpFinished;
+	}
+
+	public void Initialise(List<CardData> startHand)
+	{
+		Initialise();
+		_HandUI.Init (startHand);
 	}
 
     void _lerpPosition_OnLerpFinished()

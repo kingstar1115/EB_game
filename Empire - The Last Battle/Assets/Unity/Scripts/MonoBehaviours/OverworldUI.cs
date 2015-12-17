@@ -16,6 +16,9 @@ public class OverworldUI : MonoBehaviour
     public BoardUI _BoardUI;
     public GameObject _PauseScreen;
 
+	//******TEST ONLY******
+	public List<CardData> _StartCardData;
+
     bool _paused;
     public bool _Paused
     {
@@ -41,7 +44,7 @@ public class OverworldUI : MonoBehaviour
     public void Initialise()
     {
         _BoardUI.Init();
-		_CommanderUI.Initialise();
+		_CommanderUI.Initialise(_StartCardData);
 
         //add event listeners
         Enable();
