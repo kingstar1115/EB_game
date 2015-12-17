@@ -1,0 +1,20 @@
+language: objective-c
+install:
+- "./Scripts/install.sh"
+script:
+- "./Scripts/build.sh"
+after_success:
+- "./Scripts/pushGHPages.sh"
+deploy:
+  provider: s3
+  access_key_id: $ACCESS_KEY_ID
+  secret_access_key: $SECRET_ACCESS_KEY
+  bucket: spacesausage
+  local-dir: Build
+  upload-dir: GameJam
+  skip_cleanup: true
+  on:
+    repo: eharris93/GameJam
+env:
+  global:
+    GH_REF: github.com/eharris93/GameJam.git
