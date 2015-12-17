@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
 public class OverworldManager : MonoBehaviour
 {
@@ -8,6 +9,9 @@ public class OverworldManager : MonoBehaviour
 	public CardSystem _CardSystem;
 	public Board _Board;
 	public Player _BattlebeardPlayer;
+    public Player _StormshapersPlayer;
+    public Player _CurrentPlayer;
+    public TurnManager _TurnManager;
 
 	// Use this for initialization
 	void Start() {
@@ -17,13 +21,32 @@ public class OverworldManager : MonoBehaviour
 		_BattlebeardPlayer.Initialise();
 
 		//try get the battleboard start tile
-		if (_Board._BBStartTile != null)
-			_BattlebeardPlayer.CommanderPosition = _Board._BBStartTile;
-		else
-			Debug.LogError("Battlebeard start tile not set");
+		if (_Board._BBStartTile != null) {
+            _BattlebeardPlayer.CommanderPosition = _Board._BBStartTile;
+        }else{
+            Debug.LogError("Battleboard start tile not set");
+        }
+
+        if(_Board._SSStartTile != null){
+            _StormshapersPlayer.CommanderPosition = _Board._SSStartTile;
+        }else{
+            Debug.LogError("Stormshaper start tile not set");
+        }
+
+        _TurnManager.OnTurnStart += _TurnManager_OnTurnStart;
+        _TurnManager.OnTurnEnd += _TurnManager_OnTurnEnd;
+        _TurnManager.OnSwitchTurn += _TurnManager_OnSwitchTurn;
 
 		//snap player to start position
-		_OverworldUI.UpdateCommanderPosition();
+        _OverworldUI.UpdateCommanderPosition();
+
+        _OverworldUI._CommanderUI = _StormshapersPlayer.gameObject.GetComponent<CommanderUI>();
+
+        _OverworldUI.Initialise();
+
+        _OverworldUI.UpdateCommanderPosition();
+
+        _OverworldUI._CommanderUI = _BattlebeardPlayer.gameObject.GetComponent<CommanderUI>();
 
 		//event listeners
 		_OverworldUI.OnCommanderMove += _OverworldUI_OnCommanderMove;
@@ -40,6 +63,8 @@ public class OverworldManager : MonoBehaviour
 		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
 		// TEST
 		UseCard(_AvailableCaveCards.cards[0]);
+        _CurrentPlayer = _BattlebeardPlayer;
+        _TurnManager.StartTurn();
 	}
 
 	void _CardSystem_OnEffectApplied(CardData card, Player player) {
@@ -66,22 +91,31 @@ public class OverworldManager : MonoBehaviour
 
 	void _OverworldUI_OnCommanderMove(TileData tile) {
 		//set new position for the player (should depend on whose players turn it is)
-		_BattlebeardPlayer.CommanderPosition = tile;
+		_CurrentPlayer.CommanderPosition = tile;
 
 		//****JUST FOR TESTING**** set new reachable tiles
-        _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.Type, _BattlebeardPlayer.CommanderPosition, 1));
+		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_CurrentPlayer.Type, _CurrentPlayer.CommanderPosition, 1));
 
 		//Handles events that happen when player lands on that tile
 		HandleTileEvent(tile);
 	}
+    //This is temporary until we actually have things that happen after the move
+    IEnumerator SwitchPlayer() {
+        yield return new WaitForSeconds(2);
+        _TurnManager.SwitchTurn();
+    }
 
 	void HandleTileEvent(TileData tile) {
 		if (_BattlebeardPlayer.IsScouting) {
 			_BattlebeardPlayer.IsScouting = false;
+			_TurnManager.EndTurn();
+			StartCoroutine(SwitchPlayer());
 			return;
 		}
 		switch (tile.Building) {
 			case BuildingType.None:
+                _TurnManager.EndTurn();
+                StartCoroutine(SwitchPlayer());
 				break;
 			case BuildingType.Armoury:
 				break;
@@ -98,7 +132,7 @@ public class OverworldManager : MonoBehaviour
 				break;
 			case BuildingType.Inn:
 				//Needs changing to current player once both players are in this class
-                HealTroops(_BattlebeardPlayer);
+                HealTroops(_CurrentPlayer);
 				break;
 			case BuildingType.StartTileBattlebeard:
 				break;
@@ -126,7 +160,7 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	public CardData GenerateRandomCard(List<CardData> availableCards) {
-		//Generate a random card (Warning: This is weighted heavily towards resource cards because 
+		//Generate a random card (Warning: This is weighted heavily towards resource cards because
 		//there are more of them in the enum, change this later?)
 		short randomCardIndex = (short)UnityEngine.Random.Range(0, availableCards.Count - 1);
 		CardData card = availableCards [randomCardIndex];
@@ -142,6 +176,31 @@ public class OverworldManager : MonoBehaviour
     public void UnPause()
     {
         _OverworldUI.Enable();
+    }
+
+    void _TurnManager_OnTurnStart() {
+        _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_CurrentPlayer.Type, _CurrentPlayer.CommanderPosition, 1));
+    }
+
+    void _TurnManager_OnTurnEnd() {
+        _OverworldUI.DisablePlayerMovement();
+    }
+
+    void _TurnManager_OnSwitchTurn() {
+        switch (_CurrentPlayer.tag) {
+            case "CommanderBB":
+                _CurrentPlayer = _StormshapersPlayer;
+                _OverworldUI._CommanderUI = _StormshapersPlayer.gameObject.GetComponent<CommanderUI>();
+                _OverworldUI.SwitchFocus(_CurrentPlayer.transform);
+                _TurnManager.StartTurn();
+                break;
+            case "CommanderSS":
+                _CurrentPlayer = _BattlebeardPlayer;
+                _OverworldUI._CommanderUI = _BattlebeardPlayer.gameObject.GetComponent<CommanderUI>();
+                _OverworldUI.SwitchFocus(_CurrentPlayer.transform);
+                _TurnManager.StartTurn();
+                break;
+        }
     }
 
 	// Update is called once per frame
