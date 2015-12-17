@@ -11,10 +11,10 @@ deploy:
   secret_access_key: $SECRET_ACCESS_KEY
   bucket: spacesausage
   local-dir: Build
-  upload-dir: GameJam
+  upload-dir: ELB
   skip_cleanup: true
   on:
-    repo: eharris93/GameJam
+    repo: eharris93/ELB
 env:
   global:
-    GH_REF: github.com/eharris93/GameJam.git
+    GH_REF: github.com/eharris93/ELB.git

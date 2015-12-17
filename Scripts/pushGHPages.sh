@@ -1,6 +1,6 @@
 #! /bin/sh
 
-if [ "$TRAVIS_REPO_SLUG" == "eharris93/GameJam" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
+if [ "$TRAVIS_REPO_SLUG" == "eharris93/ELB" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
 
 echo "Looks good to publish to gh-page"
 
