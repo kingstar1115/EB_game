@@ -3,5 +3,5 @@ using System.Collections;
 
 public class ArmyUIHolder : MonoBehaviour
 {
-	UnitType _UnitType;	
+	public UnitType _UnitType;	
 }
