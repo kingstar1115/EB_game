@@ -124,6 +124,11 @@ public class OverworldUI : MonoBehaviour
         OnUnPause();
     }
 
+	public void SwitchFocus(Transform transform){
+		_CameraMovement._TargetObject = transform;
+		_CameraMovement.EnableCameraMovement(new Vector3(transform.position.x, transform.position.y, transform.position.z));
+	}
+
     void Update()
     {
         //check for pause switch by key 
