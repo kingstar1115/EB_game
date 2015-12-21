@@ -19,12 +19,13 @@ public class OverworldManager : MonoBehaviour
 		_Board.Initialise();
 		_OverworldUI.Initialise();
 		_BattlebeardPlayer.Initialise();
+		_StormshapersPlayer.Initialise();
 
 		//try get the battleboard start tile
 		if (_Board._BBStartTile != null) {
             _BattlebeardPlayer.CommanderPosition = _Board._BBStartTile;
         }else{
-            Debug.LogError("Battleboard start tile not set");
+            Debug.LogError("Battlebeard start tile not set");
         }
 
         if(_Board._SSStartTile != null){
@@ -62,8 +63,8 @@ public class OverworldManager : MonoBehaviour
 
 		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
 		// TEST
+		_CurrentPlayer = _BattlebeardPlayer;
 		UseCard(_AvailableCaveCards.cards[0]);
-        _CurrentPlayer = _BattlebeardPlayer;
         _TurnManager.StartTurn();
 	}
 
@@ -75,7 +76,7 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void UseCard(CardData card) {
-		_CardSystem.ApplyEffect(card, _BattlebeardPlayer);
+		_CardSystem.ApplyEffect(card, _CurrentPlayer);
 	}
 
     void _OverworldUI_OnUnPause()
@@ -105,41 +106,40 @@ public class OverworldManager : MonoBehaviour
     }
 
 	void HandleTileEvent(TileData tile) {
-		if (_BattlebeardPlayer.IsScouting) {
-			_BattlebeardPlayer.IsScouting = false;
-			_TurnManager.EndTurn();
-			StartCoroutine(SwitchPlayer());
-			return;
+		if (_CurrentPlayer.IsScouting) {
+			_CurrentPlayer.IsScouting = false;
+		} else {
+			switch (tile.Building) {
+				case BuildingType.None:
+					break;
+				case BuildingType.Armoury:
+					break;
+				case BuildingType.Camp:
+					break;
+				case BuildingType.CastleBattlebeard:
+					break;
+				case BuildingType.CastleStormshaper:
+					break;
+				case BuildingType.Cave:
+					GenerateRandomCard(_AvailableCaveCards.cards);
+					break;
+				case BuildingType.Fortress:
+					break;
+				case BuildingType.Inn:
+					//Needs changing to current player once both players are in this class
+					HealTroops(_CurrentPlayer);
+					break;
+				case BuildingType.StartTileBattlebeard:
+					break;
+				case BuildingType.StartTileStormshaper:
+					break;
+				default:
+					break;
+			}
 		}
-		switch (tile.Building) {
-			case BuildingType.None:
-                _TurnManager.EndTurn();
-                StartCoroutine(SwitchPlayer());
-				break;
-			case BuildingType.Armoury:
-				break;
-			case BuildingType.Camp:
-				break;
-			case BuildingType.CastleBattlebeard:
-				break;
-			case BuildingType.CastleStormshaper:
-				break;
-			case BuildingType.Cave:
-				GenerateRandomCard(_AvailableCaveCards.cards);
-				break;
-			case BuildingType.Fortress:
-				break;
-			case BuildingType.Inn:
-				//Needs changing to current player once both players are in this class
-                HealTroops(_CurrentPlayer);
-				break;
-			case BuildingType.StartTileBattlebeard:
-				break;
-			case BuildingType.StartTileStormshaper:
-				break;
-			default:
-				break;
-		}
+
+		_TurnManager.EndTurn();
+		StartCoroutine(SwitchPlayer());
 	}
 
 	public void HealTroops(Player player) {
@@ -186,14 +186,14 @@ public class OverworldManager : MonoBehaviour
     }
 
     void _TurnManager_OnSwitchTurn() {
-        switch (_CurrentPlayer.tag) {
-            case "CommanderBB":
+        switch (_CurrentPlayer.Type) {
+            case PlayerType.Battlebeard:
                 _CurrentPlayer = _StormshapersPlayer;
                 _OverworldUI._CommanderUI = _StormshapersPlayer.gameObject.GetComponent<CommanderUI>();
                 _OverworldUI.SwitchFocus(_CurrentPlayer.transform);
                 _TurnManager.StartTurn();
                 break;
-            case "CommanderSS":
+            case PlayerType.Stormshaper:
                 _CurrentPlayer = _BattlebeardPlayer;
                 _OverworldUI._CommanderUI = _BattlebeardPlayer.gameObject.GetComponent<CommanderUI>();
                 _OverworldUI.SwitchFocus(_CurrentPlayer.transform);
