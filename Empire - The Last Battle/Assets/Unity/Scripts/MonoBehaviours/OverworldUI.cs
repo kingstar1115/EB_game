@@ -39,10 +39,10 @@ public class OverworldUI : MonoBehaviour
     }
 
     // Use this for initialization
-    public void Initialise()
-    {
+    public void Initialise() {
         _BoardUI.Init();
 		_CommanderUI.Initialise();
+		_ArmyUI.Initialise();
 
         //add event listeners
         Enable();

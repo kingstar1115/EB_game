@@ -11,56 +11,81 @@ public class ArmyUI : MonoBehaviour {
 			return UI[(int)currentPlayer - 1];
 		}
 	}
-	[Range(0, 1)]
 	public float MaxWidth = 820;
 	public float MinWidth = 105;
+	public float SmallIconSize = 88.75f;
+	public float LargeIconSize = 110;
 
 	PlayerType currentPlayer;
 	Dictionary<PlayerType, Dictionary<MouseOverItem, List<UnitUI>>> uiData;
+	// cache
 	List<MouseOverItem> cachedUnitHolders;
+	Dictionary<MouseOverItem, List<UnitUI>> cachedUIData;
 
-	int selection = -1;
-	int currentSelection {
-		get {
-			return selection;
+	Vector2 lastMousePos;
+
+	int previousSelection = 0;
+	int currentSelection = -1;
+
+	void setSelection(int i) {
+		if (i == currentSelection || uiData == null) {
+			return;
+		} else if (i == -1) {
+			hideSubmenu(currentSelection);
+		} else {
+			if (currentSelection != -1) {
+				hideSubmenu(currentSelection);
+			}
+			showSubmenu(i);
 		}
-		set {
-			if (value == selection) {
-				return;
-			}
-			else if (value == -1) {
-				hideSubmenu(selection);
-			}
-			else {
-				if (selection != -1) {
-					hideSubmenu(selection);
-				}
-				showSubmenu(value);
-			}
-			selection = value;
-		}
+		previousSelection = currentSelection;
+		currentSelection = i;
 	}
 
 	// Use this for initialization
-	void Initialise () {
+	public void Initialise () {
+		currentPlayer = PlayerType.Battlebeard;
+		lastMousePos = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 		uiData = new Dictionary<PlayerType, Dictionary<MouseOverItem, List<UnitUI>>>();
+		Debug.Log(uiData);
 		for (int i = 1; i <= 2; i++) {
 			Dictionary<MouseOverItem, List<UnitUI>> playerUI = new Dictionary<MouseOverItem, List<UnitUI>>();
 			MouseOverItem[] t = UI[i-1].GetComponentsInChildren<MouseOverItem>();
-			foreach (MouseOverItem child in t) {
-				if (child.transform.parent == UI[i-1].transform) {
-					playerUI.Add(child, new List<UnitUI>(child.GetComponentsInChildren<UnitUI>()));
+			for (int j = 0; j < t.Length; j++) {
+				if (t[j].transform.parent == UI[i-1].transform) {
+
+					playerUI.Add(t[j], new List<UnitUI>(t[j].GetComponentsInChildren<UnitUI>()));
 				}
 			}
 			uiData.Add((PlayerType)i, playerUI);
 		}
 	}
 
+	Dictionary<MouseOverItem, List<UnitUI>> getUIData() {
+		if (cachedUIData == null) {
+			Dictionary<MouseOverItem, List<UnitUI>> selection;
+			Debug.Log(currentPlayer);
+			Debug.Log(uiData);
+			uiData.TryGetValue(currentPlayer, out selection);
+			if (selection != null) {
+				cachedUIData = selection;
+			} else {
+				return null;
+			}
+		}
+		return cachedUIData;
+	}
 
+	List<UnitUI> getUnitData(MouseOverItem m) {
+		Dictionary<MouseOverItem, List<UnitUI>> uiData = getUIData();
+		List<UnitUI> ui;
+		uiData.TryGetValue(m, out ui);
+		return ui;
+	}
 
 	List<MouseOverItem> getUnitHolders() {
 		if (cachedUnitHolders == null) {
-			Dictionary<MouseOverItem, List<UnitUI>> selection;
+			Dictionary<MouseOverItem, List<UnitUI>> selection = getUIData();
 			uiData.TryGetValue(currentPlayer, out selection);
 			if (selection != null) {
 				cachedUnitHolders = new List<MouseOverItem>(selection.Keys);
@@ -79,8 +104,14 @@ public class ArmyUI : MonoBehaviour {
 	}
 
 	void resetUI() {
+		clearCache();
+		setSelection(-1);
+		previousSelection = 0;
+	}
+
+	void clearCache() {
 		cachedUnitHolders = null;
-		currentSelection = -1;
+		cachedUIData = null;
 	}
 
 	public void GenerateUI(Player p) {
@@ -89,16 +120,24 @@ public class ArmyUI : MonoBehaviour {
 
 	void showSubmenu(int i) {
 		MouseOverItem currentItem = getUnitHolders()[i];
-		RectTransform rect = currentItem.GetComponentInChildren<RectTransform>();
-		rect.offsetMax = new Vector2(MaxWidth, rect.offsetMax.y);
-		currentItem.GetComponentInChildren<CanvasGroup>().alpha = 1;
+		LerpRectTransform trans = currentItem.GetComponentInChildren<LerpRectTransform>();
+		// Resize item
+		float width = getUnitData(currentItem).Count * SmallIconSize + LargeIconSize;
+		if (width > MaxWidth) { width = MaxWidth; }
+		trans.ResizeWidth(width);
+		// fade in
+		FadeCanvasGroup fCG = currentItem.GetComponentInChildren<FadeCanvasGroup>();
+		fCG.FadeTo(1);
 	}
 
 	void hideSubmenu(int i) {
 		MouseOverItem currentItem = getUnitHolders()[i];
-		RectTransform rect = currentItem.GetComponentInChildren<RectTransform>();
-		rect.offsetMax = new Vector2(MinWidth, rect.offsetMax.y);
-		currentItem.GetComponentInChildren<CanvasGroup>().alpha = 0;
+		LerpRectTransform trans = currentItem.GetComponentInChildren<LerpRectTransform>();
+		// resize item
+		trans.ResizeWidth(MinWidth);
+		// fade out
+		FadeCanvasGroup fCG = currentItem.GetComponentInChildren<FadeCanvasGroup>();
+		fCG.FadeTo(0);
 	}
 
 	void addUnit() {
@@ -136,31 +175,54 @@ public class ArmyUI : MonoBehaviour {
 		}
 	}
 
-	// Update is called once per frame
-	void OnGUI () {
-		// listen for mouseover
-		List<MouseOverItem> units = getUnitHolders();
-		for (int i = 0; i < units.Count; i++) {
-			if (units[i].isOver) {
-				currentSelection = i;
-				if (currentSelection != i) {
-					//if (currentSelection != -1) {
-					//	hideSubmenu(currentSelection);
-					//}
-					//showSubmenu(i);
-					//currentSelection = i;
+	void Update() {
+
+		bool leftDown = Input.GetKeyDown(KeyCode.LeftArrow);
+		bool rightDown = Input.GetKeyDown(KeyCode.RightArrow);
+		bool upDown = Input.GetKeyDown(KeyCode.UpArrow);
+		bool downDown = Input.GetKeyDown(KeyCode.DownArrow);
+
+		if (leftDown || rightDown || upDown || downDown) {
+			if (currentSelection == -1) {
+				// nothing is currently selected
+				if (rightDown) {
+					//show previous selected item in the list
+					setSelection(previousSelection);
+				}
+			} else {
+				// something is selected
+				if (leftDown) {
+					//hide all items;
+					setSelection(-1);
+				} else {
+					if (upDown) {
+						// select the previous menu
+						setSelection((currentSelection - 1 + cachedUnitHolders.Count) % cachedUnitHolders.Count);
+					} else if (downDown) {
+						//select the next menu
+						setSelection((currentSelection + 1) % cachedUnitHolders.Count);
+					}
 				}
 			}
-			else if (currentSelection == i) {
-				//hideSubmenu(currentSelection);
-				currentSelection = -1;
-			}
 		}
+		
 	}
 
-	void Start() {
-		SwitchPlayer(PlayerType.Battlebeard);
-		Initialise();
+	void OnGUI () {
+		// listen for mouse move
+		if (Input.GetAxis("Mouse X") != lastMousePos.x || Input.GetAxis("Mouse Y") != lastMousePos.y) {
+			List<MouseOverItem> units = getUnitHolders();
+			for (int i = 0; i < units.Count; i++) {
+				if (units[i].isOver) {
+					// show menu at i
+					setSelection(i);
+				} else if (currentSelection == i) {
+					// hide all menus
+					setSelection(-1);
+				}
+			}
+		}
+		lastMousePos = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 	}
 
 }

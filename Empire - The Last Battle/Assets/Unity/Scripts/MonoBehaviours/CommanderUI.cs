@@ -218,7 +218,7 @@ public class CommanderUI : MonoBehaviour
     {
         GameObject posMarker = getCommanderMarker(_Player.CommanderPosition.TileObject.GetComponentInChildren<TileHolder>());
         Vector3 newPosition = (posMarker != null) ? posMarker.transform.position : _Player.CommanderPosition.TileObject.transform.position;
-        newPosition.y = _Player.CommanderPosition.Height + _collider.bounds.extents.y;
+		newPosition.y = _Player.CommanderPosition.Height + _collider.bounds.extents.y;
         this.transform.position = newPosition;
         
         _lerpPosition.StopLerp();

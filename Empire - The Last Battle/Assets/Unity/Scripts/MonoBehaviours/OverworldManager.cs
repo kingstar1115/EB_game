@@ -61,10 +61,12 @@ public class OverworldManager : MonoBehaviour
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
 
+		_CurrentPlayer = _BattlebeardPlayer;
+
 		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
 		// TEST
-		_CurrentPlayer = _BattlebeardPlayer;
 		UseCard(_AvailableCaveCards.cards[0]);
+
         _TurnManager.StartTurn();
 	}
 
