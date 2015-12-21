@@ -7,13 +7,14 @@ public class UnitBaseData : ScriptableObject {
     public int HP;
 }
 
+// This is the correct order!
 public enum UnitType {
-    Archer,
-    AxeThrower,
-    Ballista,
-    Catapult,
-    Cavalry,
-    Scout,
-    Pikemen,
-    Warrior
+	Scout,
+	Pikemen,
+	Archer,
+	AxeThrower,
+	Warrior,
+	Cavalry,
+	Catapult,
+	Ballista
 }

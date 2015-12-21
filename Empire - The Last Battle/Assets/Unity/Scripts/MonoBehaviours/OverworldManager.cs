@@ -9,7 +9,7 @@ public class OverworldManager : MonoBehaviour
 	public CardSystem _CardSystem;
 	public Board _Board;
 	public Player _BattlebeardPlayer;
-    public Player _StormshapersPlayer;
+    public Player _StormshaperPlayer;
     public Player _CurrentPlayer;
     public TurnManager _TurnManager;
 
@@ -17,9 +17,19 @@ public class OverworldManager : MonoBehaviour
 	void Start() {
 		//new game setup
 		_Board.Initialise();
-		_OverworldUI.Initialise();
 		_BattlebeardPlayer.Initialise();
-		_StormshapersPlayer.Initialise();
+		_StormshaperPlayer.Initialise();
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Catapult);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Archer);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.AxeThrower);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Ballista);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Pikemen);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Warrior);
+		_OverworldUI.Initialise(_BattlebeardPlayer, _StormshaperPlayer);
 
 		//try get the battleboard start tile
 		if (_Board._BBStartTile != null) {
@@ -29,7 +39,7 @@ public class OverworldManager : MonoBehaviour
         }
 
         if(_Board._SSStartTile != null){
-            _StormshapersPlayer.CommanderPosition = _Board._SSStartTile;
+			_StormshaperPlayer.CommanderPosition = _Board._SSStartTile;
         }else{
             Debug.LogError("Stormshaper start tile not set");
         }
@@ -41,11 +51,11 @@ public class OverworldManager : MonoBehaviour
 		//snap player to start position
         _OverworldUI.UpdateCommanderPosition();
 
-        _OverworldUI._CommanderUI = _StormshapersPlayer.gameObject.GetComponent<CommanderUI>();
+        _OverworldUI._CommanderUI = _StormshaperPlayer.gameObject.GetComponent<CommanderUI>();
 
-        _OverworldUI.Initialise();
+		_OverworldUI.Initialise(_BattlebeardPlayer, _StormshaperPlayer);
 
-        _OverworldUI.UpdateCommanderPosition();
+		_OverworldUI.UpdateCommanderPosition();
 
         _OverworldUI._CommanderUI = _BattlebeardPlayer.gameObject.GetComponent<CommanderUI>();
 
@@ -57,22 +67,21 @@ public class OverworldManager : MonoBehaviour
 		//allow player movement for the start ****JUST FOR TESTING****
         //_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.Type, _BattlebeardPlayer.CommanderPosition, 1));
 
-
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-
 		_CurrentPlayer = _BattlebeardPlayer;
 
 		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
+
+		_TurnManager.StartTurn();
+
 		// TEST
 		UseCard(_AvailableCaveCards.cards[0]);
 
-        _TurnManager.StartTurn();
+        
 	}
 
 	void _CardSystem_OnEffectApplied(CardData card, Player player) {
-        if (card.Type == CardType.Scout_Card)
-        {
+        if (card.Type == CardType.Scout_Card) {
+			Debug.Log(card.Value);
             _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(player.Type, player.CommanderPosition, card.Value));
 		}
 	}
@@ -190,8 +199,8 @@ public class OverworldManager : MonoBehaviour
     void _TurnManager_OnSwitchTurn() {
         switch (_CurrentPlayer.Type) {
             case PlayerType.Battlebeard:
-                _CurrentPlayer = _StormshapersPlayer;
-                _OverworldUI._CommanderUI = _StormshapersPlayer.gameObject.GetComponent<CommanderUI>();
+                _CurrentPlayer = _StormshaperPlayer;
+                _OverworldUI._CommanderUI = _StormshaperPlayer.gameObject.GetComponent<CommanderUI>();
                 _OverworldUI.SwitchFocus(_CurrentPlayer.transform);
                 _TurnManager.StartTurn();
                 break;

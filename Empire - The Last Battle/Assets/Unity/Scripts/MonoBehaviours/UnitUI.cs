@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class UnitUI : MonoBehaviour {
@@ -29,6 +30,9 @@ public class UnitUI : MonoBehaviour {
 		}
 	}
 
+	public void SetImage(Sprite s) {
+		GetComponentInChildren<Image>().gameObject.GetComponentsInChildren<Image>()[1].sprite = s;
+	}
 
 	// Use this for initialization
 	void Start () {

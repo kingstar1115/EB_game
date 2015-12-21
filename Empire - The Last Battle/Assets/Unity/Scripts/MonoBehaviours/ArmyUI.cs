@@ -16,6 +16,16 @@ public class ArmyUI : MonoBehaviour {
 	public float SmallIconSize = 88.75f;
 	public float LargeIconSize = 110;
 
+	public Sprite ScoutSprite;
+	public Sprite PikemanSprite;
+	public Sprite AxeThrowerSprite;
+	public Sprite WarriorSprite;
+	public Sprite ArcherSprite;
+	public Sprite CavalrySprite;
+	public Sprite BallistaSprite;
+	public Sprite CatapultSprite;
+	public GameObject UnitPrefab;
+
 	PlayerType currentPlayer;
 	Dictionary<PlayerType, Dictionary<MouseOverItem, List<UnitUI>>> uiData;
 	// cache
@@ -43,29 +53,28 @@ public class ArmyUI : MonoBehaviour {
 	}
 
 	// Use this for initialization
-	public void Initialise () {
+	public void Initialise (Player battlebeard, Player stormshaper) {
 		currentPlayer = PlayerType.Battlebeard;
 		lastMousePos = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 		uiData = new Dictionary<PlayerType, Dictionary<MouseOverItem, List<UnitUI>>>();
-		Debug.Log(uiData);
 		for (int i = 1; i <= 2; i++) {
 			Dictionary<MouseOverItem, List<UnitUI>> playerUI = new Dictionary<MouseOverItem, List<UnitUI>>();
 			MouseOverItem[] t = UI[i-1].GetComponentsInChildren<MouseOverItem>();
 			for (int j = 0; j < t.Length; j++) {
 				if (t[j].transform.parent == UI[i-1].transform) {
-
 					playerUI.Add(t[j], new List<UnitUI>(t[j].GetComponentsInChildren<UnitUI>()));
 				}
 			}
 			uiData.Add((PlayerType)i, playerUI);
+		}
+		if (battlebeard != null) {
+			GenerateUI(battlebeard);
 		}
 	}
 
 	Dictionary<MouseOverItem, List<UnitUI>> getUIData() {
 		if (cachedUIData == null) {
 			Dictionary<MouseOverItem, List<UnitUI>> selection;
-			Debug.Log(currentPlayer);
-			Debug.Log(uiData);
 			uiData.TryGetValue(currentPlayer, out selection);
 			if (selection != null) {
 				cachedUIData = selection;
@@ -115,7 +124,59 @@ public class ArmyUI : MonoBehaviour {
 	}
 
 	public void GenerateUI(Player p) {
+		Dictionary<MouseOverItem, List<UnitUI>> data;
+		if (p.Type == currentPlayer) {
+			data = getUIData();
+		} else {
+			uiData.TryGetValue(currentPlayer, out data);
+		}
+		List<MouseOverItem> unitHolders = new List<MouseOverItem>(data.Keys);
+		for (int i = 0; i < unitHolders.Count; i++) {
+			List<Unit> units = p.PlayerArmy.GetUnits((UnitType)i);
+			List<UnitUI> unitUI = getUnitData(unitHolders[i]);
+			GameObject unitList = unitHolders[i].gameObject.GetComponentInChildren<HorizontalLayoutGroup>().gameObject;
+			
+			// remove existing stuff
+			List<GameObject> children = new List<GameObject>();
+			foreach (Transform child in unitList.transform) children.Add(child.gameObject);
+			children.ForEach(child => Destroy(child));
+			unitUI.Clear();
 
+			// add units
+			for (int j = 0; j < units.Count; j++) {
+				GameObject u = Instantiate(UnitPrefab);
+				u.transform.SetParent(unitList.transform);
+				u.transform.localScale = new Vector3(1, 1, 1);
+				UnitUI ui = u.GetComponent<UnitUI>();
+				ui.SetImage(getSpriteForType((UnitType)i));
+				ui.SetKO(units[j].IsKO());
+				ui.SetUpgrade(units[j].HasUpgrade());
+				unitUI.Add(ui);
+			}
+		}
+	}
+
+	Sprite getSpriteForType(UnitType t) {
+		switch (t) {
+			case UnitType.Archer:
+				return ArcherSprite;
+			case UnitType.AxeThrower:
+				return AxeThrowerSprite;
+			case UnitType.Ballista:
+				return BallistaSprite;
+			case UnitType.Catapult:
+				return CatapultSprite;
+			case UnitType.Cavalry:
+				return CavalrySprite;
+			case UnitType.Pikemen:
+				return PikemanSprite;
+			case UnitType.Scout:
+				return ScoutSprite;
+			case UnitType.Warrior:
+				return WarriorSprite;
+			default:
+				return null;
+		}
 	}
 
 	void showSubmenu(int i) {

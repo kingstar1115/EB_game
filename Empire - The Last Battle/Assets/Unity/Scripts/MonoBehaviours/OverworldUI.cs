@@ -39,10 +39,10 @@ public class OverworldUI : MonoBehaviour
     }
 
     // Use this for initialization
-    public void Initialise() {
+    public void Initialise(Player battlebeard, Player stormshaper) {
         _BoardUI.Init();
 		_CommanderUI.Initialise();
-		_ArmyUI.Initialise();
+		_ArmyUI.Initialise(battlebeard, stormshaper);
 
         //add event listeners
         Enable();
