@@ -121,21 +121,56 @@ public class ArmyUI : MonoBehaviour {
 			}
 		});
 
-		// maybe create one for each type but don't show it... not but yes
-
-		// Make sure they show in order in the UI
-		unitTypes.Sort();
 		unitTypes.ForEach(t => {
-			GameObject o = Instantiate(UnitsPrefab);
-			o.transform.SetParent(thisUI.transform);
-			o.transform.localScale = Vector3.one;
-			UnitUIAll unitUI = o.GetComponent<UnitUIAll>();
-			unitUI.Initialise(t);
+			UnitUIAll unitUI = createUIForUnitType(thisUI, t);
 			p.PlayerArmy.GetUnits(t).ForEach(u => unitUI.AddUnit(u));
-			data.Add(unitUI);
+			int index = (int)t <= data.Count ? (int)t : data.Count;
+			data.Insert(index, unitUI);
 		});
 	}
 
+	UnitUIAll createUIForUnitType(GameObject UI, UnitType t) {
+		GameObject o = Instantiate(UnitsPrefab);
+		o.transform.SetParent(UI.transform);
+		// Make sure they show in order in the UI
+		o.transform.SetSiblingIndex((int)t);
+		o.transform.localScale = Vector3.one;
+		UnitUIAll unitUI = o.GetComponent<UnitUIAll>();
+		unitUI.Initialise(t);
+		return unitUI;
+	}
+
+	public void AddUnit(Player p, Unit u) {
+		List<UnitUIAll> data;
+		UnitUIAll unitUI = null;
+		uiDataNew.TryGetValue(p.Type, out data);
+		data.ForEach(ui => {
+			if (ui.GetType() == u.Type) {
+				unitUI = ui;
+			}
+		});
+
+
+
+		if (unitUI == null) {
+			GameObject thisUI = p.Type == PlayerType.Battlebeard ? BattlebeardUI : StormshaperUI;
+			unitUI = createUIForUnitType(thisUI, u.Type);
+			int index = (int)u.Type <= data.Count ? (int)u.Type : data.Count;
+			data.Insert(index, unitUI);
+		}
+
+		unitUI.AddUnit(u);
+
+	}
+
+	public void RemoveUnit(Player p, Unit u) {
+
+	}
+
+	public void UpdateUnit(Player p, Unit u) {
+		List<UnitUIAll> data;
+		uiDataNew.TryGetValue(p.Type, out data);
+	}
 
 	void showSubmenu(int i) {
 		List<UnitUIAll> data;

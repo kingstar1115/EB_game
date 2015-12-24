@@ -19,16 +19,17 @@ public class OverworldManager : MonoBehaviour
 		_Board.Initialise();
 		_BattlebeardPlayer.Initialise();
 		_StormshaperPlayer.Initialise();
+
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Warrior);
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-		//_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Catapult);
-		//_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Archer);
-		//_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.AxeThrower);
-		//_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Ballista);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Catapult);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Archer);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.AxeThrower);
+		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Ballista);
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Pikemen);
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Warrior);
 		_OverworldUI.Initialise(_BattlebeardPlayer, _StormshaperPlayer);
 
 		//try get the battleboard start tile
