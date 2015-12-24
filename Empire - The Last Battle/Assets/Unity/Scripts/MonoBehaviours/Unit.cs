@@ -1,6 +1,9 @@
 using UnityEngine;
 using System.Collections;
 
+public delegate void UnitCallback(Unit u);
+public delegate void UnitIndexCallback(Unit u, int i);
+
 [System.Serializable]
 public class Unit {
 
@@ -11,6 +14,7 @@ public class Unit {
 	int CurrentBaseHP;
 	public TileData Position;
 	public UnitType Type;
+	public event UnitCallback OnUpdate = delegate { };
 
 	public Unit(UnitBaseData data){
 		Type = data.Type;
@@ -43,10 +47,12 @@ public class Unit {
 
 	public void ReduceHP(int HP) {
 		CurrentBaseHP -= HP;
+		OnUpdate(this);
 	}
 
 	public void Heal() {
-		CurrentBaseHP = BaseData.HP; 
+		CurrentBaseHP = BaseData.HP;
+		OnUpdate(this);
 	}
 
 	public bool HasUpgrade() {
@@ -57,10 +63,12 @@ public class Unit {
 		//Don't apply the upgrade if a unit is knocked out, should probably return something to acknowledge that it wasn't applied
 		if(!IsKO()) {
 			CurrentUpgrade = Upgrade;
+			OnUpdate(this);
 		}
 	}
 
 	public void RemoveUpgrade() {
 		CurrentUpgrade = null;
+		OnUpdate(this);
 	}
 }

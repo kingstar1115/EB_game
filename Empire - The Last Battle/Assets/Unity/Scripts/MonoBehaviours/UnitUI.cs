@@ -9,15 +9,11 @@ public class UnitUI : MonoBehaviour {
 	public Image Background;
 
 	public void SetKO(bool b) {
-		var c = KO.color;
-		c.a = b ? 255 : 0;
-		KO.color = c;
+		KO.gameObject.SetActive(b);
 	}
 
 	public void SetUpgrade(bool b) {
-		var c = Upgrade.color;
-		c.a = b ? 255 : 0;
-		Upgrade.color = c;
+		Upgrade.gameObject.SetActive(b);
 	}
 
 	public void SetImage(Sprite s) {

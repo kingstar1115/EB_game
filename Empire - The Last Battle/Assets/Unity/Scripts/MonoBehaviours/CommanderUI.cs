@@ -21,7 +21,6 @@ public class CommanderUI : MonoBehaviour
     public float _LiftTime;
     public float _MoveTime;
 
-    Collider _collider;
     LerpPosition _lerpPosition;
     Vector3 _toGoTo;
     HashSet<TileData> _reachableTiles;
@@ -62,7 +61,6 @@ public class CommanderUI : MonoBehaviour
     // Use this for initialization
 	public void Initialise () 
     {
-        _collider = this.GetComponent<Collider>();
         _lerpPosition = this.GetComponent<LerpPosition>();
         _defaultLayer = this.gameObject.layer;
 
@@ -135,7 +133,7 @@ public class CommanderUI : MonoBehaviour
 
                 _toGoTo.y = _LiftedHeight;
 
-                _targetY = tileHolder._Tile.Height + _collider.bounds.extents.y;
+				_targetY = tileHolder._Tile.Height;
 
                 _destinationTile = tileHolder;
 
@@ -165,7 +163,7 @@ public class CommanderUI : MonoBehaviour
 			//commander not moved
             GameObject posMarker = getCommanderMarker(_Player.CommanderPosition.TileObject.GetComponentInChildren<TileHolder>());
             _toGoTo = (posMarker!=null) ? posMarker.transform.position: _Player.CommanderPosition.TileObject.transform.position;
-			_targetY = _Player.CommanderPosition.Height + _collider.bounds.extents.y;
+			_targetY = _Player.CommanderPosition.Height;
         }
         else
         {
@@ -218,7 +216,7 @@ public class CommanderUI : MonoBehaviour
     {
         GameObject posMarker = getCommanderMarker(_Player.CommanderPosition.TileObject.GetComponentInChildren<TileHolder>());
         Vector3 newPosition = (posMarker != null) ? posMarker.transform.position : _Player.CommanderPosition.TileObject.transform.position;
-		newPosition.y = _Player.CommanderPosition.Height + _collider.bounds.extents.y;
+		newPosition.y = _Player.CommanderPosition.Height;
         this.transform.position = newPosition;
         
         _lerpPosition.StopLerp();

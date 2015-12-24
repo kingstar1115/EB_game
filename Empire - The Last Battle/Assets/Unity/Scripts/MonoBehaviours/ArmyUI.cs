@@ -27,17 +27,16 @@ public class ArmyUI : MonoBehaviour {
 	public GameObject UnitsPrefab;
 
 	PlayerType currentPlayer;
-	Dictionary<PlayerType, List<UnitUIAll>> uiDataNew;
-	// cached number of unit types
-	int currentCount = 0;
-
+	List<UnitTypeUI> battlebeardUIData;
+	List<UnitTypeUI> stormshaperUIData;
+	CompareUnitUI comparator;
 	Vector2 lastMousePos;
 
 	int previousSelection = 0;
 	int currentSelection = -1;
 
 	void setSelection(int i) {
-		if (i == currentSelection || uiDataNew == null) {
+		if (i == currentSelection || getUnitTypeUI(currentPlayer) == null) {
 			return;
 		} else if (i == -1) {
 			hideSubmenu(currentSelection);
@@ -51,28 +50,73 @@ public class ArmyUI : MonoBehaviour {
 		currentSelection = i;
 	}
 
+	List<UnitTypeUI> getUnitTypeUI(PlayerType p) {
+		if (p == PlayerType.Battlebeard) return battlebeardUIData;
+		if (p == PlayerType.Stormshaper) return stormshaperUIData;
+		return null;
+	}
+
 	// Use this for initialization
 	public void Initialise (Player battlebeard, Player stormshaper) {
 		lastMousePos = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-		uiDataNew = new Dictionary<PlayerType, List<UnitUIAll>>();
-		for (int i = 1; i <= 2; i++) {
-			List<UnitUIAll> unitUI = new List<UnitUIAll>();
-			uiDataNew.Add((PlayerType)i, unitUI);
-		}
+		comparator = new CompareUnitUI();
+		battlebeardUIData = new List<UnitTypeUI>();
+		stormshaperUIData = new List<UnitTypeUI>();
 
 		BattlebeardUI.SetActive(false);
 		StormshaperUI.SetActive(false);
 
 		if (battlebeard != null) {
 			GenerateUI(battlebeard);
+			battlebeard.OnAddUnit += unitAdded;
+			battlebeard.OnRemoveUnit += unitRemoved;
+			battlebeard.OnUpdateUnit += unitUpdated;
 		}
 
 		if (stormshaper != null) {
 			GenerateUI(stormshaper);
+			stormshaper.OnAddUnit += unitAdded;
+			stormshaper.OnRemoveUnit += unitRemoved;
+			stormshaper.OnUpdateUnit += unitUpdated;
 		}
 		// test
 		SwitchPlayer(PlayerType.Battlebeard);
 
+	}
+
+	private void unitUpdated(Player p, Unit u) {
+		List<UnitTypeUI> data = getUnitTypeUI(p.Type);
+		UnitTypeUI unitUI = data.Find(ui => (ui.GetType() == u.Type));
+		if (unitUI != null) {
+			int i = p.PlayerArmy.GetUnits().IndexOf(u);
+			unitUI.UpdateUnit(i, u);
+		}
+	}
+
+	private void unitRemoved(Player p, Unit u, int i) {
+		List<UnitTypeUI> data = getUnitTypeUI(p.Type);
+		UnitTypeUI unitUI = data.Find(ui => (ui.GetType() == u.Type));
+
+		if (unitUI != null) {
+			//i = p.PlayerArmy.GetAllUnits().IndexOf(u);
+			unitUI.RemoveUnit(i);
+		}
+	}
+
+	private void unitAdded(Player p, Unit u) {
+		List<UnitTypeUI> data = getUnitTypeUI(p.Type);
+		UnitTypeUI unitUI = null;
+		data.ForEach(ui => {
+			if (ui.GetType() == u.Type) {
+				unitUI = ui;
+			}
+		});
+
+		if (unitUI == null) {
+			GameObject thisUI = p.Type == PlayerType.Battlebeard ? BattlebeardUI : StormshaperUI;
+			unitUI = createUIForUnitType(thisUI, u.Type, data);
+		}
+		unitUI.AddUnit(u);
 	}
 
 	public void SwitchPlayer(PlayerType p) {
@@ -84,10 +128,6 @@ public class ArmyUI : MonoBehaviour {
 			currentUI = p == PlayerType.Battlebeard ? BattlebeardUI : StormshaperUI;
 			currentUI.SetActive(true);
 			currentPlayer = p;
-
-			List<UnitUIAll> data;
-			uiDataNew.TryGetValue(currentPlayer, out data);
-			currentCount = data.Count;
 
 		//}
 	}
@@ -102,8 +142,7 @@ public class ArmyUI : MonoBehaviour {
 
 		GameObject thisUI = p.Type == PlayerType.Battlebeard ? BattlebeardUI : StormshaperUI;
 
-		List<UnitUIAll> data;
-		uiDataNew.TryGetValue(p.Type, out data);
+		List<UnitTypeUI> data = getUnitTypeUI(p.Type);
 
 		data.ForEach(ui => ui.Reset()); // maybe not necesarry?
 
@@ -113,75 +152,39 @@ public class ArmyUI : MonoBehaviour {
 
 		data.Clear();
 
-		List<Unit> allUnits = p.PlayerArmy.GetAllUnits();
+		List<Unit> allUnits = p.PlayerArmy.GetUnits();
 		List<UnitType> unitTypes = new List<UnitType>();
 		allUnits.ForEach(unit => {
 			if (!unitTypes.Contains(unit.Type)) {
 				unitTypes.Add(unit.Type);
 			}
 		});
-
+		
 		unitTypes.ForEach(t => {
-			UnitUIAll unitUI = createUIForUnitType(thisUI, t);
-			p.PlayerArmy.GetUnits(t).ForEach(u => unitUI.AddUnit(u));
-			int index = (int)t <= data.Count ? (int)t : data.Count;
-			data.Insert(index, unitUI);
+			UnitTypeUI unitTypeUI = createUIForUnitType(thisUI, t, data);
+			p.PlayerArmy.GetUnits(t).ForEach(u => unitTypeUI.AddUnit(u));
 		});
 	}
 
-	UnitUIAll createUIForUnitType(GameObject UI, UnitType t) {
+	UnitTypeUI createUIForUnitType(GameObject UI, UnitType t, List<UnitTypeUI> data) {
 		GameObject o = Instantiate(UnitsPrefab);
+		UnitTypeUI unitUI = o.GetComponent<UnitTypeUI>();
+		unitUI.Initialise(t);
+		int index = ~data.BinarySearch(unitUI, comparator);
 		o.transform.SetParent(UI.transform);
 		// Make sure they show in order in the UI
-		o.transform.SetSiblingIndex((int)t);
+		o.transform.SetSiblingIndex(index);
 		o.transform.localScale = Vector3.one;
-		UnitUIAll unitUI = o.GetComponent<UnitUIAll>();
-		unitUI.Initialise(t);
+		data.Insert(index, unitUI);
 		return unitUI;
 	}
 
-	public void AddUnit(Player p, Unit u) {
-		List<UnitUIAll> data;
-		UnitUIAll unitUI = null;
-		uiDataNew.TryGetValue(p.Type, out data);
-		data.ForEach(ui => {
-			if (ui.GetType() == u.Type) {
-				unitUI = ui;
-			}
-		});
-
-
-
-		if (unitUI == null) {
-			GameObject thisUI = p.Type == PlayerType.Battlebeard ? BattlebeardUI : StormshaperUI;
-			unitUI = createUIForUnitType(thisUI, u.Type);
-			int index = (int)u.Type <= data.Count ? (int)u.Type : data.Count;
-			data.Insert(index, unitUI);
-		}
-
-		unitUI.AddUnit(u);
-
-	}
-
-	public void RemoveUnit(Player p, Unit u) {
-
-	}
-
-	public void UpdateUnit(Player p, Unit u) {
-		List<UnitUIAll> data;
-		uiDataNew.TryGetValue(p.Type, out data);
-	}
-
 	void showSubmenu(int i) {
-		List<UnitUIAll> data;
-		uiDataNew.TryGetValue(currentPlayer, out data);
-		data[i].Maximise();
+		getUnitTypeUI(currentPlayer)[i].Maximise();
 	}
 
 	void hideSubmenu(int i) {
-		List<UnitUIAll> data;
-		uiDataNew.TryGetValue(currentPlayer, out data);
-		data[i].Minimise();
+		getUnitTypeUI(currentPlayer)[i].Minimise();
 	}
 
 
@@ -204,12 +207,13 @@ public class ArmyUI : MonoBehaviour {
 					//hide all items;
 					setSelection(-1);
 				} else {
+					int count = getUnitTypeUI(currentPlayer).Count;
 					if (upDown) {
 						// select the previous menu
-						setSelection((currentSelection - 1 + currentCount) % currentCount);
+						setSelection((currentSelection - 1 + count) % count);
 					} else if (downDown) {
 						//select the next menu
-						setSelection((currentSelection + 1) % currentCount);
+						setSelection((currentSelection + 1) % count);
 					}
 				}
 			}
@@ -220,9 +224,8 @@ public class ArmyUI : MonoBehaviour {
 	void OnGUI() {
 		// listen for mouse move
 		if (Input.GetAxis("Mouse X") != lastMousePos.x || Input.GetAxis("Mouse Y") != lastMousePos.y) {
-			List<UnitUIAll> data;
-			uiDataNew.TryGetValue(currentPlayer, out data);
-			for (int i = 0; i < currentCount; i++) {
+			List<UnitTypeUI> data = getUnitTypeUI(currentPlayer);
+			for (int i = 0; i < data.Count; i++) {
 				if (data[i].IsMouseOver()) {
 					// show menu at i
 					setSelection(i);

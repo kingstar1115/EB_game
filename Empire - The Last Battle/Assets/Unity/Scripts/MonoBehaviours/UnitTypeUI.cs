@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-public class UnitUIAll : MonoBehaviour {
+public class UnitTypeUI : MonoBehaviour {
 
 	// Components
 	public MouseOverItem Mouse;
@@ -80,7 +80,7 @@ public class UnitUIAll : MonoBehaviour {
 		Icon.sprite = getSprite(t);
 	}
 
-	public UnitType GetType() {
+	new public UnitType GetType() {
 		return _unitType;
 	}
 
@@ -152,15 +152,32 @@ public class UnitUIAll : MonoBehaviour {
 			if (lerpTime > Speed) {
 				currentAlpha = lerpToAlpha;
 				currentWidth = lerpToWidth;
-				isLerping = false;
-				lerpTime = 0;
 			}
 			else {
+				if (lerpFromAlpha == 0) {
+					UnitList.SetActive(true);
+				}
 				currentAlpha = Mathf.Lerp(lerpFromAlpha, lerpToAlpha, lerpTime / Speed);
 				currentWidth = Mathf.Lerp(lerpFromWidth, lerpToWidth, lerpTime / Speed);
 			}
 			_unitListCanvas.alpha = currentAlpha;
 			_unitsPanelTransform.sizeDelta = new Vector2(currentWidth, _unitsPanelTransform.rect.height);
+
+			if (lerpToAlpha == currentAlpha) {
+				if (lerpToAlpha == 0) {
+					UnitList.SetActive(false);
+				}
+				isLerping = false;
+				lerpTime = 0;
+			}
 		}
+	}
+}
+
+public class CompareUnitUI : IComparer<UnitTypeUI> {
+	public int Compare(UnitTypeUI x, UnitTypeUI y) {
+		if (x == null) return -1;
+		if (y == null) return 1;
+		return x.GetType().CompareTo(y.GetType());
 	}
 }
