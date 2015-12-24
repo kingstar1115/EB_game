@@ -5,16 +5,15 @@ using UnityEngine.UI;
 
 public class ArmyUI : MonoBehaviour {
 	
-	public GameObject[] UI;
-	GameObject currentUI {
-		get {
-			return UI[(int)currentPlayer - 1];
-		}
-	}
+	public GameObject BattlebeardUI;
+	public GameObject StormshaperUI;
+	GameObject currentUI;
+
 	public float MaxWidth = 820;
-	public float MinWidth = 105;
-	public float SmallIconSize = 88.75f;
-	public float LargeIconSize = 110;
+	public float MinWidth = 110;
+	public float SmallIconSize = 70f;
+	public float UnitSpacing = 10;
+	public float LargeIconSize = 100f;
 
 	public Sprite ScoutSprite;
 	public Sprite PikemanSprite;
@@ -25,12 +24,12 @@ public class ArmyUI : MonoBehaviour {
 	public Sprite BallistaSprite;
 	public Sprite CatapultSprite;
 	public GameObject UnitPrefab;
+	public GameObject UnitsPrefab;
 
 	PlayerType currentPlayer;
-	Dictionary<PlayerType, Dictionary<MouseOverItem, List<UnitUI>>> uiData;
-	// cache
-	List<MouseOverItem> cachedUnitHolders;
-	Dictionary<MouseOverItem, List<UnitUI>> cachedUIData;
+	Dictionary<PlayerType, List<UnitUIAll>> uiDataNew;
+	// cached number of unit types
+	int currentCount = 0;
 
 	Vector2 lastMousePos;
 
@@ -38,7 +37,7 @@ public class ArmyUI : MonoBehaviour {
 	int currentSelection = -1;
 
 	void setSelection(int i) {
-		if (i == currentSelection || uiData == null) {
+		if (i == currentSelection || uiDataNew == null) {
 			return;
 		} else if (i == -1) {
 			hideSubmenu(currentSelection);
@@ -54,190 +53,104 @@ public class ArmyUI : MonoBehaviour {
 
 	// Use this for initialization
 	public void Initialise (Player battlebeard, Player stormshaper) {
-		currentPlayer = PlayerType.Battlebeard;
 		lastMousePos = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-		uiData = new Dictionary<PlayerType, Dictionary<MouseOverItem, List<UnitUI>>>();
+		uiDataNew = new Dictionary<PlayerType, List<UnitUIAll>>();
 		for (int i = 1; i <= 2; i++) {
-			Dictionary<MouseOverItem, List<UnitUI>> playerUI = new Dictionary<MouseOverItem, List<UnitUI>>();
-			MouseOverItem[] t = UI[i-1].GetComponentsInChildren<MouseOverItem>();
-			for (int j = 0; j < t.Length; j++) {
-				if (t[j].transform.parent == UI[i-1].transform) {
-					playerUI.Add(t[j], new List<UnitUI>(t[j].GetComponentsInChildren<UnitUI>()));
-				}
-			}
-			uiData.Add((PlayerType)i, playerUI);
+			List<UnitUIAll> unitUI = new List<UnitUIAll>();
+			uiDataNew.Add((PlayerType)i, unitUI);
 		}
+
+		BattlebeardUI.SetActive(false);
+		StormshaperUI.SetActive(false);
+
 		if (battlebeard != null) {
 			GenerateUI(battlebeard);
 		}
-	}
 
-	Dictionary<MouseOverItem, List<UnitUI>> getUIData() {
-		if (cachedUIData == null) {
-			Dictionary<MouseOverItem, List<UnitUI>> selection;
-			uiData.TryGetValue(currentPlayer, out selection);
-			if (selection != null) {
-				cachedUIData = selection;
-			} else {
-				return null;
-			}
+		if (stormshaper != null) {
+			GenerateUI(stormshaper);
 		}
-		return cachedUIData;
-	}
+		// test
+		SwitchPlayer(PlayerType.Battlebeard);
 
-	List<UnitUI> getUnitData(MouseOverItem m) {
-		Dictionary<MouseOverItem, List<UnitUI>> uiData = getUIData();
-		List<UnitUI> ui;
-		uiData.TryGetValue(m, out ui);
-		return ui;
-	}
-
-	List<MouseOverItem> getUnitHolders() {
-		if (cachedUnitHolders == null) {
-			Dictionary<MouseOverItem, List<UnitUI>> selection = getUIData();
-			uiData.TryGetValue(currentPlayer, out selection);
-			if (selection != null) {
-				cachedUnitHolders = new List<MouseOverItem>(selection.Keys);
-			}
-			else {
-				return null;
-			}
-		}
-		return cachedUnitHolders;
-		
 	}
 
 	public void SwitchPlayer(PlayerType p) {
-		currentPlayer = p;
-		resetUI();
+		//if (p != currentPlayer) { (for now)
+			if (currentUI) {
+				resetSelection();
+				currentUI.SetActive(false);
+			}
+			currentUI = p == PlayerType.Battlebeard ? BattlebeardUI : StormshaperUI;
+			currentUI.SetActive(true);
+			currentPlayer = p;
+
+			List<UnitUIAll> data;
+			uiDataNew.TryGetValue(currentPlayer, out data);
+			currentCount = data.Count;
+
+		//}
 	}
 
-	void resetUI() {
-		clearCache();
+	void resetSelection() {
 		setSelection(-1);
 		previousSelection = 0;
 	}
 
-	void clearCache() {
-		cachedUnitHolders = null;
-		cachedUIData = null;
-	}
 
 	public void GenerateUI(Player p) {
-		Dictionary<MouseOverItem, List<UnitUI>> data;
-		if (p.Type == currentPlayer) {
-			data = getUIData();
-		} else {
-			uiData.TryGetValue(currentPlayer, out data);
-		}
-		List<MouseOverItem> unitHolders = new List<MouseOverItem>(data.Keys);
-		for (int i = 0; i < unitHolders.Count; i++) {
-			List<Unit> units = p.PlayerArmy.GetUnits((UnitType)i);
-			List<UnitUI> unitUI = getUnitData(unitHolders[i]);
-			GameObject unitList = unitHolders[i].gameObject.GetComponentInChildren<HorizontalLayoutGroup>().gameObject;
-			
-			// remove existing stuff
-			List<GameObject> children = new List<GameObject>();
-			foreach (Transform child in unitList.transform) children.Add(child.gameObject);
-			children.ForEach(child => Destroy(child));
-			unitUI.Clear();
 
-			// add units
-			for (int j = 0; j < units.Count; j++) {
-				GameObject u = Instantiate(UnitPrefab);
-				u.transform.SetParent(unitList.transform);
-				u.transform.localScale = new Vector3(1, 1, 1);
-				UnitUI ui = u.GetComponent<UnitUI>();
-				ui.SetImage(getSpriteForType((UnitType)i));
-				ui.SetKO(units[j].IsKO());
-				ui.SetUpgrade(units[j].HasUpgrade());
-				unitUI.Add(ui);
+		GameObject thisUI = p.Type == PlayerType.Battlebeard ? BattlebeardUI : StormshaperUI;
+
+		List<UnitUIAll> data;
+		uiDataNew.TryGetValue(p.Type, out data);
+
+		data.ForEach(ui => ui.Reset()); // maybe not necesarry?
+
+		List<GameObject> children = new List<GameObject>();
+		foreach (Transform child in thisUI.transform) children.Add(child.gameObject);
+		children.ForEach(child => Destroy(child));
+
+		data.Clear();
+
+		List<Unit> allUnits = p.PlayerArmy.GetAllUnits();
+		List<UnitType> unitTypes = new List<UnitType>();
+		allUnits.ForEach(unit => {
+			if (!unitTypes.Contains(unit.Type)) {
+				unitTypes.Add(unit.Type);
 			}
-		}
+		});
+
+		// maybe create one for each type but don't show it... not but yes
+
+		// Make sure they show in order in the UI
+		unitTypes.Sort();
+		unitTypes.ForEach(t => {
+			GameObject o = Instantiate(UnitsPrefab);
+			o.transform.SetParent(thisUI.transform);
+			o.transform.localScale = Vector3.one;
+			UnitUIAll unitUI = o.GetComponent<UnitUIAll>();
+			unitUI.Initialise(t);
+			p.PlayerArmy.GetUnits(t).ForEach(u => unitUI.AddUnit(u));
+			data.Add(unitUI);
+		});
 	}
 
-	Sprite getSpriteForType(UnitType t) {
-		switch (t) {
-			case UnitType.Archer:
-				return ArcherSprite;
-			case UnitType.AxeThrower:
-				return AxeThrowerSprite;
-			case UnitType.Ballista:
-				return BallistaSprite;
-			case UnitType.Catapult:
-				return CatapultSprite;
-			case UnitType.Cavalry:
-				return CavalrySprite;
-			case UnitType.Pikemen:
-				return PikemanSprite;
-			case UnitType.Scout:
-				return ScoutSprite;
-			case UnitType.Warrior:
-				return WarriorSprite;
-			default:
-				return null;
-		}
-	}
 
 	void showSubmenu(int i) {
-		MouseOverItem currentItem = getUnitHolders()[i];
-		LerpRectTransform trans = currentItem.GetComponentInChildren<LerpRectTransform>();
-		// Resize item
-		float width = getUnitData(currentItem).Count * SmallIconSize + LargeIconSize;
-		if (width > MaxWidth) { width = MaxWidth; }
-		trans.ResizeWidth(width);
-		// fade in
-		FadeCanvasGroup fCG = currentItem.GetComponentInChildren<FadeCanvasGroup>();
-		fCG.FadeTo(1);
+		List<UnitUIAll> data;
+		uiDataNew.TryGetValue(currentPlayer, out data);
+		data[i].Maximise();
 	}
 
 	void hideSubmenu(int i) {
-		MouseOverItem currentItem = getUnitHolders()[i];
-		LerpRectTransform trans = currentItem.GetComponentInChildren<LerpRectTransform>();
-		// resize item
-		trans.ResizeWidth(MinWidth);
-		// fade out
-		FadeCanvasGroup fCG = currentItem.GetComponentInChildren<FadeCanvasGroup>();
-		fCG.FadeTo(0);
+		List<UnitUIAll> data;
+		uiDataNew.TryGetValue(currentPlayer, out data);
+		data[i].Minimise();
 	}
 
-	void addUnit() {
-		// grow ui
-	}
-
-	void removeUnit() {
-		// shrink ui
-	}
-
-	public void UpdateUI(Player p, Unit u, bool removeUnit = false) {
-		List<List<GameObject>> playerList = null;
-		//UIData.TryGetValue (p.Type, out playerList);
-		if (playerList != null) {
-			List<GameObject> listToUpdate = playerList[(int)u.Type];
-			int index = p.PlayerArmy.GetAllUnits().IndexOf(u);
-			if (index != -1) {
-				GameObject unitObject = listToUpdate[index];
-				if (removeUnit) {
-					listToUpdate.Remove(unitObject);
-					return;
-				}
-				if (u.IsKO()) {
-					// add KO icon
-				}
-				if (u.HasUpgrade()) {
-					// add upgrade icon
-				}
-				return;
-			} else {
-				// unit does not exist. cannot remove from UI!!!
-				Debug.LogError("Unit should have been removed from UI first");
-			}
-
-		}
-	}
 
 	void Update() {
-
 		bool leftDown = Input.GetKeyDown(KeyCode.LeftArrow);
 		bool rightDown = Input.GetKeyDown(KeyCode.RightArrow);
 		bool upDown = Input.GetKeyDown(KeyCode.UpArrow);
@@ -258,10 +171,10 @@ public class ArmyUI : MonoBehaviour {
 				} else {
 					if (upDown) {
 						// select the previous menu
-						setSelection((currentSelection - 1 + cachedUnitHolders.Count) % cachedUnitHolders.Count);
+						setSelection((currentSelection - 1 + currentCount) % currentCount);
 					} else if (downDown) {
 						//select the next menu
-						setSelection((currentSelection + 1) % cachedUnitHolders.Count);
+						setSelection((currentSelection + 1) % currentCount);
 					}
 				}
 			}
@@ -269,15 +182,17 @@ public class ArmyUI : MonoBehaviour {
 		
 	}
 
-	void OnGUI () {
+	void OnGUI() {
 		// listen for mouse move
 		if (Input.GetAxis("Mouse X") != lastMousePos.x || Input.GetAxis("Mouse Y") != lastMousePos.y) {
-			List<MouseOverItem> units = getUnitHolders();
-			for (int i = 0; i < units.Count; i++) {
-				if (units[i].isOver) {
+			List<UnitUIAll> data;
+			uiDataNew.TryGetValue(currentPlayer, out data);
+			for (int i = 0; i < currentCount; i++) {
+				if (data[i].IsMouseOver()) {
 					// show menu at i
 					setSelection(i);
-				} else if (currentSelection == i) {
+				}
+				else if (currentSelection == i) {
 					// hide all menus
 					setSelection(-1);
 				}

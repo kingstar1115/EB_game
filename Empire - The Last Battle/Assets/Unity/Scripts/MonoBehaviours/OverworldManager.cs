@@ -21,10 +21,10 @@ public class OverworldManager : MonoBehaviour
 		_StormshaperPlayer.Initialise();
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Catapult);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Archer);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.AxeThrower);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Ballista);
+		//_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Catapult);
+		//_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Archer);
+		//_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.AxeThrower);
+		//_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Ballista);
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Pikemen);
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
@@ -81,7 +81,6 @@ public class OverworldManager : MonoBehaviour
 
 	void _CardSystem_OnEffectApplied(CardData card, Player player) {
         if (card.Type == CardType.Scout_Card) {
-			Debug.Log(card.Value);
             _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(player.Type, player.CommanderPosition, card.Value));
 		}
 	}

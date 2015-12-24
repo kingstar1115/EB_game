@@ -3,35 +3,25 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class UnitUI : MonoBehaviour {
-
-	bool upgrade = false;
-	bool ko = false;
-
-	public GameObject UpgradeUI;
-	public GameObject KOUI;
+	public Image KO;
+	public Image Icon;
+	public Image Upgrade;
+	public Image Background;
 
 	public void SetKO(bool b) {
-		ko = b;
-		if (b) {
-			// show KO UI;
-		}
-		else {
-			// hide KO ui
-		}
+		var c = KO.color;
+		c.a = b ? 255 : 0;
+		KO.color = c;
 	}
 
 	public void SetUpgrade(bool b) {
-		ko = b;
-		if (b) {
-			// show upgrade UI;
-		}
-		else {
-			// hide upgrade ui
-		}
+		var c = Upgrade.color;
+		c.a = b ? 255 : 0;
+		Upgrade.color = c;
 	}
 
 	public void SetImage(Sprite s) {
-		GetComponentInChildren<Image>().gameObject.GetComponentsInChildren<Image>()[1].sprite = s;
+		Icon.sprite = s;
 	}
 
 	// Use this for initialization
