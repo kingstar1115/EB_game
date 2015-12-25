@@ -53,7 +53,7 @@ public class Armoury : MonoBehaviour
 
     public List<PurchasableCastlePiece> AvailableCastlePieces(Player player)
     {
-        //return early if no purchasable castel pieces
+        //return early if no purchasable castle pieces
         if (purchasableCastlePieces.Count == 0)
         {
             Debug.LogError("No purchasable castle peices at all");

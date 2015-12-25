@@ -57,7 +57,7 @@ public class UnitTypeUI : MonoBehaviour {
 				return CatapultSprite;
 			case UnitType.Cavalry:
 				return CavalrySprite;
-			case UnitType.Pikemen:
+			case UnitType.Pikeman:
 				return PikemanSprite;
 			case UnitType.Scout:
 				return ScoutSprite;

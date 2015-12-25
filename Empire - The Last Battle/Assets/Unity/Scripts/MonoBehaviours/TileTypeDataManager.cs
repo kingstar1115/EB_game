@@ -51,7 +51,7 @@ public enum TerrainType {
     Forest,
     Grass,
     Mountain,
-    Swamp,
+    Savannah,
     Tundra,
 }
 

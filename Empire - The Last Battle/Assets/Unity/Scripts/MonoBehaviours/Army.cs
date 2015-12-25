@@ -72,5 +72,4 @@ public class Army : MonoBehaviour {
 	void unitUpdated(Unit u) {
 		OnUpdateUnit(u);
 	}
-
 }

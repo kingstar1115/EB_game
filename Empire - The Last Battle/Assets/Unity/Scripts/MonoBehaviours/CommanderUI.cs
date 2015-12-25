@@ -57,6 +57,10 @@ public class CommanderUI : MonoBehaviour
             _paused = value;
         }
     }
+
+	public Vector3 getPosition() {
+		return _toGoTo;
+	}
     
     // Use this for initialization
 	public void Initialise () 
@@ -101,16 +105,17 @@ public class CommanderUI : MonoBehaviour
 
     void OnMouseDrag()
     {
-        if (!_dragging)
-        {
-            OnStartDrag();
-            _dragging = true;
-        }
 
 		//only if movement is allowed
 		if (_allowMovement) {
+
+			if (!_dragging) {
+				OnStartDrag();
+				_dragging = true;
+			}
+
 			//if hovered a tile that is reachable then move have the player move there
-            Collider tileParent;
+			Collider tileParent;
             TileHolder tileHolder = null;
             if (BoardUI.GetTileHovered_Position(out tileParent))
                 tileHolder = tileParent.GetComponentInChildren<TileHolder>();
@@ -167,7 +172,7 @@ public class CommanderUI : MonoBehaviour
         }
         else
         {
-            //cammander moved
+            //commander moved
             _toGoTo = _destination;
             OnCommanderMoved(_destinationTile._Tile);
             OnCommanderDrop(new Vector3(_destination.x, _targetY, _destination.z));
