@@ -8,12 +8,12 @@ public class UnitBaseData : ScriptableObject {
 }
 
 public enum UnitType {
-    Archer,
+	Scout,
+	Pikeman,
+	Archer,
     AxeThrower,
-    Ballista,
-    Catapult,
-    Cavalry,
-    Scout,
-    Pikemen,
-    Warrior
+	Warrior,
+	Cavalry,
+	Catapult,
+	Ballista
 }
