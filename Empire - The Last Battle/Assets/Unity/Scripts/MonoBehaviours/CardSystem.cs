@@ -17,11 +17,11 @@ public class CardSystem : MonoBehaviour {
 
 	public CardList cardList;
     // Units availiable from using alliance card at different castle levels.
-    public List<UnitType> allianceCardUnitsZero;
-	public List<UnitType> allianceCardUnitsOne;
-	public List<UnitType> allianceCardUnitsTwo;
-	public List<UnitType> allianceCardUnitsThree;
-	public List<UnitType> allianceCardUnitsFour;
+    public List<UnitType> allianceCardLevel0;
+	public List<UnitType> allianceCardLevel1;
+	public List<UnitType> allianceCardLevel2;
+	public List<UnitType> allianceCardLevel3;
+	public List<UnitType> allianceCardLevel4;
 
 	public delegate void CardCallback(CardData card, Player player);
 	public event CardCallback OnEffectApplied = delegate { };
@@ -96,11 +96,11 @@ public class CardSystem : MonoBehaviour {
 	private void UseAllianceCard(CardData card, Player player) {	
 		List<UnitType>[] totalUnits = 
 		{
-			allianceCardUnitsZero,
-			allianceCardUnitsOne,
-			allianceCardUnitsTwo,
-			allianceCardUnitsThree,
-			allianceCardUnitsFour
+			allianceCardLevel0,
+			allianceCardLevel1,
+			allianceCardLevel2,
+			allianceCardLevel3,
+			allianceCardLevel4
 		};
 
 		List<UnitType> units = new List<UnitType>();
