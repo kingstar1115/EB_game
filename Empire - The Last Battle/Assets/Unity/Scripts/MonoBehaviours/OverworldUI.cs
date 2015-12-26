@@ -78,6 +78,8 @@ public class OverworldUI : MonoBehaviour
 		_stormshaperCommanderUI._Paused = true;
 
 		_CameraMovement.DisableCameraMovement();
+
+		_ArmyUI.Disable();
     }
 
     public void Enable()
@@ -99,6 +101,8 @@ public class OverworldUI : MonoBehaviour
 		_CommanderUI._Paused = false;
 
 		_CameraMovement.EnableCameraMovement();
+
+		_ArmyUI.Enable();
     }
 
 	public void SetPlayer(Player p) {

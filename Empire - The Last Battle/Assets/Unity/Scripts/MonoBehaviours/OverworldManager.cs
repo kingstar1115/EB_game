@@ -47,19 +47,6 @@ public class OverworldManager : MonoBehaviour
 		setPlayer(PlayerType.Battlebeard);
 
 		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
-
-		// TEST
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Warrior);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Catapult);
-		//_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Archer);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.AxeThrower);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Ballista);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Pikeman);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-
         _TurnManager.StartTurn();
 	}
 
@@ -142,9 +129,9 @@ public class OverworldManager : MonoBehaviour
 				default:
 					break;
 			}
-			_TurnManager.EndTurn();
-			StartCoroutine(SwitchPlayer());
 		}
+		_TurnManager.EndTurn();
+		StartCoroutine(SwitchPlayer());
 	}
 
 	public void HealTroops(Player player) {
@@ -181,7 +168,20 @@ public class OverworldManager : MonoBehaviour
 
     void _TurnManager_OnTurnStart() {
         _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_CurrentPlayer.Type, _CurrentPlayer.CommanderPosition, 1));
-    }
+
+
+		// test add unit each turn
+		int rand = Random.Range(0, 8);
+		_CurrentPlayer.PlayerArmy.AddUnit((UnitType)rand);
+
+		// chance of knocking out a random unit each turn
+
+		int c = _CurrentPlayer.PlayerArmy.GetUnits().Count;
+		rand = Random.Range(0, (int)c * 5);
+		if (rand < c) {
+			_CurrentPlayer.PlayerArmy.GetUnits()[rand].ReduceHP(100);
+		}
+	}
 
     void _TurnManager_OnTurnEnd() {
         _OverworldUI.DisablePlayerMovement();
@@ -200,7 +200,9 @@ public class OverworldManager : MonoBehaviour
 
 	// Update is called once per frame
 	void Update() {
-
+		if (Input.GetKeyDown(KeyCode.Return)) {
+			StartCoroutine(SwitchPlayer());
+		}
 	}
 
 }

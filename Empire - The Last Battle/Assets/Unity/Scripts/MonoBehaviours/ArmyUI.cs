@@ -35,6 +35,8 @@ public class ArmyUI : MonoBehaviour {
 	int previousSelection = 0;
 	int currentSelection = -1;
 
+	new bool enabled = true;
+
 	void setSelection(int i) {
 		if (i == currentSelection || getUnitTypeUI(currentPlayer) == null) {
 			return;
@@ -81,14 +83,24 @@ public class ArmyUI : MonoBehaviour {
 		}
 		// test
 		SwitchPlayer(PlayerType.Battlebeard);
-
 	}
 
-	private void unitUpdated(Player p, Unit u) {
+	public void Enable() {
+		enabled = true;
+		getUnitTypeUI(currentPlayer).ForEach(ui => ui.Show());
+	}
+
+	public void Disable() {
+		enabled = false;
+		getUnitTypeUI(currentPlayer).ForEach(ui => ui.Hide());
+		resetSelection();
+	}
+
+	void unitUpdated(Player p, Unit u) {
 		List<UnitTypeUI> data = getUnitTypeUI(p.Type);
 		UnitTypeUI unitUI = data.Find(ui => (ui.GetType() == u.Type));
 		if (unitUI != null) {
-			int i = p.PlayerArmy.GetUnits().IndexOf(u);
+			int i = p.PlayerArmy.GetUnits(u.Type).IndexOf(u);
 			unitUI.UpdateUnit(i, u);
 		}
 	}
@@ -120,7 +132,7 @@ public class ArmyUI : MonoBehaviour {
 	}
 
 	public void SwitchPlayer(PlayerType p) {
-		//if (p != currentPlayer) { (for now)
+		if (p != currentPlayer) {
 			if (currentUI) {
 				resetSelection();
 				currentUI.SetActive(false);
@@ -129,7 +141,7 @@ public class ArmyUI : MonoBehaviour {
 			currentUI.SetActive(true);
 			currentPlayer = p;
 
-		//}
+		}
 	}
 
 	void resetSelection() {
@@ -176,6 +188,7 @@ public class ArmyUI : MonoBehaviour {
 		o.transform.SetSiblingIndex(index);
 		o.transform.localScale = Vector3.one;
 		data.Insert(index, unitUI);
+		unitUI.Show();
 		return unitUI;
 	}
 
@@ -189,41 +202,43 @@ public class ArmyUI : MonoBehaviour {
 
 
 	void Update() {
-		bool leftDown = Input.GetKeyDown(KeyCode.LeftArrow);
-		bool rightDown = Input.GetKeyDown(KeyCode.RightArrow);
-		bool upDown = Input.GetKeyDown(KeyCode.UpArrow);
-		bool downDown = Input.GetKeyDown(KeyCode.DownArrow);
+		// If there is anything in the UI
+		if (getUnitTypeUI(currentPlayer).Count > 0 && enabled) {
+			bool leftDown = Input.GetKeyDown(KeyCode.LeftArrow);
+			bool rightDown = Input.GetKeyDown(KeyCode.RightArrow);
+			bool upDown = Input.GetKeyDown(KeyCode.UpArrow);
+			bool downDown = Input.GetKeyDown(KeyCode.DownArrow);
 
-		if (leftDown || rightDown || upDown || downDown) {
-			if (currentSelection == -1) {
-				// nothing is currently selected
-				if (rightDown) {
-					//show previous selected item in the list
-					setSelection(previousSelection);
-				}
-			} else {
-				// something is selected
-				if (leftDown) {
-					//hide all items;
-					setSelection(-1);
+			if (leftDown || rightDown || upDown || downDown) {
+				if (currentSelection == -1) {
+					// nothing is currently selected
+					if (rightDown) {
+						//show previous selected item in the list
+						setSelection(previousSelection);
+					}
 				} else {
-					int count = getUnitTypeUI(currentPlayer).Count;
-					if (upDown) {
-						// select the previous menu
-						setSelection((currentSelection - 1 + count) % count);
-					} else if (downDown) {
-						//select the next menu
-						setSelection((currentSelection + 1) % count);
+					// something is selected
+					if (leftDown) {
+						//hide all items;
+						setSelection(-1);
+					} else {
+						int count = getUnitTypeUI(currentPlayer).Count;
+						if (upDown) {
+							// select the previous menu
+							setSelection((currentSelection - 1 + count) % count);
+						} else if (downDown) {
+							//select the next menu
+							setSelection((currentSelection + 1) % count);
+						}
 					}
 				}
 			}
 		}
-		
 	}
 
 	void OnGUI() {
 		// listen for mouse move
-		if (Input.GetAxis("Mouse X") != lastMousePos.x || Input.GetAxis("Mouse Y") != lastMousePos.y) {
+		if (enabled && (Input.GetAxis("Mouse X") != lastMousePos.x || Input.GetAxis("Mouse Y") != lastMousePos.y)) {
 			List<UnitTypeUI> data = getUnitTypeUI(currentPlayer);
 			for (int i = 0; i < data.Count; i++) {
 				if (data[i].IsMouseOver()) {

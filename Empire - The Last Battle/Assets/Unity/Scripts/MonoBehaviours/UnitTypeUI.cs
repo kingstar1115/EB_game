@@ -10,8 +10,14 @@ public class UnitTypeUI : MonoBehaviour {
 	public Image Icon;
 	public GameObject UnitsPanel;
 	public GameObject UnitList;
+	public GameObject UnitOverview;
+	public RectTransform PanelSlider;
 	RectTransform _unitsPanelTransform;
 	CanvasGroup _unitListCanvas;
+	CanvasGroup _unitOverviewCanvas;
+
+	// Overview
+	public Color OverviewColour;
 
 	// Size
 	public float MaxWidth = 820;
@@ -19,18 +25,23 @@ public class UnitTypeUI : MonoBehaviour {
 	public float SmallIconSize = 70f;
 	public float UnitSpacing = 10;
 	public float LargeIconSize = 100f;
+	public float UnitOverviewSpacing = 7f;
 
 	UnitType _unitType;
 	List<UnitUI> _units;
 
 	// Lerp Stuff
 	public float Speed = 0.4f; // speed that the maximise/minimise takes
-	float lerpTime;
-	bool isLerping;
+	float lerpTimeMinMax;
+	float lerpTimeHideShow;
+	bool isMinMaxLerping;
+	bool isHideShowLerping;
 	float lerpToAlpha;
 	float lerpFromAlpha;
 	float lerpToWidth;
 	float lerpFromWidth;
+	float lerpFromPos;
+	float lerpToPos;
 
 	// Individual unit prefab
 	public GameObject UnitPrefab;
@@ -75,9 +86,11 @@ public class UnitTypeUI : MonoBehaviour {
 	public void Initialise(UnitType t) {
 		_unitsPanelTransform = UnitsPanel.GetComponent<RectTransform>();
 		_unitListCanvas = UnitList.GetComponent<CanvasGroup>();
+		_unitOverviewCanvas = UnitOverview.GetComponent<CanvasGroup>();
 		_unitType = t;
 		_units = new List<UnitUI>();
 		Icon.sprite = getSprite(t);
+		Hide(true);
 	}
 
 	new public UnitType GetType() {
@@ -93,37 +106,96 @@ public class UnitTypeUI : MonoBehaviour {
 		ui.SetKO(u.IsKO());
 		ui.SetUpgrade(u.HasUpgrade());
 		_units.Add(ui);
+		GameObject g = new GameObject();
+		Image image = g.AddComponent<Image>();
+		g.transform.SetParent(UnitOverview.transform);
+		g.transform.localScale = Vector3.one;
+		if (u.IsKO()) {
+			image.color = Color.clear;
+		} else {
+			image.color = OverviewColour;
+		}
 	}
 
 	public void RemoveUnit(int i) {
 		GameObject o = _units[i].gameObject;
 		_units.RemoveAt(i);
 		Destroy(o);
+		Destroy(UnitOverview.transform.GetChild(i).gameObject);
 	}
 
 	public void Reset() {
 		_units.ForEach(unit => Destroy(unit.gameObject));
 		_units.Clear();
+		// Remove unit overview children
 	}
 
 	public void UpdateUnit(int i, Unit u) {
 		UnitUI ui = _units[i].GetComponent<UnitUI>();
 		ui.SetKO(u.IsKO());
 		ui.SetUpgrade(u.HasUpgrade());
+		if (u.IsKO()) {
+			UnitOverview.transform.GetChild(i).GetComponent<Image>().color = Color.clear;
+		} else {
+			UnitOverview.transform.GetChild(i).GetComponent<Image>().color = OverviewColour;
+		}
+	}
+
+	public void Hide() {
+		Minimise();
+		lerpToPos = (MinWidth + UnitOverviewSpacing) * -1;
+		lerpFromPos = PanelSlider.offsetMin.x;
+		isHideShowLerping = true;
+	}
+
+	public void Hide(bool forced) {
+		if (forced) {
+			PanelSlider.offsetMin = new Vector2((MinWidth + UnitOverviewSpacing) * -1, PanelSlider.offsetMin.y);
+		} else {
+			Hide();
+		}
+	}
+
+	public void Show() {
+		lerpToPos = 0;
+		lerpFromPos = PanelSlider.offsetMin.x;		
+		isHideShowLerping = true;
+	}
+
+	public void Show(bool forced) {
+		if (forced) {
+			PanelSlider.offsetMin = new Vector2(0, PanelSlider.offsetMin.y);
+		} else {
+			Show();
+		}
 	}
 
 	public void Maximise() {
 		// Resize item
 		float width = _units.Count * (SmallIconSize + UnitSpacing) + LargeIconSize + UnitSpacing;
 		if (width > MaxWidth) { width = MaxWidth; }
-		lerpFromWidth = MinWidth;
+		lerpFromWidth = _unitsPanelTransform.sizeDelta.x;
 		lerpToWidth = width;
 
 		// fade in
 		lerpToAlpha = 1;
-		lerpFromAlpha = 0;
+		lerpFromAlpha = _unitListCanvas.alpha;
 
-		isLerping = true;
+		isMinMaxLerping = true;
+	}
+
+	public void Maximise(bool forced) {
+		if (forced) {
+			float width = _units.Count * (SmallIconSize + UnitSpacing) + LargeIconSize + UnitSpacing;
+			if (width > MaxWidth) { width = MaxWidth; }
+			_unitListCanvas.alpha = 1;
+			_unitOverviewCanvas.alpha = 0f;
+			_unitsPanelTransform.sizeDelta = new Vector2(width, _unitsPanelTransform.rect.height);
+			UnitList.SetActive(true);
+			UnitOverview.SetActive(false);
+		} else {
+			Maximise();
+		}
 	}
 
 	public void Minimise() {
@@ -131,12 +203,25 @@ public class UnitTypeUI : MonoBehaviour {
 		lerpFromWidth = _unitsPanelTransform.sizeDelta.x;
 		lerpToWidth = MinWidth;
 
-		// fade out
-		lerpToAlpha = 0;
-		lerpFromAlpha = 1;
+		// fade out -- -1 looks a lot nicer than 0
+		lerpToAlpha = -1;
+		lerpFromAlpha = _unitListCanvas.alpha;
 
-		isLerping = true;
+		isMinMaxLerping = true;
 	}
+
+	public void Minimise(bool forced) {
+		if (forced) {
+			_unitListCanvas.alpha = -1;
+			_unitOverviewCanvas.alpha = 1f;
+			_unitsPanelTransform.sizeDelta = new Vector2(MinWidth, _unitsPanelTransform.rect.height);
+			UnitList.SetActive(false);
+			UnitOverview.SetActive(true);
+		} else {
+			Minimise();
+		}
+	}
+
 
 	// Use this for initialization
 	void Start () {
@@ -145,32 +230,51 @@ public class UnitTypeUI : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		if (isLerping) {
-			lerpTime += Time.deltaTime;
+		if (isMinMaxLerping) {
+			lerpTimeMinMax += Time.deltaTime;
 			float currentAlpha = 0;
 			float currentWidth = 0;
-			if (lerpTime > Speed) {
+			if (lerpTimeMinMax > Speed) {
 				currentAlpha = lerpToAlpha;
 				currentWidth = lerpToWidth;
 			}
 			else {
-				if (lerpFromAlpha == 0) {
+				if (lerpFromAlpha < lerpToAlpha) {
 					UnitList.SetActive(true);
+					UnitOverview.SetActive(false);
 				}
-				currentAlpha = Mathf.Lerp(lerpFromAlpha, lerpToAlpha, lerpTime / Speed);
-				currentWidth = Mathf.Lerp(lerpFromWidth, lerpToWidth, lerpTime / Speed);
+				currentAlpha = Mathf.Lerp(lerpFromAlpha, lerpToAlpha, lerpTimeMinMax / Speed);
+				currentWidth = Mathf.Lerp(lerpFromWidth, lerpToWidth, lerpTimeMinMax / Speed);
 			}
 			_unitListCanvas.alpha = currentAlpha;
+			_unitOverviewCanvas.alpha = 1f - currentAlpha;
 			_unitsPanelTransform.sizeDelta = new Vector2(currentWidth, _unitsPanelTransform.rect.height);
 
 			if (lerpToAlpha == currentAlpha) {
-				if (lerpToAlpha == 0) {
+				if (lerpToAlpha < lerpFromAlpha) {
 					UnitList.SetActive(false);
+					UnitOverview.SetActive(true);
 				}
-				isLerping = false;
-				lerpTime = 0;
+				isMinMaxLerping = false;
+				lerpTimeMinMax = 0;
 			}
 		}
+
+		if (isHideShowLerping) {
+			lerpTimeHideShow += Time.deltaTime;
+			float currentPos = 0;
+			if (lerpTimeHideShow > Speed) {
+				currentPos = lerpToPos;
+			} else {
+				currentPos = Mathf.Lerp(lerpFromPos, lerpToPos, lerpTimeHideShow / Speed);
+			}
+			PanelSlider.offsetMin = new Vector2(currentPos, PanelSlider.offsetMin.y);
+			if (lerpToPos == currentPos) {
+				isHideShowLerping = false;
+				lerpTimeHideShow = 0;
+			}
+		}
+
 	}
 }
 
