@@ -176,6 +176,7 @@ public class CommanderUI : MonoBehaviour
         {
             //commander moved
             _toGoTo = _destination;
+			// do we want to do this right now and not when the movement is over?
             OnCommanderMoved(_destinationTile._Tile);
             OnCommanderDrop(new Vector3(_destination.x, _targetY, _destination.z));
             _destinationTile = null;

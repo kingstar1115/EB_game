@@ -11,6 +11,7 @@ public class OverworldManager : MonoBehaviour
 	public Player _BattlebeardPlayer;
     public Player _StormshaperPlayer;
     public Player _CurrentPlayer;
+	public Player _InactivePlayer;
     public TurnManager _TurnManager;
 
 	// Use this for initialization
@@ -84,62 +85,73 @@ public class OverworldManager : MonoBehaviour
 	}
     //This is temporary until we actually have things that happen after the move
     IEnumerator SwitchPlayer() {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         _TurnManager.SwitchTurn();
+		UnPause();
     }
 
-	void HandleTileEvent(TileData tile) {
+	void HandleTileEvent(TileData tile) {		
 		if (_CurrentPlayer.IsScouting) {
 			_CurrentPlayer.IsScouting = false;
+			endTurn();
 		} else {
+			Pause();
+			ModalPanel p = ModalPanel.Instance();
 			switch (tile.Building) {
-				case BuildingType.None:
-					_TurnManager.EndTurn();
-					StartCoroutine(SwitchPlayer());
-					break;
 				case BuildingType.Armoury:
+					p.ShowOK("Armoury", "You landed on the Armoury.", endTurn);
 					break;
 				case BuildingType.Camp:
-					break;
-				case BuildingType.CastleBattlebeard:
-					break;
-				case BuildingType.CastleStormshaper:
+					p.ShowOK("Camp", "You landed on a camp.", endTurn);
 					break;
 				case BuildingType.Cave:
-					GenerateRandomCard(_AvailableCaveCards.cards);
+					CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
+					_CurrentPlayer.Hand.cards.Add(c);
+					p.ShowOK("Card Recieved!", "You recieved a " + c.Type + " card.", endTurn);
 					break;
 				case BuildingType.Fortress:
+					p.ShowOK("Fortress", "You landed on a fortress.", endTurn);
 					break;
 				case BuildingType.Inn:
-					//Needs changing to current player once both players are in this class
-					HealTroops(_CurrentPlayer);
-					break;
-				case BuildingType.StartTileBattlebeard:
-					break;
-				case BuildingType.StartTileStormshaper:
+					if (_InactivePlayer.CastleProgress >= 4) {
+						p.ShowOK("Oh No!", "The inn won't accept you!", endTurn);
+						break;
+					}
+
+					var rnd = UnityEngine.Random.Range(0, 3);
+					List<Unit> units;
+
+					units = _CurrentPlayer.PlayerArmy.GetRandomUnits(rnd, true);
+
+					foreach (var unit in units) {
+						unit.Heal();
+					}
+
+					string content, title;
+
+					if (_CurrentPlayer.PlayerArmy.GetAllUnits().Count == 0) {
+						title = "The Inn Welcomes You";
+						content = "You are well rested.";
+					} else {
+						title = units.Count + " Units Healed";
+						content = rnd == 0 ? 
+						"Their wounds were too great. Looks like they'll need some more time." :
+						"Your army is well rested.";
+					}
+					p.ShowOK(title, content, endTurn);
+
 					break;
 				default:
+					endTurn();
 					break;
 			}
 		}	
-		_TurnManager.EndTurn();
-		StartCoroutine(SwitchPlayer());
+		
 	}
 
-	public void HealTroops(Player player) {
-		//Change magic number to function once more castle code is in
-		if (player.CastleProgress >= 4)
-			return;
-
-		var rnd = UnityEngine.Random.Range(0, 3);
-		List<Unit> units;
-
-		units = player.PlayerArmy.GetRandomUnits(rnd, true);
-
-		foreach (var unit in units)
-		{
-			unit.Heal();
-		}
+	void endTurn() {	
+		_TurnManager.EndTurn();
+		StartCoroutine(SwitchPlayer());
 	}
 
 	public CardData GenerateRandomCard(List<CardData> availableCards) {
@@ -171,6 +183,7 @@ public class OverworldManager : MonoBehaviour
 
 	void setPlayer(PlayerType p) {
 		_CurrentPlayer = p == PlayerType.Battlebeard ? _BattlebeardPlayer : _StormshaperPlayer;
+		_InactivePlayer = p == PlayerType.Battlebeard ? _StormshaperPlayer : _BattlebeardPlayer;
 		_OverworldUI.SetPlayer(_CurrentPlayer);
 	}
 

@@ -74,6 +74,9 @@ public class OverworldUI : MonoBehaviour
 		_battlebeardCommanderUI._Paused = true;
 		_stormshaperCommanderUI._Paused = true;
 
+		// we need to be able to pause this probably?
+		_BoardUI.PlayerPrompt_DefaultTiles();
+
 		_CameraMovement.DisableCameraMovement();
     }
 
