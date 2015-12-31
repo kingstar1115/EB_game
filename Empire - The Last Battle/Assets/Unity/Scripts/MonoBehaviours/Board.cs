@@ -22,6 +22,11 @@ public class Board : MonoBehaviour {
         Vector2 arraySize = GetBoardSize();
         int arrayWidth = (int)arraySize.x,
             arrayHeight = (int)arraySize.y;
+
+		List<PlayerType> lostImmortals = new List<PlayerType>() {
+			PlayerType.Battlebeard, PlayerType.Battlebeard, PlayerType.Battlebeard, PlayerType.Battlebeard,
+			PlayerType.Stormshaper, PlayerType.Stormshaper, PlayerType.Stormshaper, PlayerType.Stormshaper
+		};
            
         // get start position
         Vector3 centreOffset = new Vector3(_TileWidth / 2, 0, _TileWidth / 2),
@@ -60,6 +65,13 @@ public class Board : MonoBehaviour {
                     //add building commander markers to tile holder
                     tileHolder._MarkerCommanderBB = Utils.GetFirstChildWithTag(_MarkerCommanderBB_Tag, tile.TileObject);
                     tileHolder._MarkerCommanderSS = Utils.GetFirstChildWithTag(_MarkerCommanderSS_Tag, tile.TileObject);
+
+					// if the building is a fortress then assign a lost immortal (we can use owner for this)
+					if (!loadGame && tile.Building == BuildingType.Fortress) {
+						int r = Random.Range(0, lostImmortals.Count);
+						tile.Owner = lostImmortals[r];
+						lostImmortals.RemoveAt(r);
+					}
                 }
                 // set owner flag
                 _FlagManager.SetFlagForTile(tile);

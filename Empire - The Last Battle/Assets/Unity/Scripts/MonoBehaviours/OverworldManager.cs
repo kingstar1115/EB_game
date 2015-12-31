@@ -109,6 +109,15 @@ public class OverworldManager : MonoBehaviour
 					GenerateRandomCard(_AvailableCaveCards.cards);
 					break;
 				case BuildingType.Fortress:
+					// Make sure that the fortress type matches the player type
+					if (tile.Owner == _CurrentPlayer.Type) {
+						// make sure the player owns at least 3 surrounding tiles
+						if (tile.GetConnectedTiles().FindAll(t => t.Owner == _CurrentPlayer.Type).Count >= 3) {
+							// Battle lost immortal
+							break;
+						}
+					}
+					// end turn
 					break;
 				case BuildingType.Inn:
 					//Needs changing to current player once both players are in this class
