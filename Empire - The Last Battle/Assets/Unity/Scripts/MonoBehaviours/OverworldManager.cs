@@ -114,6 +114,8 @@ public class OverworldManager : MonoBehaviour
 						// make sure the player owns at least 3 surrounding tiles
 						if (tile.GetConnectedTiles().FindAll(t => t.Owner == _CurrentPlayer.Type).Count >= 3) {
 							// Battle lost immortal
+							// on victory ->
+							tile.Owner = PlayerType.None;
 							break;
 						}
 					}
