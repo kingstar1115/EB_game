@@ -9,11 +9,12 @@ public class ModalPanel : MonoBehaviour {
 	public Text TitleBackground;
 	public Text ContentForeground;
 	public Text ContentBackground;
-	public Button OkButton;
-	public Button CancelButton;
+	public GameObject OkPanel;
+	public GameObject CancelPanel;
 	public GameObject ModalPanelObject;
-
-	private static ModalPanel modalPanel;
+	Button okButton;
+	Button cancelButton;
+	static ModalPanel modalPanel;
 
 	public static ModalPanel Instance() {
 		if (!modalPanel) {
@@ -27,11 +28,13 @@ public class ModalPanel : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		okButton = OkPanel.GetComponentInChildren<Button>();
+		cancelButton = CancelPanel.GetComponentInChildren<Button>();
 		hide();
 	}
 
-	void setupButton(Button b, UnityAction a) {
-		b.gameObject.SetActive(true);
+	void setupButton(Button b, GameObject p, UnityAction a) {
+		p.SetActive(true);
 		if (a != null) {
 			b.onClick.AddListener(a);
 		}
@@ -42,39 +45,39 @@ public class ModalPanel : MonoBehaviour {
 		ModalPanelObject.SetActive(true);
 		setTitle(title);
 		setContent(content);
-		setupButton(OkButton, onOk);
-		setupButton(CancelButton, onCancel);
+		setupButton(okButton, OkPanel, onOk);
+		setupButton(cancelButton, CancelPanel, onCancel);
 	}
 
 	public void ShowOK(string title, string content, UnityAction onOk) {
 		ModalPanelObject.SetActive(true);
 		setTitle(title);
 		setContent(content);
-		setupButton(OkButton, onOk);
+		setupButton(okButton, OkPanel, onOk);
 	}
 	public void ShowCancel(string title, string content, UnityAction onCancel) {
 		ModalPanelObject.SetActive(true);
 		setTitle(title);
 		setContent(content);
-		setupButton(CancelButton, onCancel);
+		setupButton(cancelButton, CancelPanel, onCancel);
 	}
 
 	void hide() {
-		OkButton.onClick.RemoveAllListeners();
-		CancelButton.onClick.RemoveAllListeners();
-		OkButton.gameObject.SetActive(false);
-		CancelButton.gameObject.SetActive(false);
+		okButton.onClick.RemoveAllListeners();
+		cancelButton.onClick.RemoveAllListeners();
+		OkPanel.SetActive(false);
+		CancelPanel.SetActive(false);
 		ModalPanelObject.SetActive(false);
 	}
 
 	void setContent(string content) {
 		ContentForeground.text = content;
-		ContentBackground.text = content + '\n';
+		ContentBackground.text = content;
 	}
 
 	void setTitle(string title) {
 		TitleForeground.text = title;
-		TitleBackground.text = title + '\n';
+		TitleBackground.text = title;
 	}
 	
 }
