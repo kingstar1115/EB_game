@@ -16,6 +16,7 @@ public class OverworldUI : MonoBehaviour
 	CommanderUI _stormshaperCommanderUI;
     public CameraMovement _CameraMovement;
     public BoardUI _BoardUI;
+	public ArmyUI _ArmyUI;
     public GameObject _PauseScreen;
 
     bool _paused;
@@ -52,6 +53,8 @@ public class OverworldUI : MonoBehaviour
 		_battlebeardCommanderUI.UpdateToPlayerPosition();
 		_stormshaperCommanderUI.UpdateToPlayerPosition();
 
+		_ArmyUI.Initialise(battlebeard, stormshaper);
+
         //add event listeners
         Enable();
     }
@@ -78,7 +81,16 @@ public class OverworldUI : MonoBehaviour
 		_BoardUI.PlayerPrompt_DefaultTiles();
 
 		_CameraMovement.DisableCameraMovement();
+		_ArmyUI.Disable();
     }
+
+	public void Hide() {
+		_ArmyUI.Hide();
+	}
+
+	public void Show() {
+		_ArmyUI.Show();
+	}
 
     public void Enable()
     {
@@ -99,6 +111,8 @@ public class OverworldUI : MonoBehaviour
 		_CommanderUI._Paused = false;
 
 		_CameraMovement.EnableCameraMovement();
+
+		_ArmyUI.Enable();
     }
 
 	public void SetPlayer(Player p) {
@@ -158,6 +172,7 @@ public class OverworldUI : MonoBehaviour
 	void switchFocus(CommanderUI u){
 		//_CameraMovement._TargetObject = u._Player.transform;
 		_CameraMovement.MoveToNewTarget(u._Player.transform, u.getPosition());
+		_ArmyUI.SwitchPlayer(u._Player.Type);
 	}
 
     void Update()

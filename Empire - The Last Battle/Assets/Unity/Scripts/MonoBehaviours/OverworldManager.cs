@@ -25,7 +25,7 @@ public class OverworldManager : MonoBehaviour
 		if (_Board._BBStartTile != null) {
             _BattlebeardPlayer.CommanderPosition = _Board._BBStartTile;
         }else{
-            Debug.LogError("Battleboard start tile not set");
+            Debug.LogError("Battlebeard start tile not set");
         }
 
         if(_Board._SSStartTile != null){
@@ -48,13 +48,11 @@ public class OverworldManager : MonoBehaviour
 		setPlayer(PlayerType.Battlebeard);
 
 		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
-		// TEST
         _TurnManager.StartTurn();
 	}
 
 	void _CardSystem_OnEffectApplied(CardData card, Player player) {
-        if (card.Type == CardType.Scout_Card)
-        {
+        if (card.Type == CardType.Scout_Card) {
             _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(player.Type, player.CommanderPosition, card.Value));
 		}
 	}
@@ -87,7 +85,7 @@ public class OverworldManager : MonoBehaviour
     IEnumerator SwitchPlayer() {
         yield return new WaitForSeconds(1);
         _TurnManager.SwitchTurn();
-		UnPause();
+		_OverworldUI.Enable();
     }
 
 	void HandleTileEvent(TileData tile) {		
@@ -95,19 +93,39 @@ public class OverworldManager : MonoBehaviour
 			_CurrentPlayer.IsScouting = false;
 			endTurn();
 		} else {
-			Pause();
+			_OverworldUI.Disable();
 			ModalPanel p = ModalPanel.Instance();
 			switch (tile.Building) {
 				case BuildingType.Armoury:
 					p.ShowOK("Armoury", "You landed on the Armoury.", endTurn);
 					break;
 				case BuildingType.Camp:
+					if (tile.Owner != _CurrentPlayer.Type) {
+						if (tile.Owner == PlayerType.None) {
+							// MONSTER BATTLE
+						} else {
+							// PVP BATTLE
+						}
+
+						// WIN
+						_Board.SetTileOwner(tile, _CurrentPlayer.Type);
+					}
 					p.ShowOK("Camp", "You landed on a camp.", endTurn);
 					break;
 				case BuildingType.Cave:
-					CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
-					_CurrentPlayer.Hand.cards.Add(c);
-					p.ShowOK("Card Recieved!", "You recieved a " + c.Type + " card.", endTurn);
+					if (tile.Owner != _CurrentPlayer.Type) {
+						if (tile.Owner != PlayerType.None) {
+							//BATTLE
+						} else {
+							// WIN ANYWAY
+						}
+
+						// WIN
+						CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
+						_CurrentPlayer.Hand.cards.Add(c);
+						_Board.SetTileOwner(tile, _CurrentPlayer.Type);
+						p.ShowOK("Card Recieved!", "You recieved a " + c.Type + " card.", endTurn);
+					}
 					break;
 				case BuildingType.Fortress:
 					p.ShowOK("Fortress", "You landed on a fortress.", endTurn);
@@ -129,7 +147,7 @@ public class OverworldManager : MonoBehaviour
 
 					string content, title;
 
-					if (_CurrentPlayer.PlayerArmy.GetAllUnits().Count == 0) {
+					if (_CurrentPlayer.PlayerArmy.GetUnits().Count == 0) {
 						title = "The Inn Welcomes You";
 						content = "You are well rested.";
 					} else {
@@ -139,7 +157,6 @@ public class OverworldManager : MonoBehaviour
 						"Your army is well rested.";
 					}
 					p.ShowOK(title, content, endTurn);
-
 					break;
 				default:
 					endTurn();
@@ -157,25 +174,38 @@ public class OverworldManager : MonoBehaviour
 	public CardData GenerateRandomCard(List<CardData> availableCards) {
 		//Generate a random card (Warning: This is weighted heavily towards resource cards because
 		//there are more of them in the enum, change this later?)
-		short randomCardIndex = (short)UnityEngine.Random.Range(0, availableCards.Count - 1);
-		CardData card = availableCards [randomCardIndex];
-
-		return card;
+		short randomCardIndex = (short)Random.Range(0, availableCards.Count - 1);
+		return availableCards[randomCardIndex];
 	}
 
     public void Pause()
     {
         _OverworldUI.Disable();
+		_OverworldUI.Hide();
     }
 
     public void UnPause()
     {
         _OverworldUI.Enable();
+		_OverworldUI.Show();
     }
 
     void _TurnManager_OnTurnStart() {
         _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_CurrentPlayer.Type, _CurrentPlayer.CommanderPosition, 1));
-    }
+
+
+		// test add unit each turn
+		int rand = Random.Range(0, 8);
+		_CurrentPlayer.PlayerArmy.AddUnit((UnitType)rand);
+
+		// chance of knocking out a random unit each turn
+
+		int c = _CurrentPlayer.PlayerArmy.GetUnits().Count;
+		rand = Random.Range(0, (int)c * 5);
+		if (rand < c) {
+			_CurrentPlayer.PlayerArmy.GetUnits()[rand].ReduceHP(100);
+		}
+	}
 
     void _TurnManager_OnTurnEnd() {
         _OverworldUI.DisablePlayerMovement();
@@ -195,7 +225,9 @@ public class OverworldManager : MonoBehaviour
 
 	// Update is called once per frame
 	void Update() {
-
+		if (Input.GetKeyDown(KeyCode.Return)) {
+			StartCoroutine(SwitchPlayer());
+		}
 	}
 
 }
