@@ -126,6 +126,9 @@ public class OverworldManager : MonoBehaviour
 						_Board.SetTileOwner(tile, _CurrentPlayer.Type);
 						p.ShowOK("Card Recieved!", "You recieved a " + c.Type + " card.", endTurn);
 					}
+					else {
+						endTurn();
+					}
 					break;
 				case BuildingType.Fortress:
 					p.ShowOK("Fortress", "You landed on a fortress.", endTurn);
