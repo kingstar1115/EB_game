@@ -29,11 +29,13 @@ public class OverworldUI : MonoBehaviour
             {
                 _PauseScreen.SetActive(true);
                 Disable();
+				Hide();
             }
             else
             {
                 _PauseScreen.SetActive(false);
                 Enable();
+				Show();
             }
 
             _paused = value;

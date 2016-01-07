@@ -195,16 +195,12 @@ public class OverworldManager : MonoBehaviour
 		return availableCards[randomCardIndex];
 	}
 
-    public void Pause()
-    {
+    public void Pause() {
         _OverworldUI.Disable();
-		_OverworldUI.Hide();
     }
 
-    public void UnPause()
-    {
+    public void UnPause() {
         _OverworldUI.Enable();
-		_OverworldUI.Show();
     }
 
     void _TurnManager_OnTurnStart() {
