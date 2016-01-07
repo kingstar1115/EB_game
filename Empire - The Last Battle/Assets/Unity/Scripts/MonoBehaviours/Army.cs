@@ -3,55 +3,73 @@ using System.Collections.Generic;
 
 public class Army : MonoBehaviour {
 
-	List<Unit> Units;
+	List<Unit> units;
 	public UnitDataManager _UnitDataManager;
+	public event UnitCallback OnUpdateUnit = delegate { };
+	public event UnitCallback OnAddUnit = delegate { };
+	public event UnitIndexCallback OnRemoveUnit = delegate { };
 
 	public void Initialise() {
-		Units = new List<Unit>();
+		units = new List<Unit>();
 	}
 
 	public void AddUnit(UnitType type) {
-		Units.Add(new Unit(_UnitDataManager.GetData(type)));
+		Unit u = new Unit(_UnitDataManager.GetData(type));
+		units.Add(u);
+		u.OnUpdate += unitUpdated;
+		OnAddUnit(u);
+	}
+
+	public void RemoveUnit(Unit u) {
+		int i = units.IndexOf(u);
+		if (i != -1) {
+			units.Remove(u);
+			u.OnUpdate -= unitUpdated;
+			OnRemoveUnit(u, i);
+		}
 	}
 
 	public List<Unit> GetUnits(UnitType type) {
 		List<Unit> SpecificUnits;
-		SpecificUnits = Units.FindAll(_Unit => _Unit.Type == type);
+		SpecificUnits = units.FindAll(_Unit => _Unit.Type == type);
 
 		return SpecificUnits;
 	}
 
+	public List<Unit> GetUnits() {
+		return units;
+	}
+
 	public List<Unit> GetActiveUnits(UnitType type) {
-		return Units.FindAll(x => !x.IsKO() && x.Type == type);
-	}
-
-	public List<Unit> GetKOUnits(UnitType type) {
-		return Units.FindAll(x => x.IsKO() && x.Type == type);
-	}
-
-	public List<Unit> GetKOUnits() {
-		return Units.FindAll(x => x.IsKO());
+		return units.FindAll(x => !x.IsKO() && x.Type == type);
 	}
 
 	public List<Unit> GetActiveUnits() {
-		return Units.FindAll(x => !x.IsKO());
+		return units.FindAll(x => !x.IsKO());
 	}
 
+	public List<Unit> GetKOUnits(UnitType type) {
+		return units.FindAll(x => x.IsKO() && x.Type == type);
+	}
+
+	public List<Unit> GetKOUnits() {
+		return units.FindAll(x => x.IsKO());
+	}
 	public List<Unit> GetRandomUnits(int maxNumber, bool b_ShouldBeKo = false) {
-		var RandomUnits = new List<Unit>();
-		List<Unit> AllUnits = b_ShouldBeKo ? GetKOUnits() : Units;
+		List<Unit> RandomUnits = new List<Unit>();
+		List<Unit> AllUnits = b_ShouldBeKo ? GetKOUnits() : units;
 		if (AllUnits.Count < maxNumber) {
 			maxNumber = AllUnits.Count;
 		}
 		for (int i = 0; i < maxNumber; i++) {
-			var randomNumber = UnityEngine.Random.Range(0, AllUnits.Count - 1);
+			var randomNumber = Random.Range(0, AllUnits.Count - 1);
 			RandomUnits.Add(AllUnits[randomNumber]);
 			AllUnits.RemoveAt(randomNumber);
 		}
 		return RandomUnits;
 	}
 
-	public List<Unit> GetAllUnits() {
-		return Units;
+	void unitUpdated(Unit u) {
+		OnUpdateUnit(u);
 	}
 }

@@ -7,6 +7,7 @@ public class UnitBaseData : ScriptableObject {
     public int HP;
 }
 
+// This is the correct order!
 public enum UnitType {
 	Scout,
 	Pikeman,

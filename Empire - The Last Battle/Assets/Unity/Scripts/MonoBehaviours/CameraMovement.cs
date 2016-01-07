@@ -40,18 +40,29 @@ public class CameraMovement : MonoBehaviour
 			bool changesMade = false;
 
 			//get any change in zoom
-			if (Input.GetAxis("Mouse ScrollWheel") != 0)
-			{
+			if (Input.GetAxis("Mouse ScrollWheel") != 0) {
 				_radius -= (Input.GetAxis("Mouse ScrollWheel") * _ZoomModifier);
+				_radius = Mathf.Clamp(_radius, _MinZoom, _MaxZoom);
+				changesMade = true;
+			} else if (Input.GetKey(KeyCode.Keypad8) || Input.GetKey(KeyCode.Keypad2)) {
+				// Change it to something that works with the TV numpad too
+				float zoomDir = Input.GetKey(KeyCode.Keypad8) ? 1f : -1f;
+				float keypadModifier = 0.02f;
+				_radius -= (zoomDir * _ZoomModifier * keypadModifier);
 				_radius = Mathf.Clamp(_radius, _MinZoom, _MaxZoom);
 				changesMade = true;
 			}
 
 			//right mouse button down 
-			if (Input.GetMouseButton(1))
-			{
+			if (Input.GetMouseButton(1)) {
 				//get the mouse delta in both axis to move camera
 				toMoveHorizontal = (Vector3.Normalize(Vector3.ProjectOnPlane(-this.transform.right, Vector3.up)) * (Input.GetAxis("Mouse X") * _HorizontalModifier));//(this.transform.up * (Input.GetAxis("Mouse Y")*_VerticalModifier));
+				changesMade = true;
+			} else if (Input.GetKey(KeyCode.Keypad4) || Input.GetKey(KeyCode.Keypad6)) {
+				// Change it to something that works with the TV numpad too
+				float moveDir = Input.GetKey(KeyCode.Keypad6) ? 1f : -1f;
+				float keypadModifier = 0.2f;
+				toMoveHorizontal = (Vector3.Normalize(Vector3.ProjectOnPlane(-this.transform.right, Vector3.up)) * (moveDir * _HorizontalModifier * keypadModifier));//(this.transform.up * (Input.GetAxis("Mouse Y")*_VerticalModifier));
 				changesMade = true;
 			}
 
