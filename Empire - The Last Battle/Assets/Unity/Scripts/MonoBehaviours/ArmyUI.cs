@@ -86,12 +86,18 @@ public class ArmyUI : MonoBehaviour {
 	}
 
 	public void Enable() {
-		enabled = true;
-		getUnitTypeUI(currentPlayer).ForEach(ui => ui.Show());
+		enabled = true;	
 	}
 
 	public void Disable() {
 		enabled = false;
+	}
+
+	public void Show() {
+		getUnitTypeUI(currentPlayer).ForEach(ui => ui.Show());
+	}
+
+	public void Hide() {
 		getUnitTypeUI(currentPlayer).ForEach(ui => ui.Hide());
 		resetSelection();
 	}
