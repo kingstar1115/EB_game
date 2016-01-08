@@ -131,7 +131,21 @@ public class OverworldManager : MonoBehaviour
 					}
 					break;
 				case BuildingType.Fortress:
-					p.ShowOK("Fortress", "You landed on a fortress.", endTurn);
+					// Make sure that the fortress type matches the player type
+					if (tile.Owner == _CurrentPlayer.Type) {
+						// make sure the player owns at least 3 surrounding tiles
+						if (tile.GetConnectedTiles().FindAll(t => t.Owner == _CurrentPlayer.Type).Count >= 3) {
+							// Battle lost immortal
+							// on victory ->
+							tile.Owner = PlayerType.None;
+							p.ShowOK("Fortress", "A bloody Lost Immortal just showed up innit blud!", endTurn);
+						} else {
+							p.ShowOK("Fortress", "You felt a chill in the air, but nothing appeared.", endTurn);
+						}
+						break;
+					}
+					p.ShowOK("Fortress", "Nothing appeared.", endTurn);
+					// end turn
 					break;
 				case BuildingType.Inn:
 					if (_InactivePlayer.CastleProgress >= 4) {
@@ -181,16 +195,12 @@ public class OverworldManager : MonoBehaviour
 		return availableCards[randomCardIndex];
 	}
 
-    public void Pause()
-    {
+    public void Pause() {
         _OverworldUI.Disable();
-		_OverworldUI.Hide();
     }
 
-    public void UnPause()
-    {
+    public void UnPause() {
         _OverworldUI.Enable();
-		_OverworldUI.Show();
     }
 
     void _TurnManager_OnTurnStart() {
