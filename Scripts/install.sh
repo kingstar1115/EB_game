@@ -5,3 +5,6 @@ curl -o Unity.pkg http://download.unity3d.com/download_unity/3757309da7e7/MacEdi
 
 echo 'Installing Unity.pkg'
 sudo installer -dumplog -package Unity.pkg -target /
+
+echo 'Removing unity'
+rm Unity.pkg

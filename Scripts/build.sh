@@ -33,7 +33,6 @@ echo "Attempting to build $project for Web"
   -buildWebPlayer  "$(pwd)/Build/ELB" \
   -quit
 
-echo 'Logs from build'
-cat $(pwd)/unity.log
-
-
+echo 'Zipping files for distribution'
+zip -r Build/ELB_OSX.zip Build/osx
+zip -r Build/ELB_Win.zip Build/windows

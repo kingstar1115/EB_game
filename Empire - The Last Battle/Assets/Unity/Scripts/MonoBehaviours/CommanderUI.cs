@@ -22,7 +22,6 @@ public class CommanderUI : MonoBehaviour
     public float _LiftTime;
     public float _MoveTime;
 
-    Collider _collider;
     LerpPosition _lerpPosition;
     Vector3 _toGoTo;
     HashSet<TileData> _reachableTiles;
@@ -59,11 +58,14 @@ public class CommanderUI : MonoBehaviour
             _paused = value;
         }
     }
+
+	public Vector3 getPosition() {
+		return _toGoTo;
+	}
     
     // Use this for initialization
 	public void Initialise () 
     {
-        _collider = this.GetComponent<Collider>();
         _lerpPosition = this.GetComponent<LerpPosition>();
         _defaultLayer = this.gameObject.layer;
 
@@ -110,16 +112,17 @@ public class CommanderUI : MonoBehaviour
 
     void OnMouseDrag()
     {
-        if (!_dragging)
-        {
-            OnStartDrag();
-            _dragging = true;
-        }
 
 		//only if movement is allowed
 		if (_allowMovement) {
+
+			if (!_dragging) {
+				OnStartDrag();
+				_dragging = true;
+			}
+
 			//if hovered a tile that is reachable then move have the player move there
-            Collider tileParent;
+			Collider tileParent;
             TileHolder tileHolder = null;
             if (BoardUI.GetTileHovered_Position(out tileParent))
                 tileHolder = tileParent.GetComponentInChildren<TileHolder>();
@@ -142,7 +145,7 @@ public class CommanderUI : MonoBehaviour
 
                 _toGoTo.y = _LiftedHeight;
 
-                _targetY = tileHolder._Tile.Height + _collider.bounds.extents.y;
+				_targetY = tileHolder._Tile.Height;
 
                 _destinationTile = tileHolder;
 
@@ -172,12 +175,13 @@ public class CommanderUI : MonoBehaviour
 			//commander not moved
             GameObject posMarker = getCommanderMarker(_Player.CommanderPosition.TileObject.GetComponentInChildren<TileHolder>());
             _toGoTo = (posMarker!=null) ? posMarker.transform.position: _Player.CommanderPosition.TileObject.transform.position;
-			_targetY = _Player.CommanderPosition.Height + _collider.bounds.extents.y;
+			_targetY = _Player.CommanderPosition.Height;
         }
         else
         {
-            //cammander moved
+            //commander moved
             _toGoTo = _destination;
+			// do we want to do this right now and not when the movement is over?
             OnCommanderMoved(_destinationTile._Tile);
             OnCommanderDrop(new Vector3(_destination.x, _targetY, _destination.z));
             _destinationTile = null;
@@ -225,7 +229,7 @@ public class CommanderUI : MonoBehaviour
     {
         GameObject posMarker = getCommanderMarker(_Player.CommanderPosition.TileObject.GetComponentInChildren<TileHolder>());
         Vector3 newPosition = (posMarker != null) ? posMarker.transform.position : _Player.CommanderPosition.TileObject.transform.position;
-        newPosition.y = _Player.CommanderPosition.Height + _collider.bounds.extents.y;
+		newPosition.y = _Player.CommanderPosition.Height;
         this.transform.position = newPosition;
         
         _lerpPosition.StopLerp();

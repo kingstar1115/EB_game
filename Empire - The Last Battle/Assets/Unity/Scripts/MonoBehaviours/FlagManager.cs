@@ -53,7 +53,7 @@ public class FlagManager : MonoBehaviour {
 
     void Update() {
         // Billboard the flags to always face the target (target usually == camera)
-        if (BillboardTarget != null) {
+        if (BillboardTarget != null && flagLookup != null) {
             foreach (FlagData f in flagLookup.Values) {
                 if (f.CurrentFlag != null && f.Marker != null) {
                     Vector3 targetPostition = new Vector3(BillboardTarget.transform.position.x,
