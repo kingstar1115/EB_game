@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 [RequireComponent(typeof(LerpRotation))]
 public class CardUI : MonoBehaviour 
 {
-    public LerpPosition _CardImage;
+    public Image _Image;
+    public LerpPosition _PosLerp;
     LerpRotation _lerpRotation;
 
     Vector2 _pivotVector;
@@ -18,7 +20,7 @@ public class CardUI : MonoBehaviour
         set
         {
             _pivotVector = value;
-            _CardImage.LerpTo(new Vector3(_pivotVector.x, _pivotVector.y, 0));
+            _PosLerp.LerpTo(new Vector3(_pivotVector.x, _pivotVector.y, 0));
         }
     }
 

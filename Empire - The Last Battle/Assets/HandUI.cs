@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -6,21 +7,11 @@ using System.Collections.Generic;
 public class HandUI : MonoBehaviour 
 {
 	public Pool m_CardPrefabPool;
+    public List<Sprite> m_Sprites;
     public List<CardUI> m_Cards;
     public float m_ZRotSpacing;
-    public int m_focusedCardIndex;
-    LerpRotation m_lerpRotation;
-
-	public void Init(List<CardData> cardsToAdd)
-	{
-		//add new cards
-		foreach (var card in cardsToAdd) {
-			AddNewCard(card);
-		}
-
-		//update spacing 
-		UpdateRotations ();
-	}
+    public int m_FocusedCardIndex;
+    public LerpRotation m_LerpRotation;
 
 	// Use this for initialization
 	void Start () {
@@ -42,12 +33,44 @@ public class HandUI : MonoBehaviour
 	
 	}
 
+    public void SetHand(CardList cardsToShow)
+    {
+        //trim cards diplaying that are not needed
+        if (m_Cards.Count > cardsToShow.cards.Count)
+        {
+            for (int i = cardsToShow.cards.Count; i < m_Cards.Count; i++)
+            {
+                m_Cards[i].gameObject.SetActive(false);
+            }
+        }
+
+        //for each of the showing cards
+        for (int i = 0; i < cardsToShow.cards.Count; i++)
+        {
+            //if i < cards displaying count then set new sprite
+            if (i < m_Cards.Count)
+                m_Cards[i]._Image.sprite = GetSpriteOfCard(cardsToShow.cards[i].Type);
+            else
+            {
+                //add new card
+                AddNewCard(cardsToShow.cards[i]);
+            }
+        }
+
+        //update spacing 
+        UpdateRotations();
+    }
+
 	public void AddNewCard(CardData data)
 	{
 		//create the prefab 
 		GameObject newCard = m_CardPrefabPool.GetPooledObject ();
 		CardUI cardUI = newCard.GetComponent<CardUI>();
 		if (cardUI != null) {
+            //init
+            newCard.SetActive(true);
+            cardUI.Init();
+            cardUI._Image.sprite = GetSpriteOfCard(data.Type);
 			//add as perent 
 			newCard.transform.parent = this.transform;
 			//add to the list
@@ -64,7 +87,7 @@ public class HandUI : MonoBehaviour
         float prevRotToAdd = 0;
         for (int i = 1; i < m_Cards.Count; i++)
         {
-            prevRotToAdd = (i != m_focusedCardIndex + 1) ? m_ZRotSpacing : (m_ZRotSpacing * 2);
+            prevRotToAdd = (i != m_FocusedCardIndex + 1) ? m_ZRotSpacing : (m_ZRotSpacing * 2);
             Debug.Log("RotToAdd["+i+"] "+prevRotToAdd);
             m_Cards[i]._TargetRotation = Quaternion.Euler(0, 0, prevRotToAdd + totalRotation);
             Debug.Log("Target " + m_Cards[i]._TargetRotation);
@@ -72,6 +95,11 @@ public class HandUI : MonoBehaviour
         }
 
         //rotate the hand ui minus half total
-        m_lerpRotation.LerpTo(Quaternion.Euler(0,0,-totalRotation/2));
+        m_LerpRotation.LerpTo(Quaternion.Euler(0,0,-totalRotation/2));
+    }
+
+    public Sprite GetSpriteOfCard(CardType type)
+    {
+        return m_Sprites[(int)type];
     }
 }

@@ -1,12 +1,21 @@
 using UnityEngine;
 
+public delegate void PlayerUnitCallback(Player p, Unit u);
+public delegate void PlayerUnitIndexCallback(Player p, Unit u, int i);
+
 public class Player : MonoBehaviour
 {
+    //card events
 	public delegate void CardAction(CardData cardData);
 	public event CardAction OnCardAdded = delegate {};
 	public event CardAction OnCardRemoved = delegate {};
 
-    public TileData CommanderPosition;
+    //silly java-named events
+    public event PlayerUnitCallback OnUpdateUnit = delegate { };
+    public event PlayerUnitCallback OnAddUnit = delegate { };
+    public event PlayerUnitIndexCallback OnRemoveUnit = delegate { };
+
+    public TileData PreviousCommanderPosition;
     public PlayerType Type;
 	public PointsSystem Currency;
 	public CardList Hand;
@@ -23,10 +32,39 @@ public class Player : MonoBehaviour
         }
     }
 
+    TileData commanderPosition;
+    public TileData CommanderPosition
+    {
+        get { return commanderPosition; }
+        set
+        {
+            PreviousCommanderPosition = commanderPosition;
+            commanderPosition = value;
+        }
+    }
+
 	public void Initialise() {
 		PlayerArmy.Initialise();
 		Currency = new PointsSystem();
+        PlayerArmy.OnUpdateUnit += PlayerArmy_OnUpdateUnit;
+        PlayerArmy.OnRemoveUnit += PlayerArmy_OnRemoveUnit;
+        PlayerArmy.OnAddUnit += PlayerArmy_OnAddUnit;
 	}
+
+    private void PlayerArmy_OnAddUnit(Unit u)
+    {
+        OnAddUnit(this, u);
+    }
+
+    private void PlayerArmy_OnRemoveUnit(Unit u, int i)
+    {
+        OnRemoveUnit(this, u, i);
+    }
+
+    private void PlayerArmy_OnUpdateUnit(Unit u)
+    {
+        OnUpdateUnit(this, u);
+    }
 
     public void Reset()
     {

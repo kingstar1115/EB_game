@@ -66,10 +66,16 @@ public class OverworldManager : MonoBehaviour
 		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
 
 		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
+
 		// TEST
-		UseCard(_AvailableCaveCards.cards[0]);
         _CurrentPlayer = _BattlebeardPlayer;
+        //set the player in focus
+        _OverworldUI.SetPlayerFocus(_CurrentPlayer);
+
+        UseCard(_CurrentPlayer.Hand.cards[0]);
         _TurnManager.StartTurn();
+
+        
 	}
 
 	void _BattlebeardPlayer_OnCardAdded(CardData card)
@@ -223,14 +229,12 @@ public class OverworldManager : MonoBehaviour
         switch (_CurrentPlayer.tag) {
             case "CommanderBB":
                 _CurrentPlayer = _StormshapersPlayer;
-                _OverworldUI._CommanderUI = _StormshapersPlayer.gameObject.GetComponent<CommanderUI>();
-                _OverworldUI.SwitchFocus(_CurrentPlayer.transform);
+                _OverworldUI.SetPlayerFocus(_StormshapersPlayer);
                 _TurnManager.StartTurn();
                 break;
             case "CommanderSS":
                 _CurrentPlayer = _BattlebeardPlayer;
-                _OverworldUI._CommanderUI = _BattlebeardPlayer.gameObject.GetComponent<CommanderUI>();
-                _OverworldUI.SwitchFocus(_CurrentPlayer.transform);
+                _OverworldUI.SetPlayerFocus(_BattlebeardPlayer);
                 _TurnManager.StartTurn();
                 break;
         }
