@@ -11,7 +11,8 @@ public class DebugUI : MonoBehaviour
 
 	public void SetMessage(string message, int fontSize, Color fontColour)
 	{
-		var firstItem = _text.First();
+		//Get text element that is most faded
+		var itemMostFaded = _text.OrderByDescending(x => x.color.a).Last();
 		var lastItem = _text.Last();
 
 		foreach (var item in _text)
@@ -19,12 +20,12 @@ public class DebugUI : MonoBehaviour
 			//If debug text already is showing text then move to next text object
 			if (item.text.Length > 0)
 			{
-				//If on last item, and each text before is full then go ahead and assign variables to first text element
+				//If on last item, and each text before is full then go ahead and assign variables to most faded text element
 				if (item.Equals(lastItem))
 				{
-					firstItem.text = message;
-					firstItem.fontSize = fontSize;
-					firstItem.color = fontColour;
+					itemMostFaded.text = message;
+					itemMostFaded.fontSize = fontSize;
+					itemMostFaded.color = fontColour;
 				}
 				continue;
 			}
