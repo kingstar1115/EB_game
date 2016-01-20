@@ -26,6 +26,10 @@ public class Unit {
 		return GetCurrentHP() <= 0;
 	}
 
+	public bool IsUpgradeable() {
+		return IsKO () || !HasUpgrade();
+	}
+
 	//For example if CurrentHP = -2 and CurrentUpgrade.HP is = 3 then this will return 1
 	public int GetCurrentHP() {
 		return CurrentUpgrade == null ? CurrentBaseHP : CurrentBaseHP + CurrentUpgrade.HP;
@@ -70,5 +74,15 @@ public class Unit {
 	public void RemoveUpgrade() {
 		CurrentUpgrade = null;
 		OnUpdate(this);
+	}
+
+	public UnitBaseData CreateUpgrade() {
+		UnitBaseData Upgrade = new UnitBaseData();
+		Upgrade.Type = Type;
+		Upgrade.HP = (int)Mathf.Round((float)BaseData.HP / 10);
+		Upgrade.Strength = (int)Mathf.Round((float)BaseData.Strength / 10);
+		Upgrade.Speed = (int)Mathf.Round((float)BaseData.Speed / 10);
+
+		return Upgrade;
 	}
 }
