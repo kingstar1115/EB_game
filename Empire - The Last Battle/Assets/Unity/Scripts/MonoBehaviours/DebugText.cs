@@ -2,18 +2,21 @@
 using System.Collections;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Text), typeof(CanvasGroup))]
 public class DebugText : MonoBehaviour
 {
 	private DebugUI _debugUI;
+	private CanvasGroup _canvasGroup;
 	private Text _text;
-	private Color _baseColor;
+	private float _baseAlpha;
 	private float _time;
 
 	void Start()
 	{
 		_debugUI = GameObject.Find("DebugUI").GetComponent<DebugUI>();
 		_text = gameObject.GetComponent<Text>();
-		_baseColor = _text.color;
+		_canvasGroup = gameObject.GetComponent<CanvasGroup> ();
+		_baseAlpha = 1f;
 	}
 
 	void Update()
@@ -28,7 +31,7 @@ public class DebugText : MonoBehaviour
 	void Reset()
 	{
 		_text.text = "";
-		_text.material.color = _baseColor;
+		_canvasGroup.alpha = _baseAlpha;
 		_time = 0f;
 	}
 
@@ -41,9 +44,7 @@ public class DebugText : MonoBehaviour
 			return;
 		}
 
-		Color myColor = _text.material.color;
 		float ratio = _time / _debugUI._duration;
-		myColor.a = Mathf.Lerp(1, 0, ratio);
-		_text.material.color = myColor;
+		_canvasGroup.alpha = Mathf.Lerp(1, 0, ratio);
 	}
 }

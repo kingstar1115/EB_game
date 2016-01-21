@@ -12,7 +12,7 @@ public class DebugUI : MonoBehaviour
 	public void SetMessage(string message, int fontSize, Color fontColour)
 	{
 		//Get text element that is most faded
-		var itemMostFaded = _text.OrderByDescending(x => x.color.a).Last();
+		var itemMostFaded = _text.OrderByDescending(x => x.gameObject.GetComponent<CanvasGroup>().alpha).Last();
 		var lastItem = _text.Last();
 
 		foreach (var item in _text)
