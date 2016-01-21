@@ -5,11 +5,19 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Text), typeof(CanvasGroup))]
 public class DebugText : MonoBehaviour
 {
+	public float BaseAlpha 
+	{
+		get 
+		{
+			return _baseAlpha;
+		}
+	}
+	public float Time { get; set;}
+
+	private float _baseAlpha;
 	private DebugUI _debugUI;
 	private CanvasGroup _canvasGroup;
 	private Text _text;
-	private float _baseAlpha;
-	private float _time;
 
 	void Start()
 	{
@@ -21,30 +29,30 @@ public class DebugText : MonoBehaviour
 
 	void Update()
 	{
-		_time += 0.01f;
-
-		//If text has some text then start fading
-		if (_text.text.Length > 0)
+		//If text has some text then start countdown and fading
+		if (_text.text.Length > 0) {
+			Time += 0.01f;
 			Fade();
+		}
 	}
 
 	void Reset()
 	{
 		_text.text = "";
 		_canvasGroup.alpha = _baseAlpha;
-		_time = 0f;
+		Time = 0f;
 	}
 
 	void Fade()
 	{
 		//If text has fully faded out then reset text variables to default 
-		if (_time > _debugUI._duration)
+		if (Time > _debugUI._duration)
 		{
 			Reset();
 			return;
 		}
 
-		float ratio = _time / _debugUI._duration;
+		float ratio = Time / _debugUI._duration;
 		_canvasGroup.alpha = Mathf.Lerp(1, 0, ratio);
 	}
 }

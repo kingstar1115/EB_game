@@ -8,6 +8,15 @@ public class DebugUI : MonoBehaviour
 {
 	public float _duration;
 	public List<Text> _text;
+	static DebugUI ui;
+
+	void Awake() {
+		ui = this;
+	}
+
+	public static DebugUI getUI() {
+		return ui;
+	}
 
 	public void SetMessage(string message, int fontSize, Color fontColour)
 	{
@@ -26,6 +35,12 @@ public class DebugUI : MonoBehaviour
 					itemMostFaded.text = message;
 					itemMostFaded.fontSize = fontSize;
 					itemMostFaded.color = fontColour;
+
+					//Need to reset alpha on text that we just set
+					itemMostFaded.gameObject.GetComponent<CanvasGroup>().alpha = itemMostFaded.gameObject.GetComponent<DebugText>().BaseAlpha;
+					//Reset fade timer
+					itemMostFaded.gameObject.GetComponent<DebugText>().Time = 0f;
+
 				}
 				continue;
 			}
