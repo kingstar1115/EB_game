@@ -14,6 +14,9 @@ public class OverworldManager : MonoBehaviour
     public TurnManager _TurnManager;
 	public GameStateHolder _GameStateHolder;
 
+	//****TESTS ONLY****
+	public CardList _StartCards;
+
 	// Use this for initialization
 	void Start() {
 		//new game setup
@@ -72,9 +75,11 @@ public class OverworldManager : MonoBehaviour
         //set the player in focus
         _OverworldUI.SetPlayerFocus(_CurrentPlayer);
 
-        UseCard(_CurrentPlayer.Hand.cards[0]);
+		//test by adding a scout card.
+		_CurrentPlayer.SetCards (_StartCards);
+        UseCard(_CurrentPlayer.Hand.GetCardOfType(CardType.Scout_Card));
         _TurnManager.StartTurn();
-
+		_GameStateHolder._gameState = GameState.Overworld;
         
 	}
 
@@ -246,3 +251,4 @@ public class OverworldManager : MonoBehaviour
 	}
 
 }
+

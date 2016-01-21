@@ -98,6 +98,11 @@ public class Player : MonoBehaviour
 			Debug.LogError ("trying ot remove card that doesnt exist :O");
 		
 	}
+
+	public void SetCards(CardList newCards)
+	{
+		Hand.cards = new System.Collections.Generic.List<CardData> (newCards.cards);
+	}
 }
 
 public enum PlayerType

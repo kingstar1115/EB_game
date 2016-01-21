@@ -143,11 +143,19 @@ public class OverworldUI : MonoBehaviour
 	public void AddPlayerCard(PlayerType pType, CardData cData)
 	{
 		//update the hand ui here
+		if (_CommanderUI._Player.Type == pType) 
+		{
+			_CommanderUI.DisplayInfo();
+		}
 	}
 
 	public void RemovePlayerCard(PlayerType pType, CardData cData)
 	{
 		//update the hand ui here
+		if (_CommanderUI._Player.Type == pType) 
+		{
+			_CommanderUI.DisplayInfo();
+		}
 	}
 
     void Update()

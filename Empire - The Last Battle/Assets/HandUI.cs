@@ -72,7 +72,8 @@ public class HandUI : MonoBehaviour
             cardUI.Init();
             cardUI._Image.sprite = GetSpriteOfCard(data.Type);
 			//add as perent 
-			newCard.transform.parent = this.transform;
+			newCard.transform.SetParent(this.transform);
+			newCard.transform.localPosition = Vector3.zero;
 			//add to the list
 			m_Cards.Add(cardUI);
 		} else {
@@ -88,9 +89,9 @@ public class HandUI : MonoBehaviour
         for (int i = 1; i < m_Cards.Count; i++)
         {
             prevRotToAdd = (i != m_FocusedCardIndex + 1) ? m_ZRotSpacing : (m_ZRotSpacing * 2);
-            Debug.Log("RotToAdd["+i+"] "+prevRotToAdd);
+            //Debug.Log("RotToAdd["+i+"] "+prevRotToAdd);
             m_Cards[i]._TargetRotation = Quaternion.Euler(0, 0, prevRotToAdd + totalRotation);
-            Debug.Log("Target " + m_Cards[i]._TargetRotation);
+            //Debug.Log("Target " + m_Cards[i]._TargetRotation);
             totalRotation += prevRotToAdd;
         }
 
