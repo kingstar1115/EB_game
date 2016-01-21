@@ -10,6 +10,7 @@ public class Unit {
 	UnitBaseData BaseData;
 	//TODO: Decide if this is the best way to handle an upgrade. Is it better to have a separate Upgrade class?
 	UnitBaseData CurrentUpgrade;
+	UnitBaseData CurrentTempUpgrade;
 	//CurrentBaseHP will have a max value that is equal to the BaseData.HP value
 	int CurrentBaseHP;
 	public TileData Position;
@@ -32,7 +33,18 @@ public class Unit {
 	}
 
 	public int GetStrength() {
-		return CurrentUpgrade == null ? BaseData.Strength : BaseData.Strength + CurrentUpgrade.Strength;
+		return CurrentUpgrade == null ? BaseData.Strength : BaseData.Strength + GetCombinedUpgradeStrength();
+	}
+
+	public int GetCombinedUpgradeStrength() {
+		int totalUpgradeStrength = 0;
+		if (CurrentUpgrade != null) {
+			totalUpgradeStrength += CurrentUpgrade.Strength;
+		}
+		if (CurrentTempUpgrade != null) {
+			totalUpgradeStrength += CurrentTempUpgrade.Strength;
+		}
+		return totalUpgradeStrength;
 	}
 
 	public int GetSpeed() {
@@ -69,6 +81,23 @@ public class Unit {
 
 	public void RemoveUpgrade() {
 		CurrentUpgrade = null;
+		OnUpdate(this);
+	}
+
+	public bool HasTempUpgrade() {
+		return CurrentTempUpgrade != null;
+	}
+
+	public void AddTempUpgrade(UnitBaseData Upgrade) {
+		if (CurrentTempUpgrade == null) {
+			CurrentTempUpgrade = Upgrade;
+			OnUpdate(this);
+		}
+
+	}
+
+	public void RemoveTempUpgrade() {
+		CurrentTempUpgrade = null;
 		OnUpdate(this);
 	}
 }

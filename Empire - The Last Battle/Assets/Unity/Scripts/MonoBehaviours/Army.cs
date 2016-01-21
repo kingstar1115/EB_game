@@ -30,10 +30,7 @@ public class Army : MonoBehaviour {
 	}
 
 	public List<Unit> GetUnits(UnitType type) {
-		List<Unit> SpecificUnits;
-		SpecificUnits = units.FindAll(_Unit => _Unit.Type == type);
-
-		return SpecificUnits;
+		return units.FindAll(_Unit => _Unit.Type == type);
 	}
 
 	public List<Unit> GetUnits() {
@@ -55,6 +52,7 @@ public class Army : MonoBehaviour {
 	public List<Unit> GetKOUnits() {
 		return units.FindAll(x => x.IsKO());
 	}
+
 	public List<Unit> GetRandomUnits(int maxNumber, bool b_ShouldBeKo = false) {
 		List<Unit> RandomUnits = new List<Unit>();
 		List<Unit> AllUnits = b_ShouldBeKo ? GetKOUnits() : units;
@@ -67,6 +65,15 @@ public class Army : MonoBehaviour {
 			AllUnits.RemoveAt(randomNumber);
 		}
 		return RandomUnits;
+	}
+
+	public List<Unit> GetUpgradedUnits() {
+		return units.FindAll(x => x.HasUpgrade());
+
+	}
+
+	public List<Unit> GetTempUpgradedUnits() {
+		return units.FindAll(x => x.HasTempUpgrade());
 	}
 
 	void unitUpdated(Unit u) {
