@@ -9,8 +9,8 @@ public class GameStateHolder : ScriptableObject
 
 public enum GameState
 {
-	Paused = 0x0,
-	Overworld = 0x1,
-	PreBattle = 0x2,
-	Battle = 0x4,
+	Paused = 0x1,
+	Overworld = 0x2,
+	PreBattle = 0x4,
+	Battle = 0x8,
 }
