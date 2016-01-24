@@ -5,6 +5,9 @@ script:
 - "./Scripts/build.sh"
 after_success:
 - "./Scripts/pushGHPages.sh"
+branches:
+  only:
+    - master
 deploy:
   provider: s3
   access_key_id: $ACCESS_KEY_ID

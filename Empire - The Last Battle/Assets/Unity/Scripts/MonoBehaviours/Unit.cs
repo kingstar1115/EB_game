@@ -27,24 +27,28 @@ public class Unit {
 		return GetCurrentHP() <= 0;
 	}
 
+	public bool IsUpgradeable() {
+		return IsKO () || !HasUpgrade();
+	}
+
+	public bool IsTempUpgradeable() {
+		return IsKO() || !HasTempUpgrade();
+	}
+
 	//For example if CurrentHP = -2 and CurrentUpgrade.HP is = 3 then this will return 1
 	public int GetCurrentHP() {
 		return CurrentUpgrade == null ? CurrentBaseHP : CurrentBaseHP + CurrentUpgrade.HP;
 	}
 
 	public int GetStrength() {
-		return CurrentUpgrade == null ? BaseData.Strength : BaseData.Strength + GetCombinedUpgradeStrength();
-	}
-
-	public int GetCombinedUpgradeStrength() {
-		int totalUpgradeStrength = 0;
+		int totalStrength = BaseData.Strength;
 		if (CurrentUpgrade != null) {
-			totalUpgradeStrength += CurrentUpgrade.Strength;
+			totalStrength += CurrentUpgrade.Strength;
 		}
 		if (CurrentTempUpgrade != null) {
-			totalUpgradeStrength += CurrentTempUpgrade.Strength;
+			totalStrength += CurrentTempUpgrade.Strength;
 		}
-		return totalUpgradeStrength;
+		return totalStrength;
 	}
 
 	public int GetSpeed() {
@@ -69,6 +73,10 @@ public class Unit {
 
 	public bool HasUpgrade() {
 		return CurrentUpgrade != null;
+	}
+
+	public bool HasAnyUpgrade() {
+		return HasUpgrade() || HasTempUpgrade();
 	}
 
 	public void AddUpgrade(UnitBaseData Upgrade) {
@@ -99,5 +107,14 @@ public class Unit {
 	public void RemoveTempUpgrade() {
 		CurrentTempUpgrade = null;
 		OnUpdate(this);
+	}
+
+	public UnitBaseData CreateUpgrade() {
+		UnitBaseData Upgrade = UnitBaseData.CreateInstance<UnitBaseData>();
+		Upgrade.Type = Type;
+		Upgrade.HP = (int)Mathf.Round((float)BaseData.HP / 10);
+		Upgrade.Strength = (int)Mathf.Round((float)BaseData.Strength / 10);
+		Upgrade.Speed = (int)Mathf.Round((float)BaseData.Speed / 10);
+		return Upgrade;
 	}
 }

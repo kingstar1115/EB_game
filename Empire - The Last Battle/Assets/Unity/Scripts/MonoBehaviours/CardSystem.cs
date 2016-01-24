@@ -28,7 +28,8 @@ public class CardSystem : MonoBehaviour {
 	public event CardCallback OnHealingCardUsed = delegate { };
     public event CardCallback OnCardUseFailed = delegate { };
 	public event CardCallback OnTacticCardUsed = delegate { };
-	
+	public event CardCallback OnUpgradeCardUsed = delegate { };
+
 	public void Start(){
 
 	}
@@ -62,8 +63,7 @@ public class CardSystem : MonoBehaviour {
 			OnEffectApplied (card, player);
 			break;
 		case CardType.Upgrade_Card:
-			UseUpgradeCard(card, player);
-			OnEffectApplied (card, player);
+			RegisterCardUpgrade(card, player);
 			break;
 		default:
 			break;
@@ -145,13 +145,19 @@ public class CardSystem : MonoBehaviour {
 	private void UsePriorityCard(Player player) {
 		throw new NotImplementedException();
 	}
-	
-	private void UseUpgradeCard(CardData card, Player player) {
-		throw new NotImplementedException();
+
+	private void RegisterCardUpgrade(CardData card, Player player) {
+		OnUpgradeCardUsed (card, player);
+	}
+
+	private void UseUpgradeCard(CardData card, Player player, Unit unitToUpgrade) {
+		UnitBaseData upgrade = unitToUpgrade.CreateUpgrade();
+		unitToUpgrade.AddUpgrade(upgrade);
+		OnEffectApplied(card, player);
 	}
 
 	private void UseTacticCard(CardData card, Player player, Unit unitToUpgrade) {
-		UnitBaseData TempUpgrade = new UnitBaseData();
+		UnitBaseData TempUpgrade = UnitBaseData.CreateInstance<UnitBaseData>();
 		TempUpgrade.Strength = card.Value;
 		unitToUpgrade.AddTempUpgrade(TempUpgrade);
 	}
