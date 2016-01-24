@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class OverworldManager : MonoBehaviour
 {
@@ -45,20 +46,37 @@ public class OverworldManager : MonoBehaviour
         _OverworldUI.OnPause += _OverworldUI_OnPause;
         _OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
 
+		_CardSystem.RequestUnitSelection +=_CardSystem_RequestUnitSelection;
+
+		_BattlebeardPlayer.OnCastleProgress += _Board.SetCastleState;
+		_StormshaperPlayer.OnCastleProgress += _Board.SetCastleState;
+		_BattlebeardPlayer.CastleProgress = 2;
+		_StormshaperPlayer.CastleProgress = 4;
 		setPlayer(PlayerType.Battlebeard);
 
 		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
         _TurnManager.StartTurn();
 	}
 
-	void _CardSystem_OnEffectApplied(CardData card, Player player) {
-        if (card.Type == CardType.Scout_Card) {
+	void _CardSystem_OnEffectApplied(bool success, CardData card, Player player, Unit u) {
+		ModalPanel p = ModalPanel.Instance();
+		if (!success) {	
+			p.ShowOK("Oh No!", "Card could not be used", null);
+			return;
+		}
+		if (card.Type == CardType.Scout_Card) {
             _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(player.Type, player.CommanderPosition, card.Value));
 		}
+		p.ShowOK("Yeah!", "Used " + card.Type, null);
+		player.Hand.cards.Remove(card);
 	}
 
 	void UseCard(CardData card) {
-		_CardSystem.ApplyEffect(card, _CurrentPlayer);
+		ModalPanel p = ModalPanel.Instance();
+		p.ShowOK("Card", "Using " + card.Type, () => {
+			_CardSystem.UseCard(card, _CurrentPlayer);
+		});
+		
 	}
 
     void _OverworldUI_OnUnPause()
@@ -138,6 +156,8 @@ public class OverworldManager : MonoBehaviour
 							// Battle lost immortal
 							// on victory ->
 							tile.Owner = PlayerType.None;
+							_CurrentPlayer.LostImmortalKillCount++;
+							_CurrentPlayer.CastleProgress++;
 							p.ShowOK("Fortress", "A bloody Lost Immortal just showed up innit blud!", endTurn);
 						} else {
 							p.ShowOK("Fortress", "You felt a chill in the air, but nothing appeared.", endTurn);
@@ -189,11 +209,39 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	public CardData GenerateRandomCard(List<CardData> availableCards) {
-		//Generate a random card (Warning: This is weighted heavily towards resource cards because
-		//there are more of them in the enum, change this later?)
-		short randomCardIndex = (short)Random.Range(0, availableCards.Count - 1);
-		return availableCards[randomCardIndex];
+		//Generate a random card
+		List<CardType> uniqueTypes = availableCards.Select(x => x.Type).Distinct().ToList();
+		int randomTypeIndex = Random.Range(0, uniqueTypes.Count - 1);
+		List<CardData> cardsOfType = availableCards.FindAll(x => x.Type == uniqueTypes[randomTypeIndex]);
+		int randomCardIndex = (short)Random.Range(0, cardsOfType.Count - 1);
+		return cardsOfType[randomCardIndex];
 	}
+
+	void _CardSystem_RequestUnitSelection(CardData c, int numSelection, Player p, CardAction action, EndCardAction done) {
+		// assume P is going to be the current player
+
+		_OverworldUI.ShowUnitSelectionUI(c.Type == CardType.Healing_Card);
+
+		int selectedUnits = 0;
+		UIPlayerUnitTypeIndexCallback selectUnit = null;
+		selectUnit = (PlayerType pt, UnitType u, int i) => {
+			Unit unit = _CurrentPlayer.PlayerArmy.GetUnits(u)[i];
+			selectedUnits++;
+			// perform the action each time something is selected. This will only effect healing.
+			// we don't want the player to be stuck with no units to select
+			action(c, p, unit);
+			// we reached the total?
+			if (selectedUnits == numSelection) {
+				// don't listen for namy more and hide the UI
+				_OverworldUI._ArmyUI.OnClickUnit -= selectUnit;
+				_OverworldUI.HideUnitSelectionUI();
+				done(true, c, p, unit);
+			}
+			
+		};
+		_OverworldUI._ArmyUI.OnClickUnit += selectUnit;
+	}
+
 
     public void Pause() {
         _OverworldUI.Disable();
@@ -240,6 +288,11 @@ public class OverworldManager : MonoBehaviour
 	void Update() {
 		if (Input.GetKeyDown(KeyCode.Return)) {
 			StartCoroutine(SwitchPlayer());
+		}
+		if (Input.GetKeyDown(KeyCode.C)) {
+			if (_CurrentPlayer.Hand.cards.Count > 0) {
+				UseCard(_CurrentPlayer.Hand.cards[0]);
+			}
 		}
 	}
 

@@ -13,11 +13,12 @@ public class Army : MonoBehaviour {
 		units = new List<Unit>();
 	}
 
-	public void AddUnit(UnitType type) {
+	public Unit AddUnit(UnitType type) {
 		Unit u = new Unit(_UnitDataManager.GetData(type));
 		units.Add(u);
 		u.OnUpdate += unitUpdated;
 		OnAddUnit(u);
+		return u;
 	}
 
 	public void RemoveUnit(Unit u) {

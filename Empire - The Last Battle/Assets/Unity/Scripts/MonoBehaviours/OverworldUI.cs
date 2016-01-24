@@ -94,6 +94,17 @@ public class OverworldUI : MonoBehaviour
 		_ArmyUI.Show();
 	}
 
+	public void ShowUnitSelectionUI(bool selectKO) {
+		_ArmyUI.Show();
+		_ArmyUI.MakeSelectable(selectKO);	
+		Disable();
+	}
+
+	public void HideUnitSelectionUI() {
+		_ArmyUI.MakeUnselectable();
+		Enable();
+	}
+
     public void Enable()
     {
 		//add event listeners
@@ -182,10 +193,14 @@ public class OverworldUI : MonoBehaviour
         //check for pause switch by key 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (_Paused)
-                OnUnPause();
-            else
-                OnPause();
+			if (_Paused) {
+				OnUnPause();
+				_ArmyUI.MakeSelectable();
+			}
+			else {
+				_ArmyUI.MakeUnselectable();
+				OnPause();
+			}
         }
     }
 }

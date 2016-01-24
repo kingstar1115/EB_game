@@ -11,6 +11,11 @@ public class Board : MonoBehaviour {
 	public TileData _SSStartTile;
     public string _MarkerCommanderBB_Tag;
     public string _MarkerCommanderSS_Tag;
+	public GameObject[] _BattlebeardCastles;
+	public GameObject[] _StormshaperCastles;
+
+	int battlebeardCastleState = 0;
+	int stormshaperCastleState = 0;
 
     public void Initialise() {
         _TileTypeDataManager.Initialise();
@@ -73,6 +78,22 @@ public class Board : MonoBehaviour {
 						lostImmortals.RemoveAt(r);
 					}
                 }
+
+				if (tile.Terrain == TerrainType.CastleCorner00) {
+					if (tile.Building == BuildingType.CastleBattlebeard) {
+						for (int c = 0; c < _BattlebeardCastles.Length; c++) {
+							_BattlebeardCastles[c] = (GameObject)Instantiate(_BattlebeardCastles[c], position + new Vector3(_TileWidth/2, 0, _TileWidth/2), Quaternion.identity);
+							_BattlebeardCastles[c].SetActive(false);
+						}
+					}
+					if (tile.Building == BuildingType.CastleStormshaper) {
+						for (int c = 0; c < _StormshaperCastles.Length; c++) {
+							_StormshaperCastles[c] = (GameObject)Instantiate(_StormshaperCastles[c], position + new Vector3(_TileWidth / 2, 0, _TileWidth / 2), Quaternion.identity);
+							_StormshaperCastles[c].SetActive(false);
+						}
+					}
+				}
+
                 // set owner flag
                 _FlagManager.SetFlagForTile(tile);
 
@@ -114,6 +135,28 @@ public class Board : MonoBehaviour {
         t.Owner = p;
         _FlagManager.SetFlagForTile(t);
     }
+
+	// set the state of a specific castle. 0-4. 0 is no castle, 4 is fully built.
+	public void SetCastleState(PlayerType p, int state) {
+		if (p == PlayerType.Battlebeard) {
+			if (battlebeardCastleState != -1) {
+				_BattlebeardCastles[battlebeardCastleState].SetActive(false);
+			}
+			battlebeardCastleState = state -1;
+			if (state != 0) {
+				_BattlebeardCastles[battlebeardCastleState].SetActive(true);
+			}
+		}
+		else {
+			if (stormshaperCastleState != -1) {
+				_StormshaperCastles[stormshaperCastleState].SetActive(false);
+			}
+			stormshaperCastleState = state - 1;
+			if (state != 0) {
+				_StormshaperCastles[stormshaperCastleState].SetActive(true);
+			}
+		}
+	}
 
     public Vector2 GetBoardSize() {
         // We REALLY expect the board to be a square.
@@ -160,9 +203,6 @@ public class Board : MonoBehaviour {
 
         return Random.Range(range.x, range.y);
     }
-
-
-
 
 	public HashSet<TileData> GetReachableTiles(PlayerType pType, TileData fromTile, int distance)
 	{
