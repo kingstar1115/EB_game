@@ -3,6 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
+
+public enum UnitSelection {
+	None = 0,
+	Active = 1,
+	Inactive = 2,
+	Upgraded = 4,
+	NotUpgraded = 8,
+	TempUpgraded = 16,
+	NotTempUpgraded = 32,
+}
+
 public delegate void UIUnitTypeIndexCallback(UnitType t, int i);
 public class UnitTypeUI : MonoBehaviour {
 
@@ -229,9 +240,23 @@ public class UnitTypeUI : MonoBehaviour {
 		}
 	}
 
-	public void MakeSelectable(bool selectKO = false) {
+	// pass flags - 
+	public void MakeSelectable(UnitSelection flags) {
+		bool active = (flags & UnitSelection.Active) == UnitSelection.Active,
+			 inactive = (flags & UnitSelection.Inactive) == UnitSelection.Inactive,
+			 upgraded = (flags & UnitSelection.Upgraded) == UnitSelection.Upgraded,
+			 notUpgraded = (flags & UnitSelection.NotUpgraded) == UnitSelection.NotUpgraded,
+			 tempUpgraded = (flags & UnitSelection.TempUpgraded) == UnitSelection.TempUpgraded,
+			 notTempUpgraded = (flags & UnitSelection.NotTempUpgraded) == UnitSelection.NotTempUpgraded;
+
 		_units.ForEach(ui => {
-			if (selectKO && ui.IsKO || !selectKO && !ui.IsKO) {
+			if (inactive && ui.IsKO || 
+				active && !ui.IsKO || 
+				upgraded && ui.IsUpgraded || 
+				notUpgraded && !ui.IsUpgraded ||
+				tempUpgraded && ui.isTempUpgraded ||
+				notTempUpgraded && !ui.isTempUpgraded) {
+
 				ui.EnableSelection();
 			}
 		});

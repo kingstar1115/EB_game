@@ -29,12 +29,12 @@ public class CardSystem : MonoBehaviour {
 	public event EndCardAction OnEffectApplied = delegate { };
 	public event UnitSelectionCallback RequestUnitSelection = delegate { };
 
-	public void UseCard(CardData card, Player player) {
+	public void UseCard(CardData card, Player player, Player inactivePlayer) {
 		switch (card.Type) {
 			case CardType.Healing_Card:
 				int koUnits = player.PlayerArmy.GetKOUnits().Count,
 					numSelection = card.Value <= koUnits ? card.Value : koUnits;
-				if (numSelection == 0) {
+				if (numSelection == 0 || inactivePlayer.CastleProgress == 4) {
 					// action failed
 					OnEffectApplied(false, card, player, null);
 					break;
@@ -49,8 +49,12 @@ public class CardSystem : MonoBehaviour {
 				OnEffectApplied(true, card, player, null);
 				break;
 			case CardType.Tactic_Card:
-				UseTacticCard(card, player);
-				OnEffectApplied(true, card, player, null);
+				if (player.PlayerArmy.GetTempUpgradableUnits().Count == 0) {
+					// action failed
+					OnEffectApplied(false, card, player, null);
+					break;
+				}
+				RequestUnitSelection(card, 1, player, UseTacticCard, OnEffectApplied);
 				break;
 			case CardType.Alliance_Card:
 				UseAllianceCard(card, player);
@@ -62,6 +66,11 @@ public class CardSystem : MonoBehaviour {
 				RequestUnitSelection(card, 1, player, UsePriorityCard, OnEffectApplied);
 				break;
 			case CardType.Upgrade_Card:
+				if (player.PlayerArmy.GetUpgradableUnits().Count == 0) {
+					// action failed
+					OnEffectApplied(false, card, player, null);
+					break;
+				}
 				RequestUnitSelection(card, 1, player, UseUpgradeCard, OnEffectApplied);
 				break;
 			default:
@@ -80,10 +89,6 @@ public class CardSystem : MonoBehaviour {
 	}
 	
 	private void UseBattleCard(Player player) {
-		//throw new NotImplementedException();
-	}
-	
-	private void UseTacticCard(CardData card, Player player) {
 		//throw new NotImplementedException();
 	}
 
@@ -139,7 +144,14 @@ public class CardSystem : MonoBehaviour {
 		//throw new NotImplementedException();
 	}
 
-	private void UseUpgradeCard(CardData card, Player player, Unit u) {
-		//throw new NotImplementedException();
+	private void UseUpgradeCard(CardData card, Player player, Unit unitToUpgrade) {
+		UnitBaseData upgrade = unitToUpgrade.CreateUpgrade();
+		unitToUpgrade.AddUpgrade(upgrade);
+	}
+
+	private void UseTacticCard(CardData card, Player player, Unit unitToUpgrade) {
+		UnitBaseData TempUpgrade = UnitBaseData.CreateInstance<UnitBaseData>();
+		TempUpgrade.Strength = card.Value;
+		unitToUpgrade.AddTempUpgrade(TempUpgrade);
 	}
 }

@@ -94,9 +94,9 @@ public class OverworldUI : MonoBehaviour
 		_ArmyUI.Show();
 	}
 
-	public void ShowUnitSelectionUI(bool selectKO) {
+	public void ShowUnitSelectionUI(UnitSelection flags) {
 		_ArmyUI.Show();
-		_ArmyUI.MakeSelectable(selectKO);	
+		_ArmyUI.MakeSelectable(flags);	
 		Disable();
 	}
 
@@ -195,10 +195,8 @@ public class OverworldUI : MonoBehaviour
         {
 			if (_Paused) {
 				OnUnPause();
-				_ArmyUI.MakeSelectable();
 			}
 			else {
-				_ArmyUI.MakeUnselectable();
 				OnPause();
 			}
         }

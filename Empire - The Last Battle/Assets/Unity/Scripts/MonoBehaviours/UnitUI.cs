@@ -7,16 +7,16 @@ public class UnitUI : MonoBehaviour {
 	public Image KO;
 	public Image Icon;
 	public Image Upgrade;
+	public Image TempUpgrade;
 	public Button Button;
 	public UIUnitIndexCallback OnClick = delegate { };
 	int index;
-	bool isKO = false;
-	public bool IsKO {
-		get { return isKO; }
-	}
+	public bool IsKO = false;
+	public bool IsUpgraded = false;
+	public bool isTempUpgraded = false;
 
 	public void SetKO(bool b) {
-		isKO = b;
+		IsKO = b;
 		KO.gameObject.SetActive(b);
 	}
 
@@ -25,7 +25,13 @@ public class UnitUI : MonoBehaviour {
 	}
 
 	public void SetUpgrade(bool b) {
+		IsUpgraded = b;
 		Upgrade.gameObject.SetActive(b);
+	}
+
+	public void SetTempUpgrade(bool b) {
+		isTempUpgraded = b;
+		TempUpgrade.gameObject.SetActive(b);
 	}
 
 	public void SetImage(Sprite s) {
@@ -33,7 +39,6 @@ public class UnitUI : MonoBehaviour {
 	}
 
 	public void EnableSelection() {
-		
 		Button.interactable = true;
 	}
 

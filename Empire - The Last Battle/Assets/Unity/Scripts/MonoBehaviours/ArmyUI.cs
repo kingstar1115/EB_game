@@ -87,9 +87,9 @@ public class ArmyUI : MonoBehaviour {
 		enabled = false;
 	}
 
-	public void MakeSelectable(bool selectKO = false) {
+	public void MakeSelectable(UnitSelection flags) {
 		Disable();
-		getUnitTypeUI(currentPlayer).ForEach(ui => ui.MakeSelectable(selectKO));
+		getUnitTypeUI(currentPlayer).ForEach(ui => ui.MakeSelectable(flags));
 		getUnitTypeUI(currentPlayer).ForEach(ui => ui.Maximise());
 		resetSelection();
 	}

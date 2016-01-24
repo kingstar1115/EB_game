@@ -58,28 +58,34 @@ public class OverworldManager : MonoBehaviour
         _TurnManager.StartTurn();
 	}
 
+	// get rid of this shit later
+	void cardNotUsedModal () {
+		ModalPanel.Instance().ShowOK("Oh No!", "Card could not be used", null);
+	}
+
 	void _CardSystem_OnEffectApplied(bool success, CardData card, Player player, Unit u) {
 		ModalPanel p = ModalPanel.Instance();
-		if (!success) {	
-			p.ShowOK("Oh No!", "Card could not be used", null);
+		if (!success) {
+			// we wont bother with this in the final but for now it hides the previous modal after it shows this one.
+			Invoke("cardNotUsedModal", 1);
 			return;
 		}
 		if (card.Type == CardType.Scout_Card) {
             _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(player.Type, player.CommanderPosition, card.Value));
 		}
-		p.ShowOK("Yeah!", "Used " + card.Type, null);
+		ModalPanel.Instance().ShowOK("Yeah!", "Used " + card.Type, null);
 		player.Hand.cards.Remove(card);
 	}
 
 	void UseCard(CardData card) {
 		ModalPanel p = ModalPanel.Instance();
 		p.ShowOK("Card", "Using " + card.Type, () => {
-			_CardSystem.UseCard(card, _CurrentPlayer);
+			_CardSystem.UseCard(card, _CurrentPlayer, _InactivePlayer);
 		});
 		
 	}
 
-    void _OverworldUI_OnUnPause()
+    void _OverworldUI_OnUnPause() 
     {
         _OverworldUI._Paused = false;
     }
@@ -184,7 +190,7 @@ public class OverworldManager : MonoBehaviour
 
 					string content, title;
 
-					if (_CurrentPlayer.PlayerArmy.GetUnits().Count == 0) {
+					if (_CurrentPlayer.PlayerArmy.GetKOUnits().Count == 0) {
 						title = "The Inn Welcomes You";
 						content = "You are well rested.";
 					} else {
@@ -220,7 +226,20 @@ public class OverworldManager : MonoBehaviour
 	void _CardSystem_RequestUnitSelection(CardData c, int numSelection, Player p, CardAction action, EndCardAction done) {
 		// assume P is going to be the current player
 
-		_OverworldUI.ShowUnitSelectionUI(c.Type == CardType.Healing_Card);
+		UnitSelection flags = UnitSelection.None;
+		if (c.Type == CardType.Healing_Card) {
+			flags = flags | UnitSelection.Inactive;
+		}
+		if (c.Type == CardType.Upgrade_Card) {
+			flags = flags | UnitSelection.Active;
+			flags = flags | UnitSelection.NotUpgraded;
+		}
+		if (c.Type == CardType.Tactic_Card) {
+			flags = flags | UnitSelection.Active;
+			flags = flags | UnitSelection.NotTempUpgraded;
+		}
+
+		_OverworldUI.ShowUnitSelectionUI(flags);
 
 		int selectedUnits = 0;
 		UIPlayerUnitTypeIndexCallback selectUnit = null;
@@ -294,6 +313,10 @@ public class OverworldManager : MonoBehaviour
 				UseCard(_CurrentPlayer.Hand.cards[0]);
 			}
 		}
-	}
 
+		//Delete in final build. Used for testing, an example of how to call debug message class
+		if (Input.GetKeyDown (KeyCode.Alpha8)) {
+			DebugUI.getUI ().SetMessage ("Test", 22, Color.green);
+		}
+	}
 }
