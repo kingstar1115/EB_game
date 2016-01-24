@@ -10,6 +10,7 @@ public class Unit {
 	UnitBaseData BaseData;
 	//TODO: Decide if this is the best way to handle an upgrade. Is it better to have a separate Upgrade class?
 	UnitBaseData CurrentUpgrade;
+	UnitBaseData CurrentTempUpgrade;
 	//CurrentBaseHP will have a max value that is equal to the BaseData.HP value
 	int CurrentBaseHP;
 	public TileData Position;
@@ -30,13 +31,24 @@ public class Unit {
 		return IsKO () || !HasUpgrade();
 	}
 
+	public bool IsTempUpgradeable() {
+		return IsKO() || !HasTempUpgrade();
+	}
+
 	//For example if CurrentHP = -2 and CurrentUpgrade.HP is = 3 then this will return 1
 	public int GetCurrentHP() {
 		return CurrentUpgrade == null ? CurrentBaseHP : CurrentBaseHP + CurrentUpgrade.HP;
 	}
 
 	public int GetStrength() {
-		return CurrentUpgrade == null ? BaseData.Strength : BaseData.Strength + CurrentUpgrade.Strength;
+		int totalStrength = BaseData.Strength;
+		if (CurrentUpgrade != null) {
+			totalStrength += CurrentUpgrade.Strength;
+		}
+		if (CurrentTempUpgrade != null) {
+			totalStrength += CurrentTempUpgrade.Strength;
+		}
+		return totalStrength;
 	}
 
 	public int GetSpeed() {
@@ -63,6 +75,10 @@ public class Unit {
 		return CurrentUpgrade != null;
 	}
 
+	public bool HasAnyUpgrade() {
+		return HasUpgrade() || HasTempUpgrade();
+	}
+
 	public void AddUpgrade(UnitBaseData Upgrade) {
 		//Don't apply the upgrade if a unit is knocked out, should probably return something to acknowledge that it wasn't applied
 		if(!IsKO()) {
@@ -76,13 +92,29 @@ public class Unit {
 		OnUpdate(this);
 	}
 
+	public bool HasTempUpgrade() {
+		return CurrentTempUpgrade != null;
+	}
+
+	public void AddTempUpgrade(UnitBaseData Upgrade) {
+		if (CurrentTempUpgrade == null) {
+			CurrentTempUpgrade = Upgrade;
+			OnUpdate(this);
+		}
+
+	}
+
+	public void RemoveTempUpgrade() {
+		CurrentTempUpgrade = null;
+		OnUpdate(this);
+	}
+
 	public UnitBaseData CreateUpgrade() {
-		UnitBaseData Upgrade = new UnitBaseData();
+		UnitBaseData Upgrade = UnitBaseData.CreateInstance<UnitBaseData>();
 		Upgrade.Type = Type;
 		Upgrade.HP = (int)Mathf.Round((float)BaseData.HP / 10);
 		Upgrade.Strength = (int)Mathf.Round((float)BaseData.Strength / 10);
 		Upgrade.Speed = (int)Mathf.Round((float)BaseData.Speed / 10);
-
 		return Upgrade;
 	}
 }

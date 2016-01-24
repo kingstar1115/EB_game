@@ -27,8 +27,9 @@ public class CardSystem : MonoBehaviour {
 	public event CardCallback OnEffectApplied = delegate { };
 	public event CardCallback OnHealingCardUsed = delegate { };
     public event CardCallback OnCardUseFailed = delegate { };
+	public event CardCallback OnTacticCardUsed = delegate { };
 	public event CardCallback OnUpgradeCardUsed = delegate { };
-	
+
 	public void Start(){
 
 	}
@@ -153,5 +154,11 @@ public class CardSystem : MonoBehaviour {
 		UnitBaseData upgrade = unitToUpgrade.CreateUpgrade();
 		unitToUpgrade.AddUpgrade(upgrade);
 		OnEffectApplied(card, player);
+	}
+
+	private void UseTacticCard(CardData card, Player player, Unit unitToUpgrade) {
+		UnitBaseData TempUpgrade = UnitBaseData.CreateInstance<UnitBaseData>();
+		TempUpgrade.Strength = card.Value;
+		unitToUpgrade.AddTempUpgrade(TempUpgrade);
 	}
 }
