@@ -1,26 +1,68 @@
 fileFormatVersion: 2
-guid: 68558b6c236246741b52666a72b594c9
-timeCreated: 1436453161
-licenseType: Store
+guid: 35998166100a5a746ba37b0653c14bc5
+timeCreated: 1453821641
+licenseType: Free
 ModelImporter:
   serializedVersion: 18
   fileIDToRecycleName:
-    100000: joint1
-    100002: //RootNode
-    100004: skinned_planes
-    100006: wood
-    400000: joint1
-    400002: //RootNode
-    400004: skinned_planes
-    400006: wood
-    2300000: wood
-    2300002: skinned_planes
-    3300000: wood
-    3300002: skinned_planes
-    4300000: wood
-    4300002: skinned_planes
+    100000: //RootNode
+    100002: Box001
+    100004: Box054
+    100006: Box060
+    100008: Box061
+    100010: Cylinder003
+    100012: Cylinder004
+    100014: Cylinder008
+    100016: Cylinder009
+    100018: Cylinder010
+    100020: Cylinder011
+    100022: Object001
+    400000: //RootNode
+    400002: Box001
+    400004: Box054
+    400006: Box060
+    400008: Box061
+    400010: Cylinder003
+    400012: Cylinder004
+    400014: Cylinder008
+    400016: Cylinder009
+    400018: Cylinder010
+    400020: Cylinder011
+    400022: Object001
+    2300000: Box001
+    2300002: Box054
+    2300004: Box060
+    2300006: Box061
+    2300008: Cylinder003
+    2300010: Cylinder004
+    2300012: Cylinder008
+    2300014: Cylinder009
+    2300016: Cylinder010
+    2300018: Cylinder011
+    2300020: Object001
+    3300000: Box001
+    3300002: Box054
+    3300004: Box060
+    3300006: Box061
+    3300008: Cylinder003
+    3300010: Cylinder004
+    3300012: Cylinder008
+    3300014: Cylinder009
+    3300016: Cylinder010
+    3300018: Cylinder011
+    3300020: Object001
+    4300000: Box001
+    4300002: Cylinder003
+    4300004: Cylinder004
+    4300006: Box054
+    4300008: Cylinder008
+    4300010: Cylinder009
+    4300012: Cylinder010
+    4300014: Cylinder011
+    4300016: Box060
+    4300018: Box061
+    4300020: Object001
     9500000: //RootNode
-    13700000: skinned_planes
   materials:
     importMaterials: 0
     materialName: 0
@@ -44,7 +86,7 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 3
+    globalScale: .200000003
     meshCompression: 0
     addColliders: 0
     importBlendShapes: 1
