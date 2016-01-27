@@ -15,6 +15,7 @@ public class CardUI : MonoBehaviour
     public LerpPosition _PosLerp;
     public UIMouseEvents _MouseEvents;
     public float _ImageYAlt;
+    public CardData _Card;
     float _imageYDefualt;
     LerpRotation _lerpRotation;
 

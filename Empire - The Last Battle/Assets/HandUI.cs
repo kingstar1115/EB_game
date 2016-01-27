@@ -6,6 +6,9 @@ using System.Collections.Generic;
 [RequireComponent(typeof(LerpRotation))]
 public class HandUI : MonoBehaviour 
 {
+    public event System.Action OnHandSet = delegate { };
+    public event System.Action OnCardSelect = delegate { };
+
 	public Pool m_CardPrefabPool;
     public List<Sprite> m_Sprites;
     public List<CardUI> m_Cards;
@@ -18,16 +21,6 @@ public class HandUI : MonoBehaviour
 	// Use this for initialization
 	void Start () {
 
-		/*
-        //init all the car ui
-        foreach (var cardUI in m_Cards)
-        {
-            cardUI.Init();
-        }
-
-        m_lerpRotation = this.GetComponent<LerpRotation>();
-        UpdateRotations();
-        */
 	}
 	
 	// Update is called once per frame
@@ -54,16 +47,20 @@ public class HandUI : MonoBehaviour
             {
                 m_Cards[i]._Image.sprite = GetSpriteOfCard(cardsToShow.cards[i].Type);
                 m_Cards[i]._Index = i;
+                m_Cards[i]._Card = cardsToShow.cards[i];
             }
             else
             {
                 //add new card
                 AddNewCard(cardsToShow.cards[i]);
             }
-        }
+        }            
 
         //update spacing 
         UpdateRotations();
+
+        //event 
+        OnHandSet();
     }
 
 	public void AddNewCard(CardData data)
@@ -77,6 +74,7 @@ public class HandUI : MonoBehaviour
             cardUI.Init();
             cardUI._Image.sprite = GetSpriteOfCard(data.Type);
             cardUI._Index = m_Cards.Count;
+            cardUI._Card = data;
 
             //events
             cardUI.OnPointerEnter += cardUI_OnPointerEnter;
@@ -114,6 +112,9 @@ public class HandUI : MonoBehaviour
 
         m_SelectedCardUI = m_Cards[index];
         m_Cards[index].Popup();
+
+        //event
+        OnCardSelect();
     }
 
     public void DeselectCard(int index)

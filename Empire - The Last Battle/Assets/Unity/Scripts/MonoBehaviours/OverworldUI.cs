@@ -15,6 +15,7 @@ public class OverworldUI : MonoBehaviour
     public CameraMovement _CameraMovement;
     public BoardUI _BoardUI;
     public GameObject _PauseScreen;
+    public CardDisplayUI _CardDisplayUI;
 
     bool _paused;
     public bool _Paused
@@ -42,6 +43,7 @@ public class OverworldUI : MonoBehaviour
     {
         _BoardUI.Init();
 		_CommanderUI.Initialise();
+        _CardDisplayUI.Init();
 
         //add event listeners
         Enable();
@@ -55,6 +57,7 @@ public class OverworldUI : MonoBehaviour
         _CommanderUI.OnCommanderDrop -= _CommanderUI_OnCommanderDrop;
         _CommanderUI.OnCommanderGrounded -= _CommanderUI_Grounded;
         _CommanderUI.OnDropCommander -= _CommanderUI_OnDropCommander;
+        _CardDisplayUI.OnCardUse -= _CardDisplayUI_OnCardUse;
 
         //disable components
         _CommanderUI._Paused = true;
@@ -69,10 +72,16 @@ public class OverworldUI : MonoBehaviour
         _CommanderUI.OnCommanderDrop += _CommanderUI_OnCommanderDrop;
         _CommanderUI.OnCommanderGrounded += _CommanderUI_Grounded;
         _CommanderUI.OnDropCommander += _CommanderUI_OnDropCommander;
+        _CardDisplayUI.OnCardUse += _CardDisplayUI_OnCardUse;
 
         //enable components
         _CommanderUI._Paused = false;
         _CameraMovement.EnableCameraMovement();
+    }
+
+    public void _CardDisplayUI_OnCardUse(CardData cardData)
+    {
+        Debug.Log("CardData: "+cardData.name);
     }
 
     void _CommanderUI_OnDropCommander(TileData tile)
