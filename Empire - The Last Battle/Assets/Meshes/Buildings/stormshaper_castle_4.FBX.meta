@@ -11,29 +11,34 @@ ModelImporter:
     100006: Object002
     100008: Object003
     100010: Object004
+    100012: Plane001
     400000: //RootNode
     400002: castle_skewed4
     400004: Object001
     400006: Object002
     400008: Object003
     400010: Object004
+    400012: Plane001
     2300000: //RootNode
     2300002: castle_skewed4
     2300004: Object001
     2300006: Object002
     2300008: Object003
     2300010: Object004
+    2300012: Plane001
     3300000: //RootNode
     3300002: castle_skewed4
     3300004: Object001
     3300006: Object002
     3300008: Object003
     3300010: Object004
+    3300012: Plane001
     4300000: castle_skewed4
     4300002: Object001
     4300004: Object002
     4300006: Object003
     4300008: Object004
+    4300010: Plane001
     9500000: //RootNode
   materials:
     importMaterials: 0
