@@ -50,7 +50,7 @@ public class OverworldManager : MonoBehaviour
 
 		_BattlebeardPlayer.OnCastleProgress += _Board.SetCastleState;
 		_StormshaperPlayer.OnCastleProgress += _Board.SetCastleState;
-		_BattlebeardPlayer.CastleProgress = 2;
+		_BattlebeardPlayer.CastleProgress = 4;
 		_StormshaperPlayer.CastleProgress = 4;
 		setPlayer(PlayerType.Battlebeard);
 
