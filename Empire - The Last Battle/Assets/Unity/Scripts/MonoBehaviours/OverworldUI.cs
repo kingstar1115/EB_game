@@ -62,7 +62,8 @@ public class OverworldUI : MonoBehaviour
         _CommanderUI.OnCommanderGrounded -= _CommanderUI_Grounded;
         _CommanderUI.OnDropCommander -= _CommanderUI_OnDropCommander;
         _CardDisplayUI.OnCardUse -= _CardDisplayUI_OnCardUse;
-        _HandUI.enabled = false;
+		_CardDisplayUI.Hide();
+        _HandUI._Enabled = false;
 
         //disable components
         _CommanderUI._Paused = true;
@@ -78,7 +79,11 @@ public class OverworldUI : MonoBehaviour
         _CommanderUI.OnCommanderGrounded += _CommanderUI_Grounded;
         _CommanderUI.OnDropCommander += _CommanderUI_OnDropCommander;
         _CardDisplayUI.OnCardUse += _CardDisplayUI_OnCardUse;
-        _HandUI.enabled = true;
+		_HandUI._Enabled = true;
+
+		//show the card ui if there is a se4lected card
+		if (_HandUI.m_SelectedCardUI != null)
+			_CardDisplayUI.Show();
 
         //enable components
         _CommanderUI._Paused = false;
@@ -167,7 +172,6 @@ public class OverworldUI : MonoBehaviour
 
 	public void RemovePlayerCard(PlayerType pType, CardData cData)
 	{
-        Debug.Log("RemoveCard");
 		//update the hand ui here
 		if (_CommanderUI._Player.Type == pType) 
 		{

@@ -19,6 +19,13 @@ public class HandUI : MonoBehaviour
     public bool m_CardsSelectable;
     public int m_focusedCardIndex;
 
+	bool _enabled;
+	public bool _Enabled
+	{
+		get { return _enabled; }
+		set { _enabled = value; }
+	}
+
 	// Use this for initialization
 	void Start () {
 
@@ -95,15 +102,16 @@ public class HandUI : MonoBehaviour
 
     void cardUI_OnPointerUP(CardUI cardUI)
     {
-        //pop the card in or out
-        if (cardUI == m_SelectedCardUI)
-        {
-            DeselectCard(cardUI._Index);
-        }
-        else
-        {
-            SelectCard(cardUI._Index);
-        }
+		//only if enabled
+		if (_enabled) 
+		{
+			//pop the card in or out
+			if (cardUI == m_SelectedCardUI) {
+				DeselectCard (cardUI._Index);
+			} else {
+				SelectCard (cardUI._Index);
+			}
+		}
     }
 
     public void SelectCard(int index)
@@ -127,14 +135,22 @@ public class HandUI : MonoBehaviour
 
     void cardUI_OnPointerExit(CardUI cardUI)
     {
-        //set the focus index to non (-1)
-        SetFocusIndex(-1);
+		//only if enabled
+		if (_enabled) 
+		{
+			//set the focus index to non (-1)
+			SetFocusIndex (-1);
+		}
     }
 
     void cardUI_OnPointerEnter(CardUI cardUI)
     {
-        //set to apropriate index
-        SetFocusIndex(cardUI._Index);
+		//only if enabled
+		if (_enabled) 
+		{
+			//set to apropriate index
+			SetFocusIndex (cardUI._Index);
+		}
     }
 
     public void SetFocusIndex(int index)

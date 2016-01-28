@@ -37,8 +37,7 @@ public class CardDisplayUI : MonoBehaviour
     public void Show()
     {
         //make visible 
-        _canvasGroup.interactable = true;
-        _canvasGroup.blocksRaycasts = true;
+		Enable();
         _canvasGroup.alpha = 1;
         _isShowing = true;
     }
@@ -46,14 +45,22 @@ public class CardDisplayUI : MonoBehaviour
     public void Hide()
     {
         //make invisible
-        _canvasGroup.interactable = false;
-        _canvasGroup.blocksRaycasts = false;
+		Disable();
         _canvasGroup.alpha = 0;
         _isShowing = false;
-
-        //deselect
-        _HandUI.DeselectCurrent();
     }
+
+	public void Disable()
+	{
+		_canvasGroup.interactable = false;
+		_canvasGroup.blocksRaycasts = false;
+	}
+
+	public void Enable()
+	{
+		_canvasGroup.interactable = true;
+		_canvasGroup.blocksRaycasts = true;
+	}
 
     public void Init()
     {
@@ -69,14 +76,16 @@ public class CardDisplayUI : MonoBehaviour
         Hide();
 
         //------TEST-------
-        if(_HandUI.m_Cards.Count > 0)
-            _HandUI.SelectCard(0);
+        //if(_HandUI.m_Cards.Count > 0)
+         //   _HandUI.SelectCard(0);
     }
 
     void _HandUI_OnCardDeselect()
     {
-        Debug.Log("Deselect");
         Hide();
+
+		//deselect
+		_HandUI.DeselectCurrent();
     }
 
     void _HandUI_OnHandSet()
@@ -144,6 +153,9 @@ public class CardDisplayUI : MonoBehaviour
     {
         //hide 
         Hide();
+
+		//deselect
+		_HandUI.DeselectCurrent();
     }
 
 }
