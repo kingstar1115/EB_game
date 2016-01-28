@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 
+[RequireComponent(typeof(CanvasGroup))]
 public class CardDisplayUI : MonoBehaviour 
 {
     public delegate void CardAction(CardData cardData);
@@ -12,11 +13,19 @@ public class CardDisplayUI : MonoBehaviour
     public Image _RightCard;
     public Image _CentreCard;
     public Color _LandR_Colour;
+    CanvasGroup _canvasGroup;
     int _currentCentreIndex;
 
+    bool _isShowing;
+    public bool _IsShowing
+    {
+        get { return _isShowing; }
+    }
+
 	// Use this for initialization
-	void Start () {
-	
+	void Start () 
+    {
+        
 	}
 	
 	// Update is called once per frame
@@ -25,24 +34,49 @@ public class CardDisplayUI : MonoBehaviour
 	    //put a wheel scroll thing????? Maybe.
 	}
 
-    public void Enable()
+    public void Show()
     {
         //make visible 
+        _canvasGroup.interactable = true;
+        _canvasGroup.blocksRaycasts = true;
+        _canvasGroup.alpha = 1;
+        _isShowing = true;
     }
 
-    public void Disable()
+    public void Hide()
     {
         //make invisible
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = false;
+        _canvasGroup.alpha = 0;
+        _isShowing = false;
+
+        //deselect
+        _HandUI.DeselectCurrent();
     }
 
     public void Init()
     {
+        //grab canvas group
+        _canvasGroup = this.GetComponent<CanvasGroup>();
+
+        //events
         _HandUI.OnCardSelect += _HandUI_OnCardSelect;
         _HandUI.OnHandSet += _HandUI_OnHandSet;
+        _HandUI.OnCardDeselect += _HandUI_OnCardDeselect;
+
+        //hide
+        Hide();
 
         //------TEST-------
         if(_HandUI.m_Cards.Count > 0)
             _HandUI.SelectCard(0);
+    }
+
+    void _HandUI_OnCardDeselect()
+    {
+        Debug.Log("Deselect");
+        Hide();
     }
 
     void _HandUI_OnHandSet()
@@ -80,6 +114,10 @@ public class CardDisplayUI : MonoBehaviour
     {
         //swich the card sprites so that selected is front.
         _HandUI_OnHandSet();
+
+        //show
+        if (!_isShowing)
+            Show();
     }
 
     public void UseSelectedCardHandler()
@@ -100,6 +138,12 @@ public class CardDisplayUI : MonoBehaviour
         //select next card right
         if (_currentCentreIndex < _HandUI.m_Cards.Count - 1)
             _HandUI.SelectCard(_currentCentreIndex + 1);
+    }
+
+    public void OnBackClickedHandler()
+    {
+        //hide 
+        Hide();
     }
 
 }

@@ -72,7 +72,6 @@ public class CommanderUI : MonoBehaviour
         //event listener
         _lerpPosition.OnLerpFinished += _lerpPosition_OnLerpFinished;
 	}
-
     void _lerpPosition_OnLerpFinished()
     {
         //if lifting piece then not doin it anymore

@@ -8,6 +8,7 @@ public class HandUI : MonoBehaviour
 {
     public event System.Action OnHandSet = delegate { };
     public event System.Action OnCardSelect = delegate { };
+    public event System.Action OnCardDeselect = delegate { };
 
 	public Pool m_CardPrefabPool;
     public List<Sprite> m_Sprites;
@@ -121,6 +122,7 @@ public class HandUI : MonoBehaviour
     {
         m_Cards[index].PopDown();
         m_SelectedCardUI = null;
+        OnCardDeselect();
     }
 
     void cardUI_OnPointerExit(CardUI cardUI)
@@ -165,5 +167,11 @@ public class HandUI : MonoBehaviour
     public Sprite GetSpriteOfCard(CardType type)
     {
         return m_Sprites[(int)type];
+    }
+
+    public void DeselectCurrent()
+    {
+        if (m_SelectedCardUI!=null)
+            DeselectCard(m_SelectedCardUI._Index);
     }
 }

@@ -7,6 +7,9 @@ public class OverworldUI : MonoBehaviour
     public delegate void BoardAction(TileData tile);
     public event BoardAction OnCommanderMove = delegate { };
 
+    public delegate void CardAction(CardData card);
+    public event CardAction OnPlayerUseCard = delegate { };
+
     public event System.Action OnPause = delegate { };
     public event System.Action OnUnPause = delegate { };
 
@@ -16,6 +19,7 @@ public class OverworldUI : MonoBehaviour
     public BoardUI _BoardUI;
     public GameObject _PauseScreen;
     public CardDisplayUI _CardDisplayUI;
+    public HandUI _HandUI;
 
     bool _paused;
     public bool _Paused
@@ -58,6 +62,7 @@ public class OverworldUI : MonoBehaviour
         _CommanderUI.OnCommanderGrounded -= _CommanderUI_Grounded;
         _CommanderUI.OnDropCommander -= _CommanderUI_OnDropCommander;
         _CardDisplayUI.OnCardUse -= _CardDisplayUI_OnCardUse;
+        _HandUI.enabled = false;
 
         //disable components
         _CommanderUI._Paused = true;
@@ -73,6 +78,7 @@ public class OverworldUI : MonoBehaviour
         _CommanderUI.OnCommanderGrounded += _CommanderUI_Grounded;
         _CommanderUI.OnDropCommander += _CommanderUI_OnDropCommander;
         _CardDisplayUI.OnCardUse += _CardDisplayUI_OnCardUse;
+        _HandUI.enabled = true;
 
         //enable components
         _CommanderUI._Paused = false;
@@ -82,6 +88,7 @@ public class OverworldUI : MonoBehaviour
     public void _CardDisplayUI_OnCardUse(CardData cardData)
     {
         Debug.Log("CardData: "+cardData.name);
+        _CardDisplayUI.Hide();
     }
 
     void _CommanderUI_OnDropCommander(TileData tile)
@@ -160,6 +167,7 @@ public class OverworldUI : MonoBehaviour
 
 	public void RemovePlayerCard(PlayerType pType, CardData cData)
 	{
+        Debug.Log("RemoveCard");
 		//update the hand ui here
 		if (_CommanderUI._Player.Type == pType) 
 		{

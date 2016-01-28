@@ -56,6 +56,7 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.OnCommanderMove += _OverworldUI_OnCommanderMove;
         _OverworldUI.OnPause += _OverworldUI_OnPause;
         _OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
+        _OverworldUI.OnPlayerUseCard += _OverworldUI_OnPlayerUseCard;
 		_BattlebeardPlayer.OnCardAdded += _BattlebeardPlayer_OnCardAdded;
 		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
 		_StormshapersPlayer.OnCardAdded += _StormshapersPlayer_OnCardAdded;
@@ -82,6 +83,11 @@ public class OverworldManager : MonoBehaviour
 		_GameStateHolder._gameState = GameState.Overworld;
         
 	}
+
+    void _OverworldUI_OnPlayerUseCard(CardData card)
+    {
+        UseCard(card);
+    }
 
 	void _BattlebeardPlayer_OnCardAdded(CardData card)
 	{
