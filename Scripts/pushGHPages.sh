@@ -10,6 +10,7 @@ cp Build/ELB/ELB.unity3d ./ELB.unity3d
 git config --global user.email "ewanharris93@gmail.com"
 git config --global user.name "travis-ci"
 
+git init
 git add .
 git commit -m "Push to github pages"
 
