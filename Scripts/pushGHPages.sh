@@ -13,8 +13,7 @@ git config --global user.name "travis-ci"
 git init
 git add .
 git commit -m "Push to github pages"
-
-git push --force --quiet "https://${GH_TOKEN}@${GH_REF}" > /dev/null 2>&1
+git push --force --quiet "https://${GH_TOKEN}@github.com/${GH_REF}.git" master:gh-pages > /dev/null 2>&1
 
 echo "Publish done"
 fi
