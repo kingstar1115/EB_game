@@ -64,6 +64,7 @@ public class OverworldUI : MonoBehaviour
         _CardDisplayUI.OnCardUse -= _CardDisplayUI_OnCardUse;
 		_CardDisplayUI.Hide();
         _HandUI._Enabled = false;
+        _HandUI.Hide();
 
         //disable components
         _CommanderUI._Paused = true;
@@ -80,6 +81,7 @@ public class OverworldUI : MonoBehaviour
         _CommanderUI.OnDropCommander += _CommanderUI_OnDropCommander;
         _CardDisplayUI.OnCardUse += _CardDisplayUI_OnCardUse;
 		_HandUI._Enabled = true;
+        _HandUI.Show();
 
 		//show the card ui if there is a se4lected card
 		if (_HandUI.m_SelectedCardUI != null)

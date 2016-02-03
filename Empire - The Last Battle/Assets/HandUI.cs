@@ -3,13 +3,15 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(LerpRotation))]
+[RequireComponent(typeof(LerpRotation), typeof(LerpPosition))]
 public class HandUI : MonoBehaviour 
 {
     public event System.Action OnHandSet = delegate { };
     public event System.Action OnCardSelect = delegate { };
     public event System.Action OnCardDeselect = delegate { };
 
+    public Transform _HandInPos;
+    public Transform _HandOutPos;
 	public Pool m_CardPrefabPool;
     public List<Sprite> m_Sprites;
     public List<CardUI> m_Cards;
@@ -35,6 +37,18 @@ public class HandUI : MonoBehaviour
 	void Update () {
 	
 	}
+
+    public void Show()
+    {
+        //lerp to out pos
+        GetComponent<LerpPosition>().LerpTo(_HandOutPos.position);
+    }
+
+    public void Hide()
+    {
+        //lerp to in pos
+        GetComponent<LerpPosition>().LerpTo(_HandInPos.position);
+    }
 
     public void SetHand(CardList cardsToShow)
     {
