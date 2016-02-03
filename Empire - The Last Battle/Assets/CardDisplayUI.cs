@@ -8,6 +8,8 @@ public class CardDisplayUI : MonoBehaviour
     public delegate void CardAction(CardData cardData);
     public event CardAction OnCardUse = delegate { };
 
+    public CanvasGroup _CGLeftButton;
+    public CanvasGroup _CGRightButton;
     public HandUI _HandUI;
     public Image _LeftCard;
     public Image _RightCard;
@@ -103,17 +105,43 @@ public class CardDisplayUI : MonoBehaviour
         {
             _RightCard.sprite = _HandUI.GetSpriteOfCard(_HandUI.m_Cards[r_Index]._Card.Type);
             _RightCard.color = _LandR_Colour;
+
+            //if not already set visiable
+            if (_CGRightButton.alpha == 0)
+            {
+                _CGRightButton.alpha = 1;
+                _CGRightButton.interactable = true;
+                _CGRightButton.blocksRaycasts = true;
+            }
         }
         else
+        {
+            _CGRightButton.alpha = 0.0f;
+            _CGRightButton.interactable = false;
+            _CGRightButton.blocksRaycasts = false;
             _RightCard.color = new Color(0, 0, 0, 0);
+        }
 
         if (l_Index != -1)
         {
             _LeftCard.sprite = _HandUI.GetSpriteOfCard(_HandUI.m_Cards[l_Index]._Card.Type);
             _LeftCard.color = _LandR_Colour;
+
+            //if not already set visiable
+            if (_CGLeftButton.alpha == 0)
+            {
+                _CGLeftButton.alpha = 1;
+                _CGLeftButton.interactable = true;
+                _CGLeftButton.blocksRaycasts = true;
+            }
         }
         else
+        {
+            _CGLeftButton.alpha = 0.0f;
+            _CGLeftButton.interactable = false;
+            _CGLeftButton.blocksRaycasts = false;
             _LeftCard.color = new Color(0, 0, 0, 0);
+        }
 
         //remenber selected index
         _currentCentreIndex = index;
