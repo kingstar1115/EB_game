@@ -17,6 +17,7 @@ public class CommanderUI : MonoBehaviour
     public event V3Action OnCommanderDrop = delegate { };
 
     public Player _Player;
+	public HandUI _HandUI;
     public float _LiftedHeight;
     public float _LiftTime;
     public float _MoveTime;
@@ -71,7 +72,6 @@ public class CommanderUI : MonoBehaviour
         //event listener
         _lerpPosition.OnLerpFinished += _lerpPosition_OnLerpFinished;
 	}
-
     void _lerpPosition_OnLerpFinished()
     {
         //if lifting piece then not doin it anymore
@@ -231,6 +231,13 @@ public class CommanderUI : MonoBehaviour
     public HashSet<TileData> GetReachableTiles()
     {
         return _reachableTiles;
+    }
+
+    public void DisplayInfo()
+    {
+        //update the hand ui 
+        _HandUI.SetHand(_Player.Hand);
+        //should update the army ui here as well I guess
     }
 
     GameObject getCommanderMarker(TileHolder tHolder)

@@ -10,10 +10,14 @@ public class OverworldManager : MonoBehaviour
 	public CardSystem _CardSystem;
 	public Board _Board;
 	public Player _BattlebeardPlayer;
-    public Player _StormshaperPlayer;
+	public Player _StormshaperPlayer;
     public Player _CurrentPlayer;
 	public Player _InactivePlayer;
     public TurnManager _TurnManager;
+	public GameStateHolder _GameStateHolder;
+
+	//****TESTS ONLY****
+	public CardList _StartCards;
 
 	// Use this for initialization
 	void Start() {
@@ -30,21 +34,27 @@ public class OverworldManager : MonoBehaviour
         }
 
         if(_Board._SSStartTile != null){
-            _StormshaperPlayer.CommanderPosition = _Board._SSStartTile;
+			_StormshaperPlayer.CommanderPosition = _Board._SSStartTile;
         }else{
             Debug.LogError("Stormshaper start tile not set");
         }
 
 		_OverworldUI.Initialise(_BattlebeardPlayer, _StormshaperPlayer);
 
-		_TurnManager.OnTurnStart += _TurnManager_OnTurnStart;
+        _TurnManager.OnTurnStart += _TurnManager_OnTurnStart;
         _TurnManager.OnTurnEnd += _TurnManager_OnTurnEnd;
         _TurnManager.OnSwitchTurn += _TurnManager_OnSwitchTurn;
+
 
 		//event listeners
 		_OverworldUI.OnCommanderMove += _OverworldUI_OnCommanderMove;
         _OverworldUI.OnPause += _OverworldUI_OnPause;
         _OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
+        _OverworldUI.OnPlayerUseCard += _OverworldUI_OnPlayerUseCard;
+		_BattlebeardPlayer.OnCardAdded += _BattlebeardPlayer_OnCardAdded;
+		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
+		_StormshaperPlayer.OnCardAdded += _StormshapersPlayer_OnCardAdded;
+		_StormshaperPlayer.OnCardRemoved += _StormshapersPlayer_OnCardRemoved;
 
 		_CardSystem.RequestUnitSelection +=_CardSystem_RequestUnitSelection;
 
@@ -55,7 +65,42 @@ public class OverworldManager : MonoBehaviour
 		setPlayer(PlayerType.Battlebeard);
 
 		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
-        _TurnManager.StartTurn();
+
+		_GameStateHolder._gameState = GameState.Overworld;
+
+		//test by adding a scout card.
+		_CurrentPlayer.SetCards (_StartCards);
+        _TurnManager.StartTurn();    
+	}
+
+    void _OverworldUI_OnPlayerUseCard(CardData card)
+    {
+        Debug.Log("test");
+        UseCard(card);
+    }
+
+	void _BattlebeardPlayer_OnCardAdded(CardData card)
+	{
+		//inform ui
+		_OverworldUI.AddPlayerCard (PlayerType.Battlebeard, card);
+	}
+
+	void _BattlebeardPlayer_OnCardRemoved(CardData card)
+	{
+		//inform ui
+		_OverworldUI.RemovePlayerCard (PlayerType.Battlebeard, card);
+	}
+
+	void _StormshapersPlayer_OnCardAdded(CardData card)
+	{
+		//inform ui
+		_OverworldUI.AddPlayerCard (PlayerType.Stormshaper, card);
+	}
+
+	void _StormshapersPlayer_OnCardRemoved(CardData card)
+	{
+		//inform ui
+		_OverworldUI.RemovePlayerCard (PlayerType.Stormshaper, card);
 	}
 
 	// get rid of this shit later
@@ -74,15 +119,23 @@ public class OverworldManager : MonoBehaviour
             _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(player.Type, player.CommanderPosition, card.Value));
 		}
 		ModalPanel.Instance().ShowOK("Yeah!", "Used " + card.Type, null);
-		player.Hand.cards.Remove(card);
+		_CurrentPlayer.RemoveCard(card);
 	}
 
 	void UseCard(CardData card) {
+
 		ModalPanel p = ModalPanel.Instance();
 		p.ShowOK("Card", "Using " + card.Type, () => {
 			_CardSystem.UseCard(card, _CurrentPlayer, _InactivePlayer);
 		});
 		
+
+		//use the card
+		//if (_CardSystem.CanUseCard (card, _GameStateHolder._gameState)) 
+		//{
+		//	_CardSystem.ApplyEffect (card, _CurrentPlayer);	
+		//}
+
 	}
 
     void _OverworldUI_OnUnPause() 
@@ -109,109 +162,107 @@ public class OverworldManager : MonoBehaviour
     IEnumerator SwitchPlayer() {
         yield return new WaitForSeconds(1);
         _TurnManager.SwitchTurn();
-		_OverworldUI.Enable();
+        _OverworldUI.Enable(); 
     }
 
 	void HandleTileEvent(TileData tile) {		
 		if (_CurrentPlayer.IsScouting) {
 			_CurrentPlayer.IsScouting = false;
-			endTurn();
+			endTurn ();
 		} else {
-			_OverworldUI.Disable();
-			ModalPanel p = ModalPanel.Instance();
+			_OverworldUI.Disable ();
+			ModalPanel p = ModalPanel.Instance ();
 			switch (tile.Building) {
-				case BuildingType.Armoury:
-					p.ShowOK("Armoury", "You landed on the Armoury.", endTurn);
-					break;
-				case BuildingType.Camp:
-					if (tile.Owner != _CurrentPlayer.Type) {
-						if (tile.Owner == PlayerType.None) {
-							// MONSTER BATTLE
-						} else {
-							// PVP BATTLE
-						}
-
-						// WIN
-						_Board.SetTileOwner(tile, _CurrentPlayer.Type);
-					}
-					p.ShowOK("Camp", "You landed on a camp.", endTurn);
-					break;
-				case BuildingType.Cave:
-					if (tile.Owner != _CurrentPlayer.Type) {
-						if (tile.Owner != PlayerType.None) {
-							//BATTLE
-						} else {
-							// WIN ANYWAY
-						}
-
-						// WIN
-						CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
-						_CurrentPlayer.Hand.cards.Add(c);
-						_Board.SetTileOwner(tile, _CurrentPlayer.Type);
-						p.ShowOK("Card Recieved!", "You recieved a " + c.Type + " card.", endTurn);
-					}
-					else {
-						endTurn();
-					}
-					break;
-				case BuildingType.Fortress:
-					// Make sure that the fortress type matches the player type
-					if (tile.Owner == _CurrentPlayer.Type) {
-						// make sure the player owns at least 3 surrounding tiles
-						if (tile.GetConnectedTiles().FindAll(t => t.Owner == _CurrentPlayer.Type).Count >= 3) {
-							// Battle lost immortal
-							// on victory ->
-							tile.Owner = PlayerType.None;
-							_CurrentPlayer.LostImmortalKillCount++;
-							_CurrentPlayer.CastleProgress++;
-							p.ShowOK("Fortress", "A bloody Lost Immortal just showed up innit blud!", endTurn);
-						} else {
-							p.ShowOK("Fortress", "You felt a chill in the air, but nothing appeared.", endTurn);
-						}
-						break;
-					}
-					p.ShowOK("Fortress", "Nothing appeared.", endTurn);
-					// end turn
-					break;
-				case BuildingType.Inn:
-					if (_InactivePlayer.CastleProgress >= 4) {
-						p.ShowOK("Oh No!", "The inn won't accept you!", endTurn);
-						break;
-					}
-
-					var rnd = UnityEngine.Random.Range(0, 3);
-					List<Unit> units;
-
-					units = _CurrentPlayer.PlayerArmy.GetRandomUnits(rnd, true);
-
-					foreach (var unit in units) {
-						unit.Heal();
-					}
-
-					string content, title;
-
-					if (_CurrentPlayer.PlayerArmy.GetKOUnits().Count == 0) {
-						title = "The Inn Welcomes You";
-						content = "You are well rested.";
+			case BuildingType.Armoury:
+				p.ShowOK ("Armoury", "You landed on the Armoury.", endTurn);
+				break;
+			case BuildingType.Camp:
+				if (tile.Owner != _CurrentPlayer.Type) {
+					if (tile.Owner == PlayerType.None) {
+						// MONSTER BATTLE
 					} else {
-						title = units.Count + " Units Healed";
-						content = rnd == 0 ? 
+						// PVP BATTLE
+					}
+
+					// WIN
+					_Board.SetTileOwner (tile, _CurrentPlayer.Type);
+				}
+				p.ShowOK ("Camp", "You landed on a camp.", endTurn);
+				break;
+			case BuildingType.Cave:
+				if (tile.Owner != _CurrentPlayer.Type) {
+					if (tile.Owner != PlayerType.None) {
+						//BATTLE
+					} else {
+						// WIN ANYWAY
+					}
+
+					// WIN
+					CardData c = GenerateRandomCard (_AvailableCaveCards.cards);
+					_CurrentPlayer.Hand.cards.Add (c);
+					_Board.SetTileOwner (tile, _CurrentPlayer.Type);
+					p.ShowOK ("Card Recieved!", "You recieved a " + c.Type + " card.", endTurn);
+				} else {
+					endTurn ();
+				}
+				break;
+			case BuildingType.Fortress:
+					// Make sure that the fortress type matches the player type
+				if (tile.Owner == _CurrentPlayer.Type) {
+					// make sure the player owns at least 3 surrounding tiles
+					if (tile.GetConnectedTiles ().FindAll (t => t.Owner == _CurrentPlayer.Type).Count >= 3) {
+						// Battle lost immortal
+						// on victory ->
+						tile.Owner = PlayerType.None;
+						_CurrentPlayer.LostImmortalKillCount++;
+						_CurrentPlayer.CastleProgress++;
+						p.ShowOK ("Fortress", "A bloody Lost Immortal just showed up innit blud!", endTurn);
+					} else {
+						p.ShowOK ("Fortress", "You felt a chill in the air, but nothing appeared.", endTurn);
+					}
+					break;
+				}
+				p.ShowOK ("Fortress", "Nothing appeared.", endTurn);
+					// end turn
+				break;
+			case BuildingType.Inn:
+				if (_InactivePlayer.CastleProgress >= 4) {
+					p.ShowOK ("Oh No!", "The inn won't accept you!", endTurn);
+					break;
+				}
+
+				var rnd = UnityEngine.Random.Range (0, 3);
+				List<Unit> units;
+
+				units = _CurrentPlayer.PlayerArmy.GetRandomUnits (rnd, true);
+
+				foreach (var unit in units) {
+					unit.Heal ();
+				}
+
+				string content, title;
+
+				if (_CurrentPlayer.PlayerArmy.GetKOUnits ().Count == 0) {
+					title = "The Inn Welcomes You";
+					content = "You are well rested.";
+				} else {
+					title = units.Count + " Units Healed";
+					content = rnd == 0 ? 
 						"Their wounds were too great. Looks like they'll need some more time." :
 						"Your army is well rested.";
-					}
-					p.ShowOK(title, content, endTurn);
-					break;
-				default:
-					endTurn();
-					break;
+				}
+				p.ShowOK (title, content, endTurn);
+				break;
+			default:
+				endTurn ();
+				break;
 			}
 		}	
-		
 	}
 
-	void endTurn() {	
-		_TurnManager.EndTurn();
-		StartCoroutine(SwitchPlayer());
+	void endTurn() {
+		_TurnManager.EndTurn ();
+		StartCoroutine (SwitchPlayer ());
 	}
 
 	public CardData GenerateRandomCard(List<CardData> availableCards) {
@@ -266,42 +317,30 @@ public class OverworldManager : MonoBehaviour
         _OverworldUI.Disable();
     }
 
-    public void UnPause() {
+    public void UnPause()
+    {
         _OverworldUI.Enable();
     }
 
     void _TurnManager_OnTurnStart() {
         _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_CurrentPlayer.Type, _CurrentPlayer.CommanderPosition, 1));
-
-
-		// test add unit each turn
-		int rand = Random.Range(0, 8);
-		_CurrentPlayer.PlayerArmy.AddUnit((UnitType)rand);
-
-		// chance of knocking out a random unit each turn
-
-		int c = _CurrentPlayer.PlayerArmy.GetUnits().Count;
-		rand = Random.Range(0, (int)c * 5);
-		if (rand < c) {
-			_CurrentPlayer.PlayerArmy.GetUnits()[rand].ReduceHP(100);
-		}
-	}
+    }
 
     void _TurnManager_OnTurnEnd() {
         _OverworldUI.DisablePlayerMovement();
     }
 
-	void setPlayer(PlayerType p) {
-		_CurrentPlayer = p == PlayerType.Battlebeard ? _BattlebeardPlayer : _StormshaperPlayer;
-		_InactivePlayer = p == PlayerType.Battlebeard ? _StormshaperPlayer : _BattlebeardPlayer;
-		_OverworldUI.SetPlayer(_CurrentPlayer);
-	}
+	void setPlayer(PlayerType p) {    
+		_CurrentPlayer = p == PlayerType.Battlebeard ? _BattlebeardPlayer : _StormshaperPlayer;    
+		_InactivePlayer = p == PlayerType.Battlebeard ? _StormshaperPlayer : _BattlebeardPlayer;    
+		_OverworldUI.SetPlayer(_CurrentPlayer);    
+	}  
 
-    void _TurnManager_OnSwitchTurn() {
-		setPlayer(_CurrentPlayer.Type == PlayerType.Battlebeard ? 
-			PlayerType.Stormshaper : PlayerType.Battlebeard);
-		_TurnManager.StartTurn();
-	}
+
+    void _TurnManager_OnSwitchTurn() {    
+		setPlayer (_CurrentPlayer.Type == PlayerType.Battlebeard ? PlayerType.Stormshaper : PlayerType.Battlebeard);
+		_TurnManager.StartTurn ();
+    }
 
 	// Update is called once per frame
 	void Update() {
@@ -320,3 +359,4 @@ public class OverworldManager : MonoBehaviour
 		}
 	}
 }
+

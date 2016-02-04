@@ -29,6 +29,12 @@ public class CardSystem : MonoBehaviour {
 	public event EndCardAction OnEffectApplied = delegate { };
 	public event UnitSelectionCallback RequestUnitSelection = delegate { };
 
+public bool CanUseCard(CardData cData, GameState gameState)
+	{
+		//check that the card can use the game state 
+		return (cData.UseableGameState & gameState) == gameState;
+	}
+
 	public void UseCard(CardData card, Player player, Player inactivePlayer) {
 		switch (card.Type) {
 			case CardType.Healing_Card:
