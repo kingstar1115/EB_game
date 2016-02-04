@@ -129,7 +129,7 @@ public class OverworldManager : MonoBehaviour
 		}
 	}
 
-    void _OverworldUI_OnUnPause()
+    void _OverworldUI_OnUnPause() 
     {
         _OverworldUI._Paused = false;
     }
@@ -253,8 +253,14 @@ public class OverworldManager : MonoBehaviour
 
 	// Update is called once per frame
 	void Update() {
+		if (Input.GetKeyDown(KeyCode.Return)) {
+			StartCoroutine(SwitchPlayer());
+		}
 
+		//Delete in final build. Used for testing, an example of how to call debug message class
+		if (Input.GetKeyDown (KeyCode.Alpha8)) {
+			DebugUI.getUI ().SetMessage ("Test", 22, Color.green);
+		}
 	}
-
 }
 
