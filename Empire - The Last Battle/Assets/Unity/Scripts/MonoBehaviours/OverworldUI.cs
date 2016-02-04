@@ -7,17 +7,19 @@ public class OverworldUI : MonoBehaviour
     public delegate void BoardAction(TileData tile);
     public event BoardAction OnCommanderMove = delegate { };
 
+    public delegate void CardAction(CardData card);
+    public event CardAction OnPlayerUseCard = delegate { };
+
     public event System.Action OnPause = delegate { };
     public event System.Action OnUnPause = delegate { };
 
     public bool _TileHover;
     public CommanderUI _CommanderUI;
-	CommanderUI _battlebeardCommanderUI;
-	CommanderUI _stormshaperCommanderUI;
     public CameraMovement _CameraMovement;
     public BoardUI _BoardUI;
-	public ArmyUI _ArmyUI;
     public GameObject _PauseScreen;
+    public CardDisplayUI _CardDisplayUI;
+    public HandUI _HandUI;
 
     bool _paused;
     public bool _Paused
@@ -29,13 +31,11 @@ public class OverworldUI : MonoBehaviour
             {
                 _PauseScreen.SetActive(true);
                 Disable();
-				Hide();
             }
             else
             {
                 _PauseScreen.SetActive(false);
                 Enable();
-				Show();
             }
 
             _paused = value;
@@ -43,19 +43,11 @@ public class OverworldUI : MonoBehaviour
     }
 
     // Use this for initialization
-    public void Initialise(Player battlebeard, Player stormshaper)
+    public void Initialise()
     {
         _BoardUI.Init();
-		_battlebeardCommanderUI = battlebeard.GetComponent<CommanderUI>();
-		_stormshaperCommanderUI = stormshaper.GetComponent<CommanderUI>();
-		_battlebeardCommanderUI.Initialise();
-		_stormshaperCommanderUI.Initialise();
-
-		//snap players to start position
-		_battlebeardCommanderUI.UpdateToPlayerPosition();
-		_stormshaperCommanderUI.UpdateToPlayerPosition();
-
-		_ArmyUI.Initialise(battlebeard, stormshaper);
+		_CommanderUI.Initialise();
+        _CardDisplayUI.Init();
 
         //add event listeners
         Enable();
@@ -63,67 +55,50 @@ public class OverworldUI : MonoBehaviour
 
     public void Disable()
     {
-		//remove event listeners
-		_battlebeardCommanderUI.OnCommanderMoved -= _CommanderUI_OnCommanderMoved;
-		_stormshaperCommanderUI.OnCommanderMoved -= _CommanderUI_OnCommanderMoved;
-		_battlebeardCommanderUI.OnStartDrag -= _CommanderUI_OnStartDrag;
-		_stormshaperCommanderUI.OnStartDrag -= _CommanderUI_OnStartDrag;
-		_battlebeardCommanderUI.OnCommanderDrop -= _CommanderUI_OnCommanderDrop;
-		_stormshaperCommanderUI.OnCommanderDrop -= _CommanderUI_OnCommanderDrop;
-		_battlebeardCommanderUI.OnCommanderGrounded -= _CommanderUI_Grounded;
-		_stormshaperCommanderUI.OnCommanderGrounded -= _CommanderUI_Grounded;
-		_battlebeardCommanderUI.OnDropCommander -= _CommanderUI_OnDropCommander;
-		_stormshaperCommanderUI.OnDropCommander -= _CommanderUI_OnDropCommander;
+        //remove event listeners
+        _CommanderUI.OnCommanderMoved -= _CommanderUI_OnCommanderMoved;
+        _CommanderUI.OnStartDrag -= _CommanderUI_OnStartDrag;
+        _CommanderUI.OnCommanderDrop -= _CommanderUI_OnCommanderDrop;
+        _CommanderUI.OnCommanderGrounded -= _CommanderUI_Grounded;
+        _CommanderUI.OnDropCommander -= _CommanderUI_OnDropCommander;
+        _CardDisplayUI.OnCardUse -= _CardDisplayUI_OnCardUse;
+		_CardDisplayUI.Hide();
+        _HandUI._Enabled = false;
+        _HandUI.Hide();
 
-		//disable components
-		_battlebeardCommanderUI._Paused = true;
-		_stormshaperCommanderUI._Paused = true;
-
-		// we need to be able to pause this probably?
-		_BoardUI.PlayerPrompt_DefaultTiles();
-
-		_CameraMovement.DisableCameraMovement();
-		_ArmyUI.Disable();
+        //disable components
+        _CommanderUI._Paused = true;
+        _CameraMovement.DisableCameraMovement();
     }
-
-	public void Hide() {
-		_ArmyUI.Hide();
-	}
-
-	public void Show() {
-		_ArmyUI.Show();
-	}
 
     public void Enable()
     {
-		//add event listeners
-		_battlebeardCommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
-		_stormshaperCommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
-		_battlebeardCommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
-		_stormshaperCommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
-		_battlebeardCommanderUI.OnCommanderDrop += _CommanderUI_OnCommanderDrop;
-		_stormshaperCommanderUI.OnCommanderDrop += _CommanderUI_OnCommanderDrop;
-		_battlebeardCommanderUI.OnCommanderGrounded += _CommanderUI_Grounded;
-		_stormshaperCommanderUI.OnCommanderGrounded += _CommanderUI_Grounded;
-		_battlebeardCommanderUI.OnDropCommander += _CommanderUI_OnDropCommander;
-		_stormshaperCommanderUI.OnDropCommander += _CommanderUI_OnDropCommander;
+        //add event listeners
+        _CommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
+        _CommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
+        _CommanderUI.OnCommanderDrop += _CommanderUI_OnCommanderDrop;
+        _CommanderUI.OnCommanderGrounded += _CommanderUI_Grounded;
+        _CommanderUI.OnDropCommander += _CommanderUI_OnDropCommander;
+        _CardDisplayUI.OnCardUse += _CardDisplayUI_OnCardUse;
+		_HandUI._Enabled = true;
+        _HandUI.Show();
 
-		//enable components
-		_CommanderUI._Paused = false;
-		_CommanderUI._Paused = false;
+		//show the card ui if there is a se4lected card
+		if (_HandUI.m_SelectedCardUI != null)
+			_CardDisplayUI.Show();
 
-		_CameraMovement.EnableCameraMovement();
-
-		_ArmyUI.Enable();
+        //enable components
+        _CommanderUI._Paused = false;
+        _CameraMovement.EnableCameraMovement();
     }
 
-	public void SetPlayer(Player p) {
-		_CommanderUI.DisablePlayerMovement();
-		_CommanderUI = p.Type == PlayerType.Battlebeard ? _battlebeardCommanderUI : _stormshaperCommanderUI;
-		switchFocus(_CommanderUI);
-	}
+    public void _CardDisplayUI_OnCardUse(CardData cardData)
+    {
+        Debug.Log("CardData: "+cardData.name);
+        _CardDisplayUI.Hide();
+    }
 
-	void _CommanderUI_OnDropCommander(TileData tile)
+    void _CommanderUI_OnDropCommander(TileData tile)
     {
         _BoardUI.PlayerPrompt_DefaultTiles();
     }
@@ -171,10 +146,39 @@ public class OverworldUI : MonoBehaviour
         OnUnPause();
     }
 
-	void switchFocus(CommanderUI u){
-		//_CameraMovement._TargetObject = u._Player.transform;
-		_CameraMovement.MoveToNewTarget(u._Player.transform, u.getPosition());
-		_ArmyUI.SwitchPlayer(u._Player.Type);
+    public void SetPlayerFocus(Player player)
+    {
+        //set up arpropriate ui
+        _CommanderUI = player.GetComponent<CommanderUI>();
+
+        //update display
+        _CommanderUI.DisplayInfo();
+
+        //focus camera
+        SwitchFocus(player.transform);
+    }
+
+	public void SwitchFocus(Transform transform){
+		_CameraMovement._TargetObject = transform;
+		_CameraMovement.EnableCameraMovement(new Vector3(transform.position.x, transform.position.y, transform.position.z));
+	}
+
+	public void AddPlayerCard(PlayerType pType, CardData cData)
+	{
+		//update the hand ui here
+		if (_CommanderUI._Player.Type == pType) 
+		{
+			_CommanderUI.DisplayInfo();
+		}
+	}
+
+	public void RemovePlayerCard(PlayerType pType, CardData cData)
+	{
+		//update the hand ui here
+		if (_CommanderUI._Player.Type == pType) 
+		{
+			_CommanderUI.DisplayInfo();
+		}
 	}
 
     void Update()
