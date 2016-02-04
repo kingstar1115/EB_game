@@ -70,6 +70,9 @@ public class OverworldManager : MonoBehaviour
 
 		//test by adding a scout card.
 		_CurrentPlayer.SetCards (_StartCards);
+		_CurrentPlayer.PlayerArmy.AddUnit (UnitType.Scout);
+		_CurrentPlayer.PlayerArmy.AddUnit (UnitType.Scout);
+		_CurrentPlayer.PlayerArmy.AddUnit (UnitType.Scout);
         _TurnManager.StartTurn();    
 	}
 
