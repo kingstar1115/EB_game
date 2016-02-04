@@ -14,6 +14,7 @@ ModelImporter:
     100012: Object038
     100014: Object039
     100016: Object040
+    100018: Plane001
     400000: //RootNode
     400002: castle 4
     400004: flag
@@ -23,6 +24,7 @@ ModelImporter:
     400012: Object038
     400014: Object039
     400016: Object040
+    400018: Plane001
     2300000: //RootNode
     2300002: castle 4
     2300004: flag
@@ -32,6 +34,7 @@ ModelImporter:
     2300012: Object038
     2300014: Object039
     2300016: Object040
+    2300018: Plane001
     3300000: //RootNode
     3300002: castle 4
     3300004: flag
@@ -41,6 +44,7 @@ ModelImporter:
     3300012: Object038
     3300014: Object039
     3300016: Object040
+    3300018: Plane001
     4300000: castle 4
     4300002: flag
     4300004: Object035
@@ -49,6 +53,7 @@ ModelImporter:
     4300010: Object038
     4300012: Object039
     4300014: Object040
+    4300016: Plane001
     9500000: //RootNode
   materials:
     importMaterials: 0
