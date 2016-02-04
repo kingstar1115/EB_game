@@ -191,15 +191,9 @@ public class CommanderUI : MonoBehaviour
     }
 
 	public void ForceMoveCommander(Vector3 dest, TileHolder tile){
-		//commander moved
-		_toGoTo = dest;
-		_destinationTile = tile;
-		// do we want to do this right now and not when the movement is over?
 		OnCommanderMoved(tile._Tile);
 		OnCommanderDrop(new Vector3(dest.x, _targetY, dest.z));
-		_destinationTile = null;
 		OnDropCommander(_Player.CommanderPosition);
-		this.gameObject.layer = _defaultLayer;
 		UpdateToPlayerPosition ();
 	}
 
