@@ -110,15 +110,16 @@ public class CommanderUI : MonoBehaviour
 		if (_allowMovement) {
 
 			if (!_dragging) {
-				OnStartDrag();
+				OnStartDrag ();
 				_dragging = true;
 			}
 
 			//if hovered a tile that is reachable then move have the player move there
 			Collider tileParent;
-            TileHolder tileHolder = null;
-            if (BoardUI.GetTileHovered_Position(out tileParent))
-                tileHolder = tileParent.GetComponentInChildren<TileHolder>();
+			TileHolder tileHolder = null;
+			if (BoardUI.GetTileHovered_Position (out tileParent)){
+				tileHolder = tileParent.GetComponentInChildren<TileHolder> ();
+			}
 
             if (tileHolder != null)
             {
@@ -150,9 +151,9 @@ public class CommanderUI : MonoBehaviour
                 _destinationTile = null;
             }
 
-            if (!_hasBeenLifted && !_liftingPiece)// && _destinationTile == null )//|| _prevHovered != hoveredCollider))
+			if (!_hasBeenLifted && !_liftingPiece) {// && _destinationTile == null )//|| _prevHovered != hoveredCollider))
 				LiftPiece ();
-
+			}
             //block raycast 
             this.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
 		}
@@ -188,6 +189,19 @@ public class CommanderUI : MonoBehaviour
         //raycast 
         this.gameObject.layer = _defaultLayer;
     }
+
+	public void ForceMoveCommander(Vector3 dest, TileHolder tile){
+		//commander moved
+		_toGoTo = dest;
+		_destinationTile = tile;
+		// do we want to do this right now and not when the movement is over?
+		OnCommanderMoved(tile._Tile);
+		OnCommanderDrop(new Vector3(dest.x, _targetY, dest.z));
+		_destinationTile = null;
+		OnDropCommander(_Player.CommanderPosition);
+		this.gameObject.layer = _defaultLayer;
+		UpdateToPlayerPosition ();
+	}
 
     public void LiftPiece()
     {
@@ -235,8 +249,9 @@ public class CommanderUI : MonoBehaviour
 
     GameObject getCommanderMarker(TileHolder tHolder)
     {
-        if (tHolder == null)
-            return null;
+		if (tHolder == null) {
+			return null;
+		}
 
         switch (_Player.Type)
         {

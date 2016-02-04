@@ -177,6 +177,10 @@ public class OverworldUI : MonoBehaviour
 		_ArmyUI.SwitchPlayer(u._Player.Type);
 	}
 
+	public void MoveCommander(Vector3 dest, TileHolder tile){
+		_CommanderUI.ForceMoveCommander (dest, tile);
+	}
+
     void Update()
     {
         //check for pause switch by key 

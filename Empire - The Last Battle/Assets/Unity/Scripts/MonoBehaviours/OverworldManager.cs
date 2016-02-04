@@ -13,6 +13,7 @@ public class OverworldManager : MonoBehaviour
     public Player _CurrentPlayer;
 	public Player _InactivePlayer;
     public TurnManager _TurnManager;
+	public TileHolder tile;
 
 	// Use this for initialization
 	void Start() {
@@ -241,7 +242,10 @@ public class OverworldManager : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.Return)) {
 			StartCoroutine(SwitchPlayer());
 		}
-
+		if (Input.GetKeyDown (KeyCode.C)) {
+			Vector3 dest = new Vector3(-2.7f, 0.5f, 3.7f);
+			_OverworldUI.MoveCommander (dest, tile);
+		}
 		//Delete in final build. Used for testing, an example of how to call debug message class
 		if (Input.GetKeyDown (KeyCode.Alpha8)) {
 			DebugUI.getUI ().SetMessage ("Test", 22, Color.green);
