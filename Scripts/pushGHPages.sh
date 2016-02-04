@@ -9,7 +9,7 @@ cd Build
 cp ELB/ELB.html ./ELB.html
 cp ELB/ELB.unity3d ./ELB.unity3d
 cp ../index.html ./index.html
-cp ../.gitignore ./.
+cp ../.gitignore ./.gitignore
 
 git init
 git config --global user.email "ewanharris93@gmail.com"
