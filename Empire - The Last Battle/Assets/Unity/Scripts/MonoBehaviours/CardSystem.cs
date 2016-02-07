@@ -13,6 +13,9 @@ public enum CardType {
 	Upgrade_Card
 }
 
+public delegate void CardAction(CardData card, Player player, Unit u);
+public delegate void EndCardAction(bool success, CardData card, Player player, Unit u);
+public delegate void UnitSelectionCallback(CardData card, int number, Player player, CardAction action, EndCardAction done);
 public class CardSystem : MonoBehaviour {	
 
 	public CardList cardList;
@@ -23,81 +26,76 @@ public class CardSystem : MonoBehaviour {
 	public List<UnitType> allianceCardLevel3;
 	public List<UnitType> allianceCardLevel4;
 
-	public delegate void CardCallback(CardData card, Player player);
-	public event CardCallback OnEffectApplied = delegate { };
-	public event CardCallback OnHealingCardUsed = delegate { };
-    public event CardCallback OnCardUseFailed = delegate { };
-	public event CardCallback OnTacticCardUsed = delegate { };
-	public event CardCallback OnUpgradeCardUsed = delegate { };
+	public event EndCardAction OnEffectApplied = delegate { };
+	public event UnitSelectionCallback RequestUnitSelection = delegate { };
 
-	public void Start(){
-
-	}
-
-	public bool CanUseCard(CardData cData, GameState gameState)
+public bool CanUseCard(CardData cData, GameState gameState)
 	{
 		//check that the card can use the game state 
 		return (cData.UseableGameState & gameState) == gameState;
 	}
 
-	public void ApplyEffect(CardData card, Player player) {
+	public void UseCard(CardData card, Player player, Player inactivePlayer) {
 		switch (card.Type) {
-		case CardType.Healing_Card:
-			RegisterCardHeal(card, player);
-			break;
-		case CardType.Resource_Card:
-			UseResourceCard(card, player);
-			OnEffectApplied (card, player);
-			break;
-		case CardType.Battle_Card:
-			UseBattleCard(player);
-			OnEffectApplied (card, player);
-			break;
-		case CardType.Tactic_Card:
-			UseTacticCard(card, player);
-			OnEffectApplied (card, player);
-			break;
-		case CardType.Alliance_Card:
-			UseAllianceCard(card, player);
-			OnEffectApplied (card, player);
-			break;
-		case CardType.Scout_Card:
-			UseScoutCard(card, player);
-			break;
-		case CardType.Priority_Card:
-			UsePriorityCard(player);
-			OnEffectApplied (card, player);
-			break;
-		case CardType.Upgrade_Card:
-			RegisterCardUpgrade(card, player);
-			break;
-		default:
-			break;
+			case CardType.Healing_Card:
+				int koUnits = player.PlayerArmy.GetKOUnits().Count,
+					numSelection = card.Value <= koUnits ? card.Value : koUnits;
+				if (numSelection == 0 || inactivePlayer.CastleProgress == 4) {
+					// action failed
+					OnEffectApplied(false, card, player, null);
+					break;
+				}
+				RequestUnitSelection(card, numSelection, player, UseHealingCard, OnEffectApplied);
+				break;
+			case CardType.Resource_Card:
+				UseResourceCard(card, player);
+				break;
+			case CardType.Battle_Card:
+				UseBattleCard(player);
+				OnEffectApplied(true, card, player, null);
+				break;
+			case CardType.Tactic_Card:
+				if (player.PlayerArmy.GetTempUpgradableUnits().Count == 0) {
+					// action failed
+					OnEffectApplied(false, card, player, null);
+					break;
+				}
+				RequestUnitSelection(card, 1, player, UseTacticCard, OnEffectApplied);
+				break;
+			case CardType.Alliance_Card:
+				UseAllianceCard(card, player);
+				break;
+			case CardType.Scout_Card:
+				UseScoutCard(card, player);
+				break;
+			case CardType.Priority_Card:
+				RequestUnitSelection(card, 1, player, UsePriorityCard, OnEffectApplied);
+				break;
+			case CardType.Upgrade_Card:
+				if (player.PlayerArmy.GetUpgradableUnits().Count == 0) {
+					// action failed
+					OnEffectApplied(false, card, player, null);
+					break;
+				}
+				RequestUnitSelection(card, 1, player, UseUpgradeCard, OnEffectApplied);
+				break;
+			default:
+				break;
 		}
 	}
-	
-	private void RegisterCardHeal(CardData card, Player player) {
-		OnHealingCardUsed (card, player);
-	}
-	
-	public void UseHealingCard(CardData card, Player player, List<Unit> unitsToHeal) {
-		foreach (var unit in unitsToHeal) {
-			unit.Heal();
-		}
 
-		OnEffectApplied (card, player);
+	
+	public void UseHealingCard(CardData card, Player player, Unit u) {
+		u.Heal();
 	}
 	
 	private void UseResourceCard(CardData card, Player player) {
 		player.Currency.addPoints(card.Value);
+		OnEffectApplied(true, card, player, null);
 	}
 	
 	private void UseBattleCard(Player player) {
-		throw new NotImplementedException();
-	}
-	
-	private void UseTacticCard(CardData card, Player player) {
-		throw new NotImplementedException();
+		//throw new NotImplementedException();
 	}
 
 	private void UseAllianceCard(CardData card, Player player) {	
@@ -110,8 +108,8 @@ public class CardSystem : MonoBehaviour {
 			allianceCardLevel4
 		};
 
-		List<UnitType> units = new List<UnitType>();
-		UnitType randomUnit;
+		List<UnitType> unitTypes = new List<UnitType>();
+		UnitType randomUnitType;
 		int rand = UnityEngine.Random.Range(0, 100);
         
         int totalNextUnits = 0;
@@ -122,44 +120,39 @@ public class CardSystem : MonoBehaviour {
 		if (rand >= totalNextUnits) {
 			for(int i = 0; i <= player.CastleProgress; i++)
 			{
-				units.AddRange (totalUnits[i]);
+				unitTypes.AddRange(totalUnits[i]);
 			}
-			int randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
-			randomUnit = units[randomUnitIndex];
+			int randomUnitIndex = UnityEngine.Random.Range(0, unitTypes.Count);
+			randomUnitType = unitTypes[randomUnitIndex];
 		} else {
-			units = totalUnits[player.CastleProgress + 1];
-			int randomUnitIndex = UnityEngine.Random.Range(0, units.Count);
-			randomUnit = units[randomUnitIndex];
+			unitTypes = totalUnits[player.CastleProgress + 1];
+			int randomUnitIndex = UnityEngine.Random.Range(0, unitTypes.Count);
+			randomUnitType = unitTypes[randomUnitIndex];
 		}
 
-		player.PlayerArmy.AddUnit(randomUnit);
+		Unit unit = player.PlayerArmy.AddUnit(randomUnitType);
+		OnEffectApplied(true, card, player, unit);
 	}
 
 	private void UseScoutCard(CardData card, Player player) {
 		int availableScouts = player.PlayerArmy.GetActiveUnits(UnitType.Scout).Count;
+		bool success = false;
         if (availableScouts > 0) {
             Mathf.Clamp(availableScouts++, 2, 4);
             player.IsScouting = true;
             card.Value = availableScouts;
-            OnEffectApplied(card, player);
-            return;
-        }
-        OnCardUseFailed(card, player);
-        return;
-	}
-	
-	private void UsePriorityCard(Player player) {
-		throw new NotImplementedException();
+			success = true;
+		}
+		OnEffectApplied(success, card, player, null);
 	}
 
-	private void RegisterCardUpgrade(CardData card, Player player) {
-		OnUpgradeCardUsed (card, player);
+	private void UsePriorityCard(CardData card, Player player, Unit u) {
+		//throw new NotImplementedException();
 	}
 
 	private void UseUpgradeCard(CardData card, Player player, Unit unitToUpgrade) {
 		UnitBaseData upgrade = unitToUpgrade.CreateUpgrade();
 		unitToUpgrade.AddUpgrade(upgrade);
-		OnEffectApplied(card, player);
 	}
 
 	private void UseTacticCard(CardData card, Player player, Unit unitToUpgrade) {

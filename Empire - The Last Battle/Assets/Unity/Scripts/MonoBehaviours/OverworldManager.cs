@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class OverworldManager : MonoBehaviour
 {
@@ -9,8 +10,9 @@ public class OverworldManager : MonoBehaviour
 	public CardSystem _CardSystem;
 	public Board _Board;
 	public Player _BattlebeardPlayer;
-    public Player _StormshapersPlayer;
+	public Player _StormshaperPlayer;
     public Player _CurrentPlayer;
+	public Player _InactivePlayer;
     public TurnManager _TurnManager;
 	public GameStateHolder _GameStateHolder;
 
@@ -21,36 +23,28 @@ public class OverworldManager : MonoBehaviour
 	void Start() {
 		//new game setup
 		_Board.Initialise();
-		_OverworldUI.Initialise();
 		_BattlebeardPlayer.Initialise();
+		_StormshaperPlayer.Initialise();
 
 		//try get the battleboard start tile
 		if (_Board._BBStartTile != null) {
             _BattlebeardPlayer.CommanderPosition = _Board._BBStartTile;
         }else{
-            Debug.LogError("Battleboard start tile not set");
+            Debug.LogError("Battlebeard start tile not set");
         }
 
         if(_Board._SSStartTile != null){
-            _StormshapersPlayer.CommanderPosition = _Board._SSStartTile;
+			_StormshaperPlayer.CommanderPosition = _Board._SSStartTile;
         }else{
             Debug.LogError("Stormshaper start tile not set");
         }
+
+		_OverworldUI.Initialise(_BattlebeardPlayer, _StormshaperPlayer);
 
         _TurnManager.OnTurnStart += _TurnManager_OnTurnStart;
         _TurnManager.OnTurnEnd += _TurnManager_OnTurnEnd;
         _TurnManager.OnSwitchTurn += _TurnManager_OnSwitchTurn;
 
-		//snap player to start position
-        _OverworldUI.UpdateCommanderPosition();
-
-        _OverworldUI._CommanderUI = _StormshapersPlayer.gameObject.GetComponent<CommanderUI>();
-
-        _OverworldUI.Initialise();
-
-        _OverworldUI.UpdateCommanderPosition();
-
-        _OverworldUI._CommanderUI = _BattlebeardPlayer.gameObject.GetComponent<CommanderUI>();
 
 		//event listeners
 		_OverworldUI.OnCommanderMove += _OverworldUI_OnCommanderMove;
@@ -59,33 +53,32 @@ public class OverworldManager : MonoBehaviour
         _OverworldUI.OnPlayerUseCard += _OverworldUI_OnPlayerUseCard;
 		_BattlebeardPlayer.OnCardAdded += _BattlebeardPlayer_OnCardAdded;
 		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
-		_StormshapersPlayer.OnCardAdded += _StormshapersPlayer_OnCardAdded;
-		_StormshapersPlayer.OnCardRemoved += _StormshapersPlayer_OnCardRemoved;
+		_StormshaperPlayer.OnCardAdded += _StormshapersPlayer_OnCardAdded;
+		_StormshaperPlayer.OnCardRemoved += _StormshapersPlayer_OnCardRemoved;
 
-		//allow player movement for the start ****JUST FOR TESTING****
-        //_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_BattlebeardPlayer.Type, _BattlebeardPlayer.CommanderPosition, 1));
+		_CardSystem.RequestUnitSelection +=_CardSystem_RequestUnitSelection;
 
-
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-		_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+		_BattlebeardPlayer.OnCastleProgress += _Board.SetCastleState;
+		_StormshaperPlayer.OnCastleProgress += _Board.SetCastleState;
+		_BattlebeardPlayer.CastleProgress = 4;
+		_StormshaperPlayer.CastleProgress = 4;
+		setPlayer(PlayerType.Battlebeard);
 
 		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
 
-		// TEST
-        _CurrentPlayer = _BattlebeardPlayer;
-        //set the player in focus
-        _OverworldUI.SetPlayerFocus(_CurrentPlayer);
+		_GameStateHolder._gameState = GameState.Overworld;
 
 		//test by adding a scout card.
 		_CurrentPlayer.SetCards (_StartCards);
-        UseCard(_CurrentPlayer.Hand.GetCardOfType(CardType.Scout_Card));
-        _TurnManager.StartTurn();
-		_GameStateHolder._gameState = GameState.Overworld;
-        
+		_CurrentPlayer.PlayerArmy.AddUnit (UnitType.Scout);
+		_CurrentPlayer.PlayerArmy.AddUnit (UnitType.Scout);
+		_CurrentPlayer.PlayerArmy.AddUnit (UnitType.Scout);
+        _TurnManager.StartTurn();    
 	}
 
     void _OverworldUI_OnPlayerUseCard(CardData card)
     {
+        Debug.Log("test");
         UseCard(card);
     }
 
@@ -113,20 +106,39 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.RemovePlayerCard (PlayerType.Stormshaper, card);
 	}
 
-	void _CardSystem_OnEffectApplied(CardData card, Player player) {
-        if (card.Type == CardType.Scout_Card)
-        {
+	// get rid of this shit later
+	void cardNotUsedModal () {
+		ModalPanel.Instance().ShowOK("Oh No!", "Card could not be used", null);
+	}
+
+	void _CardSystem_OnEffectApplied(bool success, CardData card, Player player, Unit u) {
+		ModalPanel p = ModalPanel.Instance();
+		if (!success) {
+			// we wont bother with this in the final but for now it hides the previous modal after it shows this one.
+			Invoke("cardNotUsedModal", 1);
+			return;
+		}
+		if (card.Type == CardType.Scout_Card) {
             _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(player.Type, player.CommanderPosition, card.Value));
 		}
+		ModalPanel.Instance().ShowOK("Yeah!", "Used " + card.Type, null);
+		_CurrentPlayer.RemoveCard(card);
 	}
 
 	void UseCard(CardData card) {
+
+		ModalPanel p = ModalPanel.Instance();
+		p.ShowOK("Card", "Using " + card.Type, () => {
+			_CardSystem.UseCard(card, _CurrentPlayer, _InactivePlayer);
+		});
+		
+
 		//use the card
-		if (_CardSystem.CanUseCard (card, _GameStateHolder._gameState)) 
-		{
-			_CardSystem.ApplyEffect (card, _CurrentPlayer);
-			_CurrentPlayer.RemoveCard(card);
-		}
+		//if (_CardSystem.CanUseCard (card, _GameStateHolder._gameState)) 
+		//{
+		//	_CardSystem.ApplyEffect (card, _CurrentPlayer);	
+		//}
+
 	}
 
     void _OverworldUI_OnUnPause() 
@@ -151,75 +163,160 @@ public class OverworldManager : MonoBehaviour
 	}
     //This is temporary until we actually have things that happen after the move
     IEnumerator SwitchPlayer() {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         _TurnManager.SwitchTurn();
+        _OverworldUI.Enable(); 
     }
 
-	void HandleTileEvent(TileData tile) {
-		if (_BattlebeardPlayer.IsScouting) {
-			_BattlebeardPlayer.IsScouting = false;
-			_TurnManager.EndTurn();
-			StartCoroutine(SwitchPlayer());
-			return;
-		}
-		switch (tile.Building) {
-			case BuildingType.None:
-                _TurnManager.EndTurn();
-                StartCoroutine(SwitchPlayer());
-				break;
+	void HandleTileEvent(TileData tile) {		
+		if (_CurrentPlayer.IsScouting) {
+			_CurrentPlayer.IsScouting = false;
+			endTurn ();
+		} else {
+			_OverworldUI.Disable ();
+			ModalPanel p = ModalPanel.Instance ();
+			switch (tile.Building) {
 			case BuildingType.Armoury:
+				p.ShowOK ("Armoury", "You landed on the Armoury.", endTurn);
 				break;
 			case BuildingType.Camp:
-				break;
-			case BuildingType.CastleBattlebeard:
-				break;
-			case BuildingType.CastleStormshaper:
+				if (tile.Owner != _CurrentPlayer.Type) {
+					if (tile.Owner == PlayerType.None) {
+						// MONSTER BATTLE
+					} else {
+						// PVP BATTLE
+					}
+
+					// WIN
+					_Board.SetTileOwner (tile, _CurrentPlayer.Type);
+				}
+				p.ShowOK ("Camp", "You landed on a camp.", endTurn);
 				break;
 			case BuildingType.Cave:
-				GenerateRandomCard(_AvailableCaveCards.cards);
+				if (tile.Owner != _CurrentPlayer.Type) {
+					if (tile.Owner != PlayerType.None) {
+						//BATTLE
+					} else {
+						// WIN ANYWAY
+					}
+
+					// WIN
+					CardData c = GenerateRandomCard (_AvailableCaveCards.cards);
+					_CurrentPlayer.Hand.cards.Add (c);
+					_Board.SetTileOwner (tile, _CurrentPlayer.Type);
+					p.ShowOK ("Card Recieved!", "You recieved a " + c.Type + " card.", endTurn);
+				} else {
+					endTurn ();
+				}
 				break;
 			case BuildingType.Fortress:
+					// Make sure that the fortress type matches the player type
+				if (tile.Owner == _CurrentPlayer.Type) {
+					// make sure the player owns at least 3 surrounding tiles
+					if (tile.GetConnectedTiles ().FindAll (t => t.Owner == _CurrentPlayer.Type).Count >= 3) {
+						// Battle lost immortal
+						// on victory ->
+						tile.Owner = PlayerType.None;
+						_CurrentPlayer.LostImmortalKillCount++;
+						_CurrentPlayer.CastleProgress++;
+						p.ShowOK ("Fortress", "A bloody Lost Immortal just showed up innit blud!", endTurn);
+					} else {
+						p.ShowOK ("Fortress", "You felt a chill in the air, but nothing appeared.", endTurn);
+					}
+					break;
+				}
+				p.ShowOK ("Fortress", "Nothing appeared.", endTurn);
+					// end turn
 				break;
 			case BuildingType.Inn:
-				//Needs changing to current player once both players are in this class
-                HealTroops(_CurrentPlayer);
-				break;
-			case BuildingType.StartTileBattlebeard:
-				break;
-			case BuildingType.StartTileStormshaper:
+				if (_InactivePlayer.CastleProgress >= 4) {
+					p.ShowOK ("Oh No!", "The inn won't accept you!", endTurn);
+					break;
+				}
+
+				var rnd = UnityEngine.Random.Range (0, 3);
+				List<Unit> units;
+
+				units = _CurrentPlayer.PlayerArmy.GetRandomUnits (rnd, true);
+
+				foreach (var unit in units) {
+					unit.Heal ();
+				}
+
+				string content, title;
+
+				if (_CurrentPlayer.PlayerArmy.GetKOUnits ().Count == 0) {
+					title = "The Inn Welcomes You";
+					content = "You are well rested.";
+				} else {
+					title = units.Count + " Units Healed";
+					content = rnd == 0 ? 
+						"Their wounds were too great. Looks like they'll need some more time." :
+						"Your army is well rested.";
+				}
+				p.ShowOK (title, content, endTurn);
 				break;
 			default:
+				endTurn ();
 				break;
-		}
+			}
+		}	
 	}
 
-	public void HealTroops(Player player) {
-		//Change magic number to function once more castle code is in
-		if (player.CastleProgress >= 4)
-			return;
-
-		var rnd = UnityEngine.Random.Range(0, 3);
-		List<Unit> units;
-
-		units = player.PlayerArmy.GetRandomUnits(rnd, true);
-
-		foreach (var unit in units)
-		{
-			unit.Heal();
-		}
+	void endTurn() {
+		_TurnManager.EndTurn ();
+		StartCoroutine (SwitchPlayer ());
 	}
 
 	public CardData GenerateRandomCard(List<CardData> availableCards) {
-		//Generate a random card (Warning: This is weighted heavily towards resource cards because
-		//there are more of them in the enum, change this later?)
-		short randomCardIndex = (short)UnityEngine.Random.Range(0, availableCards.Count - 1);
-		CardData card = availableCards [randomCardIndex];
-
-		return card;
+		//Generate a random card
+		List<CardType> uniqueTypes = availableCards.Select(x => x.Type).Distinct().ToList();
+		int randomTypeIndex = Random.Range(0, uniqueTypes.Count - 1);
+		List<CardData> cardsOfType = availableCards.FindAll(x => x.Type == uniqueTypes[randomTypeIndex]);
+		int randomCardIndex = (short)Random.Range(0, cardsOfType.Count - 1);
+		return cardsOfType[randomCardIndex];
 	}
 
-    public void Pause()
-    {
+	void _CardSystem_RequestUnitSelection(CardData c, int numSelection, Player p, CardAction action, EndCardAction done) {
+		// assume P is going to be the current player
+
+		UnitSelection flags = UnitSelection.None;
+		if (c.Type == CardType.Healing_Card) {
+			flags = flags | UnitSelection.Inactive;
+		}
+		if (c.Type == CardType.Upgrade_Card) {
+			flags = flags | UnitSelection.Active;
+			flags = flags | UnitSelection.NotUpgraded;
+		}
+		if (c.Type == CardType.Tactic_Card) {
+			flags = flags | UnitSelection.Active;
+			flags = flags | UnitSelection.NotTempUpgraded;
+		}
+
+		_OverworldUI.ShowUnitSelectionUI(flags);
+
+		int selectedUnits = 0;
+		UIPlayerUnitTypeIndexCallback selectUnit = null;
+		selectUnit = (PlayerType pt, UnitType u, int i) => {
+			Unit unit = _CurrentPlayer.PlayerArmy.GetUnits(u)[i];
+			selectedUnits++;
+			// perform the action each time something is selected. This will only effect healing.
+			// we don't want the player to be stuck with no units to select
+			action(c, p, unit);
+			// we reached the total?
+			if (selectedUnits == numSelection) {
+				// don't listen for namy more and hide the UI
+				_OverworldUI._ArmyUI.OnClickUnit -= selectUnit;
+				_OverworldUI.HideUnitSelectionUI();
+				done(true, c, p, unit);
+			}
+			
+		};
+		_OverworldUI._ArmyUI.OnClickUnit += selectUnit;
+	}
+
+
+    public void Pause() {
         _OverworldUI.Disable();
     }
 
@@ -236,25 +333,27 @@ public class OverworldManager : MonoBehaviour
         _OverworldUI.DisablePlayerMovement();
     }
 
-    void _TurnManager_OnSwitchTurn() {
-        switch (_CurrentPlayer.tag) {
-            case "CommanderBB":
-                _CurrentPlayer = _StormshapersPlayer;
-                _OverworldUI.SetPlayerFocus(_StormshapersPlayer);
-                _TurnManager.StartTurn();
-                break;
-            case "CommanderSS":
-                _CurrentPlayer = _BattlebeardPlayer;
-                _OverworldUI.SetPlayerFocus(_BattlebeardPlayer);
-                _TurnManager.StartTurn();
-                break;
-        }
+	void setPlayer(PlayerType p) {    
+		_CurrentPlayer = p == PlayerType.Battlebeard ? _BattlebeardPlayer : _StormshaperPlayer;    
+		_InactivePlayer = p == PlayerType.Battlebeard ? _StormshaperPlayer : _BattlebeardPlayer;    
+		_OverworldUI.SetPlayer(_CurrentPlayer);    
+	}  
+
+
+    void _TurnManager_OnSwitchTurn() {    
+		setPlayer (_CurrentPlayer.Type == PlayerType.Battlebeard ? PlayerType.Stormshaper : PlayerType.Battlebeard);
+		_TurnManager.StartTurn ();
     }
 
 	// Update is called once per frame
 	void Update() {
 		if (Input.GetKeyDown(KeyCode.Return)) {
 			StartCoroutine(SwitchPlayer());
+		}
+		if (Input.GetKeyDown(KeyCode.C)) {
+			if (_CurrentPlayer.Hand.cards.Count > 0) {
+				UseCard(_CurrentPlayer.Hand.cards[0]);
+			}
 		}
 
 		//Delete in final build. Used for testing, an example of how to call debug message class

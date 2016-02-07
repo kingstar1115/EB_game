@@ -2,6 +2,7 @@ using UnityEngine;
 
 public delegate void PlayerUnitCallback(Player p, Unit u);
 public delegate void PlayerUnitIndexCallback(Player p, Unit u, int i);
+public delegate void PlayerCastleProgressCallback(PlayerType p, int i);
 
 public class Player : MonoBehaviour
 {
@@ -10,26 +11,46 @@ public class Player : MonoBehaviour
 	public event CardAction OnCardAdded = delegate {};
 	public event CardAction OnCardRemoved = delegate {};
 
-    //silly java-named events
-    public event PlayerUnitCallback OnUpdateUnit = delegate { };
-    public event PlayerUnitCallback OnAddUnit = delegate { };
-    public event PlayerUnitIndexCallback OnRemoveUnit = delegate { };
-
     public TileData PreviousCommanderPosition;
     public PlayerType Type;
 	public PointsSystem Currency;
 	public CardList Hand;
 	public Army PlayerArmy;
-	public int CastleProgress;
 	public bool IsScouting;
 
-    int lostImmortalKillCount;
-    public int LostImmortalKillCount
-    {
-        get
-        {
+	public event PlayerUnitCallback OnUpdateUnit = delegate { };
+	public event PlayerUnitCallback OnAddUnit = delegate { };
+	public event PlayerUnitIndexCallback OnRemoveUnit = delegate { };
+	public event PlayerCastleProgressCallback OnCastleProgress = delegate { };
+
+	int castleProgress;
+	public int CastleProgress {
+		get {
+			return castleProgress;
+		}
+		set {
+			if (value <= 4 && value >= 0) {
+				castleProgress = value;
+				OnCastleProgress(this.Type, value);
+			}
+			else {
+				Debug.LogError("Trying to get too many castles");
+			}
+		}
+	}
+	int lostImmortalKillCount;
+    public int LostImmortalKillCount {
+        get {
             return lostImmortalKillCount;
         }
+		set {
+			if (value <= 4 && value >= 0) {
+				lostImmortalKillCount = value;
+			}
+			else {
+				Debug.LogError("Trying to kill too many Lost Immortals");
+			}
+		}
     }
 
     TileData commanderPosition;
@@ -69,15 +90,7 @@ public class Player : MonoBehaviour
     public void Reset()
     {
         lostImmortalKillCount = 0;
-    }
-
-    public void LostImmortalKilled_Increment()
-    {
-        //limit the lost immortal kill count
-        if (lostImmortalKillCount < 3)
-            lostImmortalKillCount++;
-        else
-            Debug.LogError("Trying to kill too many Lost Immortals");
+		CastleProgress = 0;
     }
 
 	public void AddCard(CardData cardToAdd)
@@ -95,7 +108,7 @@ public class Player : MonoBehaviour
 		if (Hand.cards.Remove (cardToRemove))
 			OnCardRemoved (cardToRemove);
 		else
-			Debug.LogError ("trying ot remove card that doesnt exist :O");
+			Debug.LogError ("trying to remove card that doesnt exist :O");
 		
 	}
 
