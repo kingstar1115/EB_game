@@ -23,17 +23,17 @@ public class AudioHandler
 		_stormshaperUI = ssUi;
 		_overWorldUI = oUI;
 
-	//	_turnManager.OnSwitchTurn += SwitchTurnListener;
-		//_armoury.OnPurchasedItem += PurchasedItemListener;
-		//_army.OnUpdateUnit += UpdateUnitListener;
-		//_army.OnAddUnit += AddUnitListener;
-		//_army.OnRemoveUnit += RemoveUnitListener;
+		_turnManager.OnSwitchTurn += SwitchTurnListener;
+		_armoury.OnPurchasedItem += PurchasedItemListener;
+		_army.OnUpdateUnit += UpdateUnitListener;
+		_army.OnAddUnit += AddUnitListener;
+		_army.OnRemoveUnit += RemoveUnitListener;
 		_cardSystem.OnEffectApplied += EffectAppliedListener;
 		_cardSystem.OnCardUseFailed += EffectFailedListener;
 		_battlebeardUI.OnStartDrag += BattlebeardStartDragListener;
-		//_battlebeardUI.OnDropCommander += BattlebeardDropListener;
+		_battlebeardUI.OnDropCommander += BattlebeardDropListener;
 		_stormshaperUI.OnStartDrag += StormshaperStartDragListener;
-	//	_stormshaperUI.OnDropCommander += StormshaperDropListener;
+		_stormshaperUI.OnDropCommander += StormshaperDropListener;
 		_overWorldUI.OnPause += PauseListener;
 		_overWorldUI.OnUnPause += UnPauseListener;	}
 
