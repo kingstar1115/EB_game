@@ -82,7 +82,6 @@ public class OverworldUI : MonoBehaviour
         _CardDisplayUI.OnCardUse -= _CardDisplayUI_OnCardUse;
 		_CardDisplayUI.Hide();
         _HandUI._Enabled = false;
-        _HandUI.Hide();
 
         //disable components
         _battlebeardCommanderUI._Paused = true;
@@ -95,10 +94,15 @@ public class OverworldUI : MonoBehaviour
 
 	public void Hide() {
 		_ArmyUI.Hide();
+		_HandUI.Hide();
+		//show the card ui if there is a selected card
+		if (_HandUI.m_SelectedCardUI != null)
+			_CardDisplayUI.Show();
 	}
 
 	public void Show() {
 		_ArmyUI.Show();
+		_HandUI.Show();
 	}
 
 	public void ShowUnitSelectionUI(UnitSelection flags) {
@@ -131,11 +135,6 @@ public class OverworldUI : MonoBehaviour
 		_CardDisplayUI.OnCardUse += _CardDisplayUI_OnCardUse;
 
 		_HandUI._Enabled = true;
-        _HandUI.Show();
-
-		//show the card ui if there is a selected card
-		if (_HandUI.m_SelectedCardUI != null)
-			_CardDisplayUI.Show();
 
         //enable components
 		_stormshaperCommanderUI._Paused = false;

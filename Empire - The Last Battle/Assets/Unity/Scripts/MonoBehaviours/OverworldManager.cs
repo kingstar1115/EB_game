@@ -83,7 +83,6 @@ public class OverworldManager : MonoBehaviour
 
     void _OverworldUI_OnPlayerUseCard(CardData card)
     {
-        Debug.Log("test");
         UseCard(card);
     }
 
@@ -207,7 +206,7 @@ public class OverworldManager : MonoBehaviour
 
 					// WIN
 					CardData c = GenerateRandomCard (_AvailableCaveCards.cards);
-					_CurrentPlayer.Hand.cards.Add (c);
+					_CurrentPlayer.AddCard(c);
 					_Board.SetTileOwner (tile, _CurrentPlayer.Type);
 					p.ShowOK ("Card Recieved!", "You recieved a " + c.Type + " card.", endTurn);
 				} else {
@@ -331,10 +330,12 @@ public class OverworldManager : MonoBehaviour
     }
 
     void _TurnManager_OnTurnStart() {
+		_OverworldUI.Show();
         _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_CurrentPlayer.Type, _CurrentPlayer.CommanderPosition, 1));
     }
 
     void _TurnManager_OnTurnEnd() {
+		_OverworldUI.Hide();
         _OverworldUI.DisablePlayerMovement();
     }
 
@@ -356,9 +357,8 @@ public class OverworldManager : MonoBehaviour
 			StartCoroutine(SwitchPlayer());
 		}
 		if (Input.GetKeyDown(KeyCode.C)) {
-			if (_CurrentPlayer.Hand.cards.Count > 0) {
-				UseCard(_CurrentPlayer.Hand.cards[0]);
-			}
+			CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
+			_CurrentPlayer.AddCard(c);
 		}
 
 		//Delete in final build. Used for testing, an example of how to call debug message class
