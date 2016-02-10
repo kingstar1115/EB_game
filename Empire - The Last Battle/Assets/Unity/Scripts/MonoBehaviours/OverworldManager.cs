@@ -13,6 +13,7 @@ public class OverworldManager : MonoBehaviour
     public Player _CurrentPlayer;
 	public Player _InactivePlayer;
     public TurnManager _TurnManager;
+	public Audio _Audio;
 
 	// Use this for initialization
 	void Start() {
@@ -242,9 +243,22 @@ public class OverworldManager : MonoBehaviour
 			StartCoroutine(SwitchPlayer());
 		}
 
-		//Delete in final build. Used for testing, an example of how to call debug message class
-		if (Input.GetKeyDown (KeyCode.Alpha8)) {
-			DebugUI.getUI ().SetMessage ("Test", 22, Color.green);
+		if (Debug.isDebugBuild)
+		{
+			if (Input.GetKeyDown(KeyCode.Alpha6))
+			{
+				_Audio.PlayLooped(SoundsEnum.Catoonz);
+			}
+
+			if (Input.GetKeyDown(KeyCode.Alpha7))
+			{
+				_Audio.PlayOnce(SoundsEnum.Catoonz);
+			}
+
+			if (Input.GetKeyDown(KeyCode.Alpha8))
+			{
+				DebugUI.getUI().SetMessage("Test", 22, Color.green);
+			}
 		}
 	}
 }
