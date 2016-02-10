@@ -63,8 +63,10 @@ public class OverworldManager : MonoBehaviour
         _OverworldUI.OnPause += _OverworldUI_OnPause;
         _OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
         _OverworldUI.OnPlayerUseCard += _OverworldUI_OnPlayerUseCard;
+		_BattlebeardPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_BattlebeardPlayer.OnCardAdded += _BattlebeardPlayer_OnCardAdded;
 		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
+		_StormshaperPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_StormshaperPlayer.OnCardAdded += _StormshapersPlayer_OnCardAdded;
 		_StormshaperPlayer.OnCardRemoved += _StormshapersPlayer_OnCardRemoved;
 
@@ -83,7 +85,7 @@ public class OverworldManager : MonoBehaviour
         _TurnManager.StartTurn();    
 	}
 
-    void _OverworldUI_OnPlayerUseCard(CardData card)
+	void _OverworldUI_OnPlayerUseCard(CardData card)
     {
         UseCard(card);
     }
@@ -382,6 +384,15 @@ public class OverworldManager : MonoBehaviour
 		//Delete in final build. Used for testing, an example of how to call debug message class
 		if (Input.GetKeyDown (KeyCode.Alpha8)) {
 			DebugUI.getUI ().SetMessage ("Test", 22, Color.green);
+		}
+
+		//If debug build then lets test UI
+		if (Debug.isDebugBuild)
+		{
+			if (Input.GetKeyDown(KeyCode.Alpha7))
+			{
+				_CurrentPlayer.Currency.addPoints(10);
+			}
 		}
 	}
 }
