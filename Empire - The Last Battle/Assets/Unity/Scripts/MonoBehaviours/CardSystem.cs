@@ -161,4 +161,9 @@ public bool CanUseCard(CardData cData, GameState gameState)
 		TempUpgrade.Strength = card.Value;
 		unitToUpgrade.AddTempUpgrade(TempUpgrade);
 	}
+	public void RemoveListeners() {
+		OnEffectApplied = delegate { };
+		RequestUnitSelection = delegate { };
+	}
+
 }

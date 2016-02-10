@@ -22,6 +22,7 @@ public class OverworldManager : MonoBehaviour
 	// Use this for initialization
 	void Start() {
 		//new game setup
+
 		_Board.Initialise();
 		_BattlebeardPlayer.Initialise();
 		_StormshaperPlayer.Initialise();
@@ -44,14 +45,6 @@ public class OverworldManager : MonoBehaviour
 		}
 
         //test by adding a scout card.
-        _BattlebeardPlayer.SetCards(_StartCards);
-        _BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-        _BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-        _BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-        _StormshaperPlayer.SetCards(_StartCards);
-        _StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-        _StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-        _StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
 
 		_OverworldUI.Initialise(_BattlebeardPlayer, _StormshaperPlayer);
 
@@ -86,11 +79,10 @@ public class OverworldManager : MonoBehaviour
 		if (_BattleData._EndState == BattleEndState.None) {
 			setPlayer(PlayerType.Battlebeard);
 
-			//test by adding a scout card.
-			_GameStateHolder._ActivePlayer.SetCards(_StartCards);
-			_GameStateHolder._ActivePlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_GameStateHolder._ActivePlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_GameStateHolder._ActivePlayer.PlayerArmy.AddUnit(UnitType.Scout);
+			//test by adding cards.
+			_BattlebeardPlayer.SetCards(_StartCards);
+			_StormshaperPlayer.SetCards(_StartCards);
+
 			_BattlebeardPlayer.CastleProgress = 4;
 			_StormshaperPlayer.CastleProgress = 4;
 
@@ -98,6 +90,11 @@ public class OverworldManager : MonoBehaviour
 		}
 		else {
 			setPlayer(_BattleData._InitialPlayer.Type);
+
+			// THIS STUFF IS BROKEN!!!
+
+			 //_BattlebeardPlayer.CastleProgress = _BattlebeardPlayer.CastleProgress;
+			//_StormshaperPlayer.CastleProgress = _StormshaperPlayer.CastleProgress;
 			// run the battle end logic
 			endBattle();
 		}
@@ -297,8 +294,17 @@ public class OverworldManager : MonoBehaviour
 	void startBattle(BattleType type) {
 		_BattleData._BattleType = type;
 		_BattleData._InitialPlayer = _GameStateHolder._ActivePlayer;
+		tearDownScene();
 		Application.LoadLevel(_BattleScene);
 	}
+
+	void tearDownScene() {
+		_BattlebeardPlayer.RemoveListeners();
+		_StormshaperPlayer.RemoveListeners();
+		_OverworldUI.RemoveListeners();
+		_CardSystem.RemoveListeners();
+	}
+
 
 	void endBattle() {
 		ModalPanel p = ModalPanel.Instance ();

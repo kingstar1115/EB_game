@@ -53,15 +53,12 @@ public class OverworldUI : MonoBehaviour
     // Use this for initialization
     public void Initialise(Player battlebeard, Player stormshaper)
     {
-
         _BoardUI.Init();
 		_battlebeardCommanderUI.Initialise();    
 		_stormshaperCommanderUI.Initialise();
-
 		//snap players to start position    
 		_battlebeardCommanderUI.UpdateToPlayerPosition();    
 		_stormshaperCommanderUI.UpdateToPlayerPosition();
-
 		_ArmyUI.Initialise(battlebeard, stormshaper);
 
         _CardDisplayUI.Init();
@@ -97,6 +94,21 @@ public class OverworldUI : MonoBehaviour
         _CameraMovement.DisableCameraMovement();
 		_ArmyUI.Disable ();
     }
+
+	public void RemoveListeners() {
+		OnCommanderMove = delegate { };
+		OnCommanderForceMove = delegate { };
+		OnCommanderGrounded = delegate { };
+		OnPlayerUseCard = delegate { };
+		OnPause = delegate { };
+		OnUnPause = delegate { };
+		_ArmyUI.RemoveListeners();
+		_CardDisplayUI.RemoveListeners();
+		_HandUI.RemoveListeners();
+		_battlebeardCommanderUI.RemoveListeners();
+		_stormshaperCommanderUI.RemoveListeners();
+
+	}
 
 	public void Hide() {
 		_ArmyUI.Hide();

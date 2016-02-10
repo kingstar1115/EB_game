@@ -93,6 +93,14 @@ public class Player : ScriptableObject
 		CastleProgress = 0;
     }
 
+	public void RemoveListeners() {
+		OnUpdateUnit = delegate { };
+		OnAddUnit = delegate { };
+		OnRemoveUnit = delegate { };
+		OnCastleProgress = delegate { };
+		PlayerArmy.RemoveListeners();
+	}
+
 	public void AddCard(CardData cardToAdd)
 	{
 		//update hand 

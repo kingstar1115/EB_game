@@ -27,6 +27,10 @@ public class Unit : ScriptableObject {
 		CurrentBaseHP = data.HP;
 	}
 
+	public void RemoveListeners() {
+		OnUpdate = delegate { };
+	}
+
 	public bool IsKO() {
 		return GetCurrentHP() <= 0;
 	}

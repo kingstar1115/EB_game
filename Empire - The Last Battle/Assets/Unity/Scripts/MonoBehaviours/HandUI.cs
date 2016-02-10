@@ -38,6 +38,12 @@ public class HandUI : MonoBehaviour
 	
 	}
 
+	public void RemoveListeners() {
+		OnHandSet = delegate { };
+		OnCardSelect = delegate { };
+		OnCardDeselect = delegate { };
+	}
+
     public void Show()
     {
         //lerp to out pos

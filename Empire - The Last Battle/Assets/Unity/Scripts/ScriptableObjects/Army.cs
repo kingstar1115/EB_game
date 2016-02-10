@@ -110,4 +110,13 @@ public class Army : ScriptableObject {
 	void unitUpdated(Unit u) {
 		OnUpdateUnit(u);
 	}
+
+	public void RemoveListeners() {
+		OnUpdateUnit = delegate { };
+		OnAddUnit = delegate { };
+		OnRemoveUnit = delegate { };
+		foreach (Unit u in units) {
+			u.RemoveListeners();
+		}
+	}
 }

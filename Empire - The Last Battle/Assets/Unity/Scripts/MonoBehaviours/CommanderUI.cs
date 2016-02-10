@@ -65,7 +65,17 @@ public class CommanderUI : MonoBehaviour
 	public Vector3 getPosition() {
 		return _toGoTo;
 	}
-    
+
+	public void RemoveListeners() {
+		OnDraggingCommander = delegate { };
+		OnStartDrag = delegate { };
+		OnDropCommander = delegate { };
+		OnCommanderGrounded = delegate { };
+		OnCommanderMoved = delegate { };
+		OnCommanderForceMoved = delegate { };
+		OnCommanderDrop = delegate { };
+	}
+
     // Use this for initialization
 	public void Initialise () 
     {

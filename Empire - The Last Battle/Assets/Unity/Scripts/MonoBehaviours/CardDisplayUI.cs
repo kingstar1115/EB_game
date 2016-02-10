@@ -33,7 +33,11 @@ public class CardDisplayUI : MonoBehaviour
     {
         
 	}
-	
+
+	public void RemoveListeners() {
+		OnCardUse = delegate { };
+	}
+
 	// Update is called once per frame
 	void Update () 
     {
