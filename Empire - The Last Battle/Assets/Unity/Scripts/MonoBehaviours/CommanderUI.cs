@@ -7,11 +7,12 @@ public class CommanderUI : MonoBehaviour
 {
     public event System.Action OnDraggingCommander = delegate { };
     public event System.Action OnStartDrag = delegate { };
-    public event System.Action OnCommanderGrounded = delegate { };
 
     public delegate void BoardAction(TileData tile);
     public event BoardAction OnDropCommander = delegate { };
+	public event BoardAction OnCommanderGrounded = delegate { };
     public event BoardAction OnCommanderMoved = delegate { };
+	public event BoardAction OnCommanderForceMoved = delegate { };
 
     public delegate void V3Action(Vector3 vec);
     public event V3Action OnCommanderDrop = delegate { };
@@ -33,6 +34,8 @@ public class CommanderUI : MonoBehaviour
     bool _dragging;
     float _targetY;
     int _defaultLayer;
+	bool _forceMove;
+	bool _forceMoveEvents;
 
     bool _paused;
     public bool _Paused
@@ -80,19 +83,42 @@ public class CommanderUI : MonoBehaviour
             _liftingPiece = false;
             _hasBeenLifted = true;
         }
+		// if commander has been dropped
         else if (this.transform.position.y != _LiftedHeight)
         {
-            OnCommanderGrounded();
+			if (_forceMove) {
+				_Player.CommanderPosition = _destinationTile._Tile;
+			}
+			OnCommanderGrounded(_Player.CommanderPosition);
+		
+			if (_destinationTile != null && _reachableTiles.Contains(_destinationTile._Tile)){
+				if (_forceMove && _forceMoveEvents) {
+					OnCommanderForceMoved(_destinationTile._Tile);
+				}
+				else {
+					OnCommanderMoved(_destinationTile._Tile);
+				}
+			}
+			_destinationTile = null;
             _hasBeenLifted = false;
-        }
+
+			if (_forceMove) {
+				// force move has ended
+				_forceMove = false;
+				_forceMoveEvents = false;
+			}
+		}
+		// if commander has been force moved over a tile
+		else if (_forceMove && _hasBeenLifted) {
+			_toGoTo.y = _targetY;
+		}
     }
 	
 	// Update is called once per frame
 	void Update () 
     {
         //update the lerp goto point
-        if (_hasBeenLifted && _lerpPosition.GetEndPosition() != _toGoTo)
-        {
+        if (_hasBeenLifted && _lerpPosition.GetEndPosition() != _toGoTo) {
             _lerpPosition._LerpTime = _MoveTime;
             _lerpPosition.LerpTo(_toGoTo);
         }
@@ -110,15 +136,16 @@ public class CommanderUI : MonoBehaviour
 		if (_allowMovement) {
 
 			if (!_dragging) {
-				OnStartDrag();
+				OnStartDrag ();
 				_dragging = true;
 			}
 
 			//if hovered a tile that is reachable then move have the player move there
 			Collider tileParent;
-            TileHolder tileHolder = null;
-            if (BoardUI.GetTileHovered_Position(out tileParent))
-                tileHolder = tileParent.GetComponentInChildren<TileHolder>();
+			TileHolder tileHolder = null;
+			if (BoardUI.GetTileHovered_Position (out tileParent)){
+				tileHolder = tileParent.GetComponentInChildren<TileHolder> ();
+			}
 
             if (tileHolder != null)
             {
@@ -150,9 +177,9 @@ public class CommanderUI : MonoBehaviour
                 _destinationTile = null;
             }
 
-            if (!_hasBeenLifted && !_liftingPiece)// && _destinationTile == null )//|| _prevHovered != hoveredCollider))
+			if (!_hasBeenLifted && !_liftingPiece) {// && _destinationTile == null )//|| _prevHovered != hoveredCollider))
 				LiftPiece ();
-
+			}
             //block raycast 
             this.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
 		}
@@ -162,7 +189,7 @@ public class CommanderUI : MonoBehaviour
     {
         _dragging = false;
 
-		//if the tile hovered is not in the reachable set then back to origional tile
+		//if the tile hovered is not in the reachable set then back to original tile
         if (_destinationTile == null || !_reachableTiles.Contains(_destinationTile._Tile))
         {
 			//commander not moved
@@ -174,10 +201,8 @@ public class CommanderUI : MonoBehaviour
         {
             //commander moved
             _toGoTo = _destination;
-			// do we want to do this right now and not when the movement is over?
-            OnCommanderMoved(_destinationTile._Tile);
-            OnCommanderDrop(new Vector3(_destination.x, _targetY, _destination.z));
-            _destinationTile = null;
+			OnCommanderDrop(new Vector3(_destination.x, _targetY, _destination.z));
+           // _destinationTile = null;
         }
 
         //drop the commander
@@ -188,6 +213,38 @@ public class CommanderUI : MonoBehaviour
         //raycast 
         this.gameObject.layer = _defaultLayer;
     }
+
+
+	// moves the commander to a certain position. fires events as usual
+	public void MoveCommander(TileData tile){
+		_forceMove = true;
+		LiftPiece();
+		TileHolder tileHolder = tile.TileObject.GetComponentInChildren<TileHolder>();
+		if (tileHolder != null) {
+			//try get the commander position marker
+			GameObject posMarker = getCommanderMarker(tileHolder);
+			if (posMarker != null) {
+				_toGoTo = posMarker.transform.position;
+				_destination = _toGoTo;
+			}
+			else {
+				_toGoTo = tileHolder.transform.position;
+				_destination = _toGoTo;
+			}
+
+			_toGoTo.y = _LiftedHeight;
+
+			_targetY = tileHolder._Tile.Height;
+
+			_destinationTile = tileHolder;
+		}
+	}
+
+	// moves the commander to a position and fires different move events
+	public void ForceMoveCommander(TileData tile) {
+		_forceMoveEvents = true;
+		MoveCommander(tile);
+	}
 
     public void LiftPiece()
     {
@@ -215,7 +272,7 @@ public class CommanderUI : MonoBehaviour
 
 	public void ContinuePlayerMovement()
 	{
-		_lerpPosition.StartLerp ();
+		_lerpPosition.ResumeLerp();
 	}
 
     public void UpdateToPlayerPosition()
@@ -242,8 +299,9 @@ public class CommanderUI : MonoBehaviour
 
     GameObject getCommanderMarker(TileHolder tHolder)
     {
-        if (tHolder == null)
-            return null;
+		if (tHolder == null) {
+			return null;
+		}
 
         switch (_Player.Type)
         {

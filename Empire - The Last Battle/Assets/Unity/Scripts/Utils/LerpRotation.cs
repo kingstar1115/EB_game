@@ -13,12 +13,13 @@ public class LerpRotation : MonoBehaviour
     Quaternion _startRotation;
     Quaternion _endRotation;
     bool _isLerping;
+	bool _isPaused;
 
     // Update is called once per frame
     void Update()
     {
         //get lerping
-        if (_isLerping)
+		if (_isLerping && !_isPaused)
         {
             //update currentlerp time
             _currentLerpTime += Time.deltaTime;
@@ -72,8 +73,12 @@ public class LerpRotation : MonoBehaviour
 
     public void PauseLerp()
     {
-        _isLerping = false;
+        _isPaused = true;
     }
+
+	public void ResumeLerp() {
+		_isPaused = false;
+	}
 
     public void StartLerp()
     {

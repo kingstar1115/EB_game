@@ -11,6 +11,10 @@ public class CardDisplayUI : MonoBehaviour
     public CanvasGroup _CGLeftButton;
     public CanvasGroup _CGRightButton;
     public HandUI _HandUI;
+    public Text _LeftValDis;
+    public Text _RightValDis;
+    public Text _CenterValDis1;
+    public Text _CenterValDis2;
     public Image _LeftCard;
     public Image _RightCard;
     public Image _CentreCard;
@@ -99,12 +103,14 @@ public class CardDisplayUI : MonoBehaviour
 
         //focused sprite
         _CentreCard.sprite = _HandUI.GetSpriteOfCard(_HandUI.m_Cards[index]._Card.Type);
+        _CenterValDis1.text = _CenterValDis2.text = (_HandUI.m_Cards[index]._Card.Value > 0) ? _HandUI.m_Cards[index]._Card.Value.ToString() : "";
 
         //Hide the sideimages if they dont represent a card.
         if (r_Index != -1)
         {
             _RightCard.sprite = _HandUI.GetSpriteOfCard(_HandUI.m_Cards[r_Index]._Card.Type);
             _RightCard.color = _LandR_Colour;
+            _RightValDis.text = (_HandUI.m_Cards[r_Index]._Card.Value > 0) ? _HandUI.m_Cards[r_Index]._Card.Value.ToString() : "";
 
             //if not already set visiable
             if (_CGRightButton.alpha == 0)
@@ -126,6 +132,7 @@ public class CardDisplayUI : MonoBehaviour
         {
             _LeftCard.sprite = _HandUI.GetSpriteOfCard(_HandUI.m_Cards[l_Index]._Card.Type);
             _LeftCard.color = _LandR_Colour;
+            _LeftValDis.text = (_HandUI.m_Cards[l_Index]._Card.Value > 0) ? _HandUI.m_Cards[l_Index]._Card.Value.ToString() : "";
 
             //if not already set visiable
             if (_CGLeftButton.alpha == 0)
@@ -161,6 +168,9 @@ public class CardDisplayUI : MonoBehaviour
     {
         //event!
         OnCardUse(_HandUI.m_SelectedCardUI._Card);
+
+        //deselect card
+        _HandUI_OnCardDeselect();
     }
 
     public void OnScrollLeft()

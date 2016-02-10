@@ -52,6 +52,7 @@ public class HandUI : MonoBehaviour
 
     public void SetHand(CardList cardsToShow)
     {
+        
         //trim cards diplaying that are not needed
         if (m_Cards.Count > cardsToShow.cards.Count)
         {
@@ -70,13 +71,14 @@ public class HandUI : MonoBehaviour
                 m_Cards[i]._Image.sprite = GetSpriteOfCard(cardsToShow.cards[i].Type);
                 m_Cards[i]._Index = i;
                 m_Cards[i]._Card = cardsToShow.cards[i];
+                m_Cards[i].gameObject.SetActive(true);
             }
             else
             {
                 //add new card
                 AddNewCard(cardsToShow.cards[i]);
             }
-        }            
+        }
 
         //update spacing 
         UpdateRotations();
@@ -95,6 +97,7 @@ public class HandUI : MonoBehaviour
             newCard.SetActive(true);
             cardUI.Init();
             cardUI._Image.sprite = GetSpriteOfCard(data.Type);
+            cardUI._Value = data.Value;
             cardUI._Index = m_Cards.Count;
             cardUI._Card = data;
 
@@ -106,6 +109,7 @@ public class HandUI : MonoBehaviour
 			//add as perent 
 			newCard.transform.SetParent(this.transform);
 			newCard.transform.localPosition = Vector3.zero;
+            newCard.transform.localScale = new Vector3(1, 1, 1);
 
 			//add to the list
 			m_Cards.Add(cardUI);
@@ -183,11 +187,14 @@ public class HandUI : MonoBehaviour
         float prevRotToAdd = 0;
         for (int i = 1; i < m_Cards.Count; i++)
         {
-            prevRotToAdd = ((!m_CardsSelectable || m_focusedCardIndex == -1) || i != m_focusedCardIndex + 1) ? m_ZRotSpacing : (m_ZRotSpacing * 2);
-            //Debug.Log("RotToAdd["+i+"] "+prevRotToAdd);
-            m_Cards[i]._TargetRotation = Quaternion.Euler(0, 0, prevRotToAdd + totalRotation);
-            //Debug.Log("Target " + m_Cards[i]._TargetRotation);
-            totalRotation += prevRotToAdd;
+            if (m_Cards[i].isActiveAndEnabled)
+            {
+                prevRotToAdd = ((!m_CardsSelectable || m_focusedCardIndex == -1) || i != m_focusedCardIndex + 1) ? m_ZRotSpacing : (m_ZRotSpacing * 2);
+                //Debug.Log("RotToAdd["+i+"] "+prevRotToAdd);
+                m_Cards[i]._TargetRotation = Quaternion.Euler(0, 0, prevRotToAdd + totalRotation);
+                //Debug.Log("Target " + m_Cards[i]._TargetRotation);
+                totalRotation += prevRotToAdd;
+            }
         }
 
         //rotate the hand ui minus half total
