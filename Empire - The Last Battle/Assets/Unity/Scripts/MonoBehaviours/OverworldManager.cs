@@ -39,6 +39,16 @@ public class OverworldManager : MonoBehaviour
             Debug.LogError("Stormshaper start tile not set");
         }
 
+        //test by adding a scout card.
+        _BattlebeardPlayer.SetCards(_StartCards);
+        _BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+        _BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+        _BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+        _StormshaperPlayer.SetCards(_StartCards);
+        _StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+        _StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+        _StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+
 		_OverworldUI.Initialise(_BattlebeardPlayer, _StormshaperPlayer);
 
         _TurnManager.OnTurnStart += _TurnManager_OnTurnStart;
@@ -68,17 +78,11 @@ public class OverworldManager : MonoBehaviour
 
 		_GameStateHolder._gameState = GameState.Overworld;
 
-		//test by adding a scout card.
-		_CurrentPlayer.SetCards (_StartCards);
-		_CurrentPlayer.PlayerArmy.AddUnit (UnitType.Scout);
-		_CurrentPlayer.PlayerArmy.AddUnit (UnitType.Scout);
-		_CurrentPlayer.PlayerArmy.AddUnit (UnitType.Scout);
         _TurnManager.StartTurn();    
 	}
 
     void _OverworldUI_OnPlayerUseCard(CardData card)
     {
-        Debug.Log("test");
         UseCard(card);
     }
 
@@ -168,12 +172,12 @@ public class OverworldManager : MonoBehaviour
         _OverworldUI.Enable(); 
     }
 
-	void HandleTileEvent(TileData tile) {		
+	void HandleTileEvent(TileData tile) {
+        _OverworldUI.Disable();
 		if (_CurrentPlayer.IsScouting) {
 			_CurrentPlayer.IsScouting = false;
 			endTurn ();
 		} else {
-			_OverworldUI.Disable ();
 			ModalPanel p = ModalPanel.Instance ();
 			switch (tile.Building) {
 			case BuildingType.Armoury:
@@ -202,7 +206,7 @@ public class OverworldManager : MonoBehaviour
 
 					// WIN
 					CardData c = GenerateRandomCard (_AvailableCaveCards.cards);
-					_CurrentPlayer.Hand.cards.Add (c);
+					_CurrentPlayer.AddCard(c);
 					_Board.SetTileOwner (tile, _CurrentPlayer.Type);
 					p.ShowOK ("Card Recieved!", "You recieved a " + c.Type + " card.", endTurn);
 				} else {
@@ -326,10 +330,12 @@ public class OverworldManager : MonoBehaviour
     }
 
     void _TurnManager_OnTurnStart() {
+		_OverworldUI.Show();
         _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_CurrentPlayer.Type, _CurrentPlayer.CommanderPosition, 1));
     }
 
     void _TurnManager_OnTurnEnd() {
+		_OverworldUI.Hide();
         _OverworldUI.DisablePlayerMovement();
     }
 
@@ -351,9 +357,8 @@ public class OverworldManager : MonoBehaviour
 			StartCoroutine(SwitchPlayer());
 		}
 		if (Input.GetKeyDown(KeyCode.C)) {
-			if (_CurrentPlayer.Hand.cards.Count > 0) {
-				UseCard(_CurrentPlayer.Hand.cards[0]);
-			}
+			CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
+			_CurrentPlayer.AddCard(c);
 		}
 
 		//Delete in final build. Used for testing, an example of how to call debug message class
