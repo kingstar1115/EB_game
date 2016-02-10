@@ -133,7 +133,7 @@ public class OverworldUI : MonoBehaviour
 		_HandUI._Enabled = true;
         _HandUI.Show();
 
-		//show the card ui if there is a se4lected card
+		//show the card ui if there is a selected card
 		if (_HandUI.m_SelectedCardUI != null)
 			_CardDisplayUI.Show();
 

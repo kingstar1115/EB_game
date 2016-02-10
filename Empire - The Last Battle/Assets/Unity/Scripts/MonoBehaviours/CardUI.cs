@@ -12,6 +12,8 @@ public class CardUI : MonoBehaviour
     public event CardUIAction OnPointerUp = delegate { };
 
     public Image _Image;
+    public Text _valDisplay1;
+    public Text _valDisplay2;
     public LerpPosition _PosLerp;
     public UIMouseEvents _MouseEvents;
     public float _ImageYAlt;
@@ -52,6 +54,14 @@ public class CardUI : MonoBehaviour
     {
         get { return _index; }
         set { _index = value; }
+    }
+
+    public int _Value
+    {
+        set
+        {
+            _valDisplay1.text = _valDisplay2.text = (value > 0) ? value.ToString() : "";
+        }
     }
 
 	// Use this for initialization

@@ -39,6 +39,16 @@ public class OverworldManager : MonoBehaviour
             Debug.LogError("Stormshaper start tile not set");
         }
 
+        //test by adding a scout card.
+        _BattlebeardPlayer.SetCards(_StartCards);
+        _BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+        _BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+        _BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+        _StormshaperPlayer.SetCards(_StartCards);
+        _StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+        _StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+        _StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+
 		_OverworldUI.Initialise(_BattlebeardPlayer, _StormshaperPlayer);
 
         _TurnManager.OnTurnStart += _TurnManager_OnTurnStart;
@@ -68,11 +78,6 @@ public class OverworldManager : MonoBehaviour
 
 		_GameStateHolder._gameState = GameState.Overworld;
 
-		//test by adding a scout card.
-		_CurrentPlayer.SetCards (_StartCards);
-		_CurrentPlayer.PlayerArmy.AddUnit (UnitType.Scout);
-		_CurrentPlayer.PlayerArmy.AddUnit (UnitType.Scout);
-		_CurrentPlayer.PlayerArmy.AddUnit (UnitType.Scout);
         _TurnManager.StartTurn();    
 	}
 
@@ -168,12 +173,12 @@ public class OverworldManager : MonoBehaviour
         _OverworldUI.Enable(); 
     }
 
-	void HandleTileEvent(TileData tile) {		
+	void HandleTileEvent(TileData tile) {
+        _OverworldUI.Disable();
 		if (_CurrentPlayer.IsScouting) {
 			_CurrentPlayer.IsScouting = false;
 			endTurn ();
 		} else {
-			_OverworldUI.Disable ();
 			ModalPanel p = ModalPanel.Instance ();
 			switch (tile.Building) {
 			case BuildingType.Armoury:
