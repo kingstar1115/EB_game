@@ -15,8 +15,8 @@ public class OverworldUI : MonoBehaviour
 
     public bool _TileHover;
     public CommanderUI _CommanderUI;
-	CommanderUI _battlebeardCommanderUI;
-	CommanderUI _stormshaperCommanderUI;
+	public CommanderUI _battlebeardCommanderUI;
+	public CommanderUI _stormshaperCommanderUI;
     public CameraMovement _CameraMovement;
     public BoardUI _BoardUI;
 	public ArmyUI _ArmyUI;
@@ -50,16 +50,17 @@ public class OverworldUI : MonoBehaviour
     // Use this for initialization
     public void Initialise(Player battlebeard, Player stormshaper)
     {
-        _BoardUI.Init();
 
-		_battlebeardCommanderUI = battlebeard.GetComponent<CommanderUI>();
-		_stormshaperCommanderUI = stormshaper.GetComponent<CommanderUI>();
+        _BoardUI.Init();
 		_battlebeardCommanderUI.Initialise();    
-		_stormshaperCommanderUI.Initialise();     
+		_stormshaperCommanderUI.Initialise();
+
 		//snap players to start position    
 		_battlebeardCommanderUI.UpdateToPlayerPosition();    
-		_stormshaperCommanderUI.UpdateToPlayerPosition();    
-		_ArmyUI.Initialise(battlebeard, stormshaper);  
+		_stormshaperCommanderUI.UpdateToPlayerPosition();
+
+		_ArmyUI.Initialise(battlebeard, stormshaper);
+
         _CardDisplayUI.Init();
 
         //add event listeners
@@ -207,7 +208,7 @@ public class OverworldUI : MonoBehaviour
     }
 
 	public void SwitchFocus(CommanderUI u){
-		_CameraMovement.MoveToNewTarget (u._Player.transform, u.getPosition ());
+		_CameraMovement.MoveToNewTarget(u.transform, u.getPosition());
 		_ArmyUI.SwitchPlayer (u._Player.Type);
 	}
 

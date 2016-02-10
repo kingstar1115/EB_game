@@ -69,7 +69,8 @@ public bool CanUseCard(CardData cData, GameState gameState)
 				UseScoutCard(card, player);
 				break;
 			case CardType.Priority_Card:
-				RequestUnitSelection(card, 1, player, UsePriorityCard, OnEffectApplied);
+				//RequestUnitSelection(card, 1, player, UsePriorityCard, OnEffectApplied);
+				OnEffectApplied(false, card, player, null);
 				break;
 			case CardType.Upgrade_Card:
 				if (player.PlayerArmy.GetUpgradableUnits().Count == 0) {

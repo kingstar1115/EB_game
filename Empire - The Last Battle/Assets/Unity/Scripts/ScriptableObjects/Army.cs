@@ -1,20 +1,31 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class Army : MonoBehaviour {
+public class Army : ScriptableObject {
 
+	public UnitsData _UnitDataManager;
+	[SerializeField]
 	List<Unit> units;
-	public UnitDataManager _UnitDataManager;
+	public Army defaultData;
 	public event UnitCallback OnUpdateUnit = delegate { };
 	public event UnitCallback OnAddUnit = delegate { };
 	public event UnitIndexCallback OnRemoveUnit = delegate { };
 
 	public void Initialise() {
-		units = new List<Unit>();
+		if (units == null || units.Count == 0) {
+			if (defaultData.units != null && defaultData.units.Count != 0) {
+				// needs a  deep copy
+				units = defaultData.units;
+			}
+			else {
+				units = new List<Unit>();
+			}
+		}
 	}
 
 	public Unit AddUnit(UnitType type) {
-		Unit u = new Unit(_UnitDataManager.GetData(type));
+		Unit u = ScriptableObject.CreateInstance<Unit>();
+		u.Initialise(_UnitDataManager.GetData(type));
 		units.Add(u);
 		u.OnUpdate += unitUpdated;
 		OnAddUnit(u);
@@ -25,6 +36,7 @@ public class Army : MonoBehaviour {
 		int i = units.IndexOf(u);
 		if (i != -1) {
 			units.Remove(u);
+			// destroy?
 			u.OnUpdate -= unitUpdated;
 			OnRemoveUnit(u, i);
 		}
@@ -48,6 +60,16 @@ public class Army : MonoBehaviour {
 
 	public List<Unit> GetActiveUnits(UnitType type) {
 		return units.FindAll(x => !x.IsKO() && x.Type == type);
+	}
+
+	public List<UnitType> GetActiveUnitTypes() {
+		List<UnitType> types = new List<UnitType>();
+		foreach (Unit u in GetActiveUnits()) {
+			if (!types.Contains(u.Type)) {
+				types.Add(u.Type);
+			}
+		}
+		return types;
 	}
 
 	public List<Unit> GetActiveUnits() {

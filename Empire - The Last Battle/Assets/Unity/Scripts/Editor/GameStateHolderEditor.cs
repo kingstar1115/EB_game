@@ -8,8 +8,8 @@ public class GameStateHolderEditor : Editor
 	public static void CreateBuilding()
 	{
 		//get a save location
-		string path = EditorUtility.SaveFilePanel("Create The New TileData",
-		                                          "Assets/Unity/ScriptableObjects", "default.asset", "asset");
+		string path = EditorUtility.SaveFilePanel("Create The New GameStateHolder",
+		                                          "Assets/Unity/ScriptableObjects/GameState", "GameStateHolder.asset", "asset");
 		
 		if (path == "")
 			return;

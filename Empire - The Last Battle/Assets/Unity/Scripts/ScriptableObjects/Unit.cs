@@ -5,19 +5,23 @@ public delegate void UnitCallback(Unit u);
 public delegate void UnitIndexCallback(Unit u, int i);
 
 [System.Serializable]
-public class Unit {
+public class Unit : ScriptableObject {
 
+	[SerializeField]
 	UnitBaseData BaseData;
 	//TODO: Decide if this is the best way to handle an upgrade. Is it better to have a separate Upgrade class?
+	[SerializeField]
 	UnitBaseData CurrentUpgrade;
+	[SerializeField]
 	UnitBaseData CurrentTempUpgrade;
 	//CurrentBaseHP will have a max value that is equal to the BaseData.HP value
+	[SerializeField]
 	int CurrentBaseHP;
 	public TileData Position;
 	public UnitType Type;
 	public event UnitCallback OnUpdate = delegate { };
 
-	public Unit(UnitBaseData data){
+	public void Initialise(UnitBaseData data){
 		Type = data.Type;
 		BaseData = data;
 		CurrentBaseHP = data.HP;

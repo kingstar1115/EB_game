@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class UnitDataManager : MonoBehaviour {
+public class UnitsData : ScriptableObject {
 	public List<UnitBaseData> UnitData;
 
 	public UnitBaseData GetData(UnitType t) {

@@ -63,7 +63,6 @@ public class ArmyUI : MonoBehaviour {
 
 		BattlebeardUI.SetActive(false);
 		StormshaperUI.SetActive(false);
-
 		if (battlebeard != null) {
 			GenerateUI(battlebeard);
 			battlebeard.OnAddUnit += unitAdded;
@@ -164,31 +163,27 @@ public class ArmyUI : MonoBehaviour {
 
 
 	public void GenerateUI(Player p) {
-
 		GameObject thisUI = p.Type == PlayerType.Battlebeard ? BattlebeardUI : StormshaperUI;
 
 		List<UnitTypeUI> data = getUnitTypeUI(p.Type);
-
 		data.ForEach(ui => ui.Reset()); // maybe not necesarry?
-
 		List<GameObject> children = new List<GameObject>();
 		foreach (Transform child in thisUI.transform) children.Add(child.gameObject);
 		children.ForEach(child => Destroy(child));
 
 		data.Clear();
-
 		List<Unit> allUnits = p.PlayerArmy.GetUnits();
 		List<UnitType> unitTypes = new List<UnitType>();
-		allUnits.ForEach(unit => {
+		foreach (Unit unit in allUnits) {
 			if (!unitTypes.Contains(unit.Type)) {
 				unitTypes.Add(unit.Type);
 			}
-		});
-		
-		unitTypes.ForEach(t => {
+		}
+		foreach (UnitType t in unitTypes) {
 			UnitTypeUI unitTypeUI = createUIForUnitType(thisUI, t, data);
 			p.PlayerArmy.GetUnits(t).ForEach(u => unitTypeUI.AddUnit(u));
-		});
+		}
+
 	}
 
 	UnitTypeUI createUIForUnitType(GameObject UI, UnitType t, List<UnitTypeUI> data) {

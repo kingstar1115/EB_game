@@ -97,6 +97,10 @@ public class CardDisplayUI : MonoBehaviour
         int r_Index = (index == _HandUI.m_Cards.Count - 1) ? -1 : index + 1;
         int l_Index = (index == 0) ? -1 : index - 1;
 
+		if (_HandUI.m_Cards.Count == 0) {
+			return;
+		}
+
         //focused sprite
         _CentreCard.sprite = _HandUI.GetSpriteOfCard(_HandUI.m_Cards[index]._Card.Type);
 

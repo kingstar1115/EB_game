@@ -4,7 +4,7 @@ public delegate void PlayerUnitCallback(Player p, Unit u);
 public delegate void PlayerUnitIndexCallback(Player p, Unit u, int i);
 public delegate void PlayerCastleProgressCallback(PlayerType p, int i);
 
-public class Player : MonoBehaviour
+public class Player : ScriptableObject
 {
     //card events
 	public delegate void CardAction(CardData cardData);
