@@ -1,0 +1,250 @@
+fileFormatVersion: 2
+guid: 47bc78273abc47d47b82d7df84bc353f
+timeCreated: 1453931726
+licenseType: Free
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: 136
+    100004: 1K
+    100006: 2k
+    100008: 5k polys
+    100010: 5k polys clean
+    100012: Armour_Chest
+    100014: awesome
+    100016: awesome001
+    100018: awesome002
+    100020: Base
+    100022: Base002
+    100024: Box001
+    100026: Box002
+    100028: Box003
+    100030: Box005
+    100032: Box082
+    100034: Box083
+    100036: campfire + benches
+    100038: cklean up
+    100040: Cylinder006
+    100042: Cylinder007
+    100044: Cylinder008
+    100046: Cylinder009
+    100048: default
+    100050: franky
+    100052: hand
+    100054: Inn
+    100056: Object003
+    100058: Object011
+    100060: Plane008
+    100062: Plane009
+    100064: Plane010
+    100066: Sphere001
+    100068: Tile size
+    100070: Tile size001
+    100072: Torso
+    400000: //RootNode
+    400002: 136
+    400004: 1K
+    400006: 2k
+    400008: 5k polys
+    400010: 5k polys clean
+    400012: Armour_Chest
+    400014: awesome
+    400016: awesome001
+    400018: awesome002
+    400020: Base
+    400022: Base002
+    400024: Box001
+    400026: Box002
+    400028: Box003
+    400030: Box005
+    400032: Box082
+    400034: Box083
+    400036: campfire + benches
+    400038: cklean up
+    400040: Cylinder006
+    400042: Cylinder007
+    400044: Cylinder008
+    400046: Cylinder009
+    400048: default
+    400050: franky
+    400052: hand
+    400054: Inn
+    400056: Object003
+    400058: Object011
+    400060: Plane008
+    400062: Plane009
+    400064: Plane010
+    400066: Sphere001
+    400068: Tile size
+    400070: Tile size001
+    400072: Torso
+    2300000: //RootNode
+    2300002: 136
+    2300004: 1K
+    2300006: 2k
+    2300008: 5k polys
+    2300010: 5k polys clean
+    2300012: Armour_Chest
+    2300014: awesome
+    2300016: awesome001
+    2300018: awesome002
+    2300020: Base
+    2300022: Base002
+    2300024: Box001
+    2300026: Box002
+    2300028: Box003
+    2300030: Box005
+    2300032: Box082
+    2300034: Box083
+    2300036: cklean up
+    2300038: Cylinder006
+    2300040: Cylinder007
+    2300042: Cylinder008
+    2300044: Cylinder009
+    2300046: default
+    2300048: franky
+    2300050: Inn
+    2300052: Object003
+    2300054: Object011
+    2300056: Plane008
+    2300058: Plane009
+    2300060: Plane010
+    2300062: Sphere001
+    2300064: Tile size
+    2300066: Tile size001
+    2300068: Torso
+    3300000: //RootNode
+    3300002: 136
+    3300004: 1K
+    3300006: 2k
+    3300008: 5k polys
+    3300010: 5k polys clean
+    3300012: Armour_Chest
+    3300014: awesome
+    3300016: awesome001
+    3300018: awesome002
+    3300020: Base
+    3300022: Base002
+    3300024: Box001
+    3300026: Box002
+    3300028: Box003
+    3300030: Box005
+    3300032: Box082
+    3300034: Box083
+    3300036: cklean up
+    3300038: Cylinder006
+    3300040: Cylinder007
+    3300042: Cylinder008
+    3300044: Cylinder009
+    3300046: default
+    3300048: franky
+    3300050: Inn
+    3300052: Object003
+    3300054: Object011
+    3300056: Plane008
+    3300058: Plane009
+    3300060: Plane010
+    3300062: Sphere001
+    3300064: Tile size
+    3300066: Tile size001
+    3300068: Torso
+    4300000: Inn
+    4300002: Tile size
+    4300004: Plane008
+    4300006: Plane009
+    4300008: Plane010
+    4300010: Box082
+    4300012: Torso
+    4300014: Base
+    4300016: Armour_Chest
+    4300018: Sphere001
+    4300020: Base002
+    4300022: Box001
+    4300024: 5k polys
+    4300026: 5k polys clean
+    4300028: default
+    4300030: cklean up
+    4300032: 1K
+    4300034: franky
+    4300036: awesome
+    4300038: 2k
+    4300040: awesome001
+    4300042: awesome002
+    4300044: Box002
+    4300046: 136
+    4300048: Box003
+    4300050: Box005
+    4300052: Object003
+    4300054: Tile size001
+    4300056: Box083
+    4300058: Object011
+    4300060: Cylinder006
+    4300062: Cylinder008
+    4300064: Cylinder009
+    4300066: Cylinder007
+    9500000: //RootNode
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: .0799999982
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 0
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
