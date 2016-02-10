@@ -14,7 +14,8 @@ public class OverworldUI : MonoBehaviour
     public event System.Action OnUnPause = delegate { };
 
     public bool _TileHover;
-    public CommanderUI _CommanderUI;
+	public ResourceUI _ResourceUI;
+	public CommanderUI _CommanderUI;
 	CommanderUI _battlebeardCommanderUI;
 	CommanderUI _stormshaperCommanderUI;
     public CameraMovement _CameraMovement;
@@ -151,7 +152,7 @@ public class OverworldUI : MonoBehaviour
 		SwitchFocus (_CommanderUI);
 	}
 
-    public void _CardDisplayUI_OnCardUse(CardData cardData)
+	public void _CardDisplayUI_OnCardUse(CardData cardData)
     {
         Debug.Log("CardData: "+cardData.name);
         OnPlayerUseCard(cardData);
@@ -209,6 +210,8 @@ public class OverworldUI : MonoBehaviour
 	public void SwitchFocus(CommanderUI u){
 		_CameraMovement.MoveToNewTarget (u._Player.transform, u.getPosition ());
 		_ArmyUI.SwitchPlayer (u._Player.Type);
+		_ResourceUI.UpdateResources(u._Player.Currency.getPoints());
+		_ResourceUI.UpdatePlayerImage(u._Player);
 	}
 
 	public void AddPlayerCard(PlayerType pType, CardData cData)

@@ -6,7 +6,6 @@ using System.Linq;
 public class OverworldManager : MonoBehaviour
 {
 	public OverworldUI _OverworldUI;
-	public ResourceUI _ResourceUI;
 	public CardList _AvailableCaveCards;
 	public CardSystem _CardSystem;
 	public Board _Board;
@@ -52,10 +51,10 @@ public class OverworldManager : MonoBehaviour
         _OverworldUI.OnPause += _OverworldUI_OnPause;
         _OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
         _OverworldUI.OnPlayerUseCard += _OverworldUI_OnPlayerUseCard;
-		_BattlebeardPlayer.Currency.OnChange += ResourceUI_OnCurrencyChanged;
+		_BattlebeardPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_BattlebeardPlayer.OnCardAdded += _BattlebeardPlayer_OnCardAdded;
 		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
-		_StormshaperPlayer.Currency.OnChange += ResourceUI_OnCurrencyChanged;
+		_StormshaperPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_StormshaperPlayer.OnCardAdded += _StormshapersPlayer_OnCardAdded;
 		_StormshaperPlayer.OnCardRemoved += _StormshapersPlayer_OnCardRemoved;
 
@@ -77,11 +76,6 @@ public class OverworldManager : MonoBehaviour
 		_CurrentPlayer.PlayerArmy.AddUnit (UnitType.Scout);
 		_CurrentPlayer.PlayerArmy.AddUnit (UnitType.Scout);
         _TurnManager.StartTurn();    
-	}
-
-	private void ResourceUI_OnCurrencyChanged(int val)
-	{
-		_ResourceUI.UpdateResources(_CurrentPlayer);
 	}
 
 	void _OverworldUI_OnPlayerUseCard(CardData card)
@@ -335,8 +329,6 @@ public class OverworldManager : MonoBehaviour
 
     void _TurnManager_OnTurnStart() {
         _OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_CurrentPlayer.Type, _CurrentPlayer.CommanderPosition, 1));
-		_ResourceUI.UpdateResources(_CurrentPlayer);
-		_ResourceUI.UpdatePlayerImage(_CurrentPlayer);
     }
 
     void _TurnManager_OnTurnEnd() {

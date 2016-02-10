@@ -5,19 +5,11 @@ using UnityEngine.UI;
 public class ResourceUI : MonoBehaviour
 {
 	public Text ResourceText;
-	public RawImage PlayerImage;
+	public Image SSImage, BBImage;
 
-	Texture2D[] _textures = new Texture2D[2];
-
-	void Start()
+	public void UpdateResources(int val)
 	{
-		_textures[0] = Resources.Load<Texture2D>("Textures/Interface/BattlebeardSigilV1");
-		_textures[1] = Resources.Load<Texture2D>("Textures/Interface/StormShapersSigilV1");
-	}
-
-	public void UpdateResources(Player currentPlayer)
-	{
-		ResourceText.text = currentPlayer.Currency.getPoints().ToString();
+		ResourceText.text = val.ToString();
 	}
 
 	public void UpdatePlayerImage(Player currentPlayer)
@@ -25,11 +17,13 @@ public class ResourceUI : MonoBehaviour
 		if (currentPlayer.Type == PlayerType.Battlebeard)
 		{
 			//Change to player images once in
-			PlayerImage.texture = _textures[0];
+			BBImage.enabled = true;
+			SSImage.enabled = false;
 		}
 		else if (currentPlayer.Type == PlayerType.Stormshaper)
 		{
-			PlayerImage.texture = _textures[1];
+			BBImage.enabled = false;
+			SSImage.enabled = true;
 		}
 		else
 		{
