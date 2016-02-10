@@ -49,6 +49,7 @@ public class OverworldManager : MonoBehaviour
 
 		//event listeners
 		_OverworldUI.OnCommanderMove += _OverworldUI_OnCommanderMove;
+		_OverworldUI.OnCommanderForceMove += _OverworldUI_OnCommanderForceMove;
         _OverworldUI.OnPause += _OverworldUI_OnPause;
         _OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
         _OverworldUI.OnPlayerUseCard += _OverworldUI_OnPlayerUseCard;
@@ -151,6 +152,11 @@ public class OverworldManager : MonoBehaviour
     {
         _OverworldUI._Paused = true;
     }
+
+	void _OverworldUI_OnCommanderForceMove(TileData tile) {
+		//****JUST FOR TESTING**** set new reachable tiles
+		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_CurrentPlayer.Type, _CurrentPlayer.CommanderPosition, 1));
+	}
 
 	void _OverworldUI_OnCommanderMove(TileData tile) {
 		//set new position for the player (should depend on whose players turn it is)
@@ -352,9 +358,16 @@ public class OverworldManager : MonoBehaviour
 			StartCoroutine(SwitchPlayer());
 		}
 
-		if (Input.GetKeyDown (KeyCode.C)) {
-			Vector3 dest = new Vector3(-2.7f, 0.5f, 3.7f);
-			_OverworldUI.MoveCommander (dest, tile);
+		if (Input.GetKeyDown (KeyCode.M)) {
+			if (_CurrentPlayer.PreviousCommanderPosition && _CurrentPlayer.PreviousCommanderPosition != _CurrentPlayer.CommanderPosition) {
+				_OverworldUI.ForceMoveCommander(_CurrentPlayer.PreviousCommanderPosition);
+			}
+		}
+		if (Input.GetKeyDown(KeyCode.N)) {
+			// move back using up a turn
+			if (_CurrentPlayer.PreviousCommanderPosition && _CurrentPlayer.PreviousCommanderPosition != _CurrentPlayer.CommanderPosition) {
+				_OverworldUI.MoveCommander(_CurrentPlayer.PreviousCommanderPosition);
+			}
 		}
 		if (Input.GetKeyDown(KeyCode.C)) {
 			if (_CurrentPlayer.Hand.cards.Count > 0) {
