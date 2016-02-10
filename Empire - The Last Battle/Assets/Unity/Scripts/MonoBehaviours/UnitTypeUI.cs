@@ -3,6 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
+
+public enum UnitSelection {
+	None = 0,
+	Active = 1,
+	Inactive = 2,
+	Upgraded = 4,
+	NotUpgraded = 8,
+	TempUpgraded = 16,
+	NotTempUpgraded = 32,
+}
+
+public delegate void UIUnitTypeIndexCallback(UnitType t, int i);
 public class UnitTypeUI : MonoBehaviour {
 
 	// Components
@@ -16,19 +28,22 @@ public class UnitTypeUI : MonoBehaviour {
 	CanvasGroup _unitListCanvas;
 	CanvasGroup _unitOverviewCanvas;
 
+	public UIUnitTypeIndexCallback OnClickUnit = delegate { };
+
 	// Overview
 	public Color OverviewColour;
 
 	// Size
 	public float MaxWidth = 820;
-	public float MinWidth = 110;
-	public float SmallIconSize = 70f;
+	public float MinWidth = 90;
+	public float SmallIconSize = 60f;
 	public float UnitSpacing = 10;
 	public float LargeIconSize = 100f;
 	public float UnitOverviewSpacing = 7f;
 
 	UnitType _unitType;
 	List<UnitUI> _units;
+	bool _selectMode;
 
 	// Lerp Stuff
 	public float Speed = 0.4f; // speed that the maximise/minimise takes
@@ -104,7 +119,10 @@ public class UnitTypeUI : MonoBehaviour {
 		UnitUI ui = obj.GetComponent<UnitUI>();
 		ui.SetImage(getSprite(u.Type));
 		ui.SetKO(u.IsKO());
+		ui.SetIndex(_units.Count);
 		ui.SetUpgrade(u.HasUpgrade());
+		ui.OnClick += _clickUnit;
+		if (_selectMode) { ui.EnableSelection(); }
 		_units.Add(ui);
 		GameObject g = new GameObject();
 		Image image = g.AddComponent<Image>();
@@ -131,7 +149,7 @@ public class UnitTypeUI : MonoBehaviour {
 	}
 
 	public void UpdateUnit(int i, Unit u) {
-		UnitUI ui = _units[i].GetComponent<UnitUI>();
+		UnitUI ui = _units[i];
 		ui.SetKO(u.IsKO());
 		ui.SetUpgrade(u.HasUpgrade());
 		if (u.IsKO()) {
@@ -222,6 +240,37 @@ public class UnitTypeUI : MonoBehaviour {
 		}
 	}
 
+	// pass flags - 
+	public void MakeSelectable(UnitSelection flags) {
+		bool active = (flags & UnitSelection.Active) == UnitSelection.Active,
+			 inactive = (flags & UnitSelection.Inactive) == UnitSelection.Inactive,
+			 upgraded = (flags & UnitSelection.Upgraded) == UnitSelection.Upgraded,
+			 notUpgraded = (flags & UnitSelection.NotUpgraded) == UnitSelection.NotUpgraded,
+			 tempUpgraded = (flags & UnitSelection.TempUpgraded) == UnitSelection.TempUpgraded,
+			 notTempUpgraded = (flags & UnitSelection.NotTempUpgraded) == UnitSelection.NotTempUpgraded;
+
+		_units.ForEach(ui => {
+			if (inactive && ui.IsKO || 
+				active && !ui.IsKO || 
+				upgraded && ui.IsUpgraded || 
+				notUpgraded && !ui.IsUpgraded ||
+				tempUpgraded && ui.isTempUpgraded ||
+				notTempUpgraded && !ui.isTempUpgraded) {
+
+				ui.EnableSelection();
+			}
+		});
+		_selectMode = true;
+	}
+
+	public void MakeUnselectable() {
+		_units.ForEach(ui => ui.DisableSelection());
+		_selectMode = false;
+	}
+
+	void _clickUnit(int i) {
+		OnClickUnit(_unitType, i);
+	}
 
 	// Use this for initialization
 	void Start () {

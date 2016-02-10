@@ -3,17 +3,12 @@ using System.Collections.Generic;
 using System;
 using UnityEngine.UI;
 
+public delegate void UIPlayerUnitTypeIndexCallback(PlayerType p, UnitType t, int i);
 public class ArmyUI : MonoBehaviour {
 	
 	public GameObject BattlebeardUI;
 	public GameObject StormshaperUI;
 	GameObject currentUI;
-
-	public float MaxWidth = 820;
-	public float MinWidth = 110;
-	public float SmallIconSize = 70f;
-	public float UnitSpacing = 10;
-	public float LargeIconSize = 100f;
 
 	public Sprite ScoutSprite;
 	public Sprite PikemanSprite;
@@ -32,6 +27,7 @@ public class ArmyUI : MonoBehaviour {
 	CompareUnitUI comparator;
 	Vector2 lastMousePos;
 
+	public UIPlayerUnitTypeIndexCallback OnClickUnit = delegate { };
 	int previousSelection = 0;
 	int currentSelection = -1;
 
@@ -81,8 +77,6 @@ public class ArmyUI : MonoBehaviour {
 			stormshaper.OnRemoveUnit += unitRemoved;
 			stormshaper.OnUpdateUnit += unitUpdated;
 		}
-		// test
-		SwitchPlayer(PlayerType.Battlebeard);
 	}
 
 	public void Enable() {
@@ -91,6 +85,19 @@ public class ArmyUI : MonoBehaviour {
 
 	public void Disable() {
 		enabled = false;
+	}
+
+	public void MakeSelectable(UnitSelection flags) {
+		Disable();
+		getUnitTypeUI(currentPlayer).ForEach(ui => ui.MakeSelectable(flags));
+		getUnitTypeUI(currentPlayer).ForEach(ui => ui.Maximise());
+		resetSelection();
+	}
+
+	public void MakeUnselectable() {
+		Enable();
+		getUnitTypeUI(currentPlayer).ForEach(ui => ui.MakeUnselectable());
+		getUnitTypeUI(currentPlayer).ForEach(ui => ui.Minimise());
 	}
 
 	public void Show() {
@@ -194,6 +201,7 @@ public class ArmyUI : MonoBehaviour {
 		o.transform.SetSiblingIndex(index);
 		o.transform.localScale = Vector3.one;
 		data.Insert(index, unitUI);
+		unitUI.OnClickUnit += _clickUnit;
 		unitUI.Show();
 		return unitUI;
 	}
@@ -206,6 +214,9 @@ public class ArmyUI : MonoBehaviour {
 		getUnitTypeUI(currentPlayer)[i].Minimise();
 	}
 
+	void _clickUnit(UnitType u, int i) {
+		OnClickUnit(currentPlayer, u, i);
+	}
 
 	void Update() {
 		// If there is anything in the UI
@@ -222,17 +233,20 @@ public class ArmyUI : MonoBehaviour {
 						//show previous selected item in the list
 						setSelection(previousSelection);
 					}
-				} else {
+				}
+				else {
 					// something is selected
 					if (leftDown) {
 						//hide all items;
 						setSelection(-1);
-					} else {
+					}
+					else {
 						int count = getUnitTypeUI(currentPlayer).Count;
 						if (upDown) {
 							// select the previous menu
 							setSelection((currentSelection - 1 + count) % count);
-						} else if (downDown) {
+						}
+						else if (downDown) {
 							//select the next menu
 							setSelection((currentSelection + 1) % count);
 						}
@@ -259,5 +273,4 @@ public class ArmyUI : MonoBehaviour {
 		}
 		lastMousePos = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 	}
-
 }
