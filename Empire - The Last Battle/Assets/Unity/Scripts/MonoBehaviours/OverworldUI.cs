@@ -6,6 +6,8 @@ public class OverworldUI : MonoBehaviour
 {
     public delegate void BoardAction(TileData tile);
     public event BoardAction OnCommanderMove = delegate { };
+	public event BoardAction OnCommanderForceMove = delegate { };
+	public event BoardAction OnCommanderGrounded = delegate { };
 
     public delegate void CardAction(CardData card);
     public event CardAction OnPlayerUseCard = delegate { };
@@ -14,7 +16,8 @@ public class OverworldUI : MonoBehaviour
     public event System.Action OnUnPause = delegate { };
 
     public bool _TileHover;
-    public CommanderUI _CommanderUI;
+	public ResourceUI _ResourceUI;
+	public CommanderUI _CommanderUI;
 	CommanderUI _battlebeardCommanderUI;
 	CommanderUI _stormshaperCommanderUI;
     public CameraMovement _CameraMovement;
@@ -70,11 +73,13 @@ public class OverworldUI : MonoBehaviour
     {
         //remove event listeners
         _battlebeardCommanderUI.OnCommanderMoved -= _CommanderUI_OnCommanderMoved;
+		_battlebeardCommanderUI.OnCommanderForceMoved -= _CommanderUI_OnCommanderForceMoved;
 		_battlebeardCommanderUI.OnStartDrag -= _CommanderUI_OnStartDrag;
 		_battlebeardCommanderUI.OnCommanderDrop -= _CommanderUI_OnCommanderDrop;
 		_battlebeardCommanderUI.OnCommanderGrounded -= _CommanderUI_Grounded;
 		_battlebeardCommanderUI.OnDropCommander -= _CommanderUI_OnDropCommander;
 		_stormshaperCommanderUI.OnCommanderMoved -= _CommanderUI_OnCommanderMoved;
+		_stormshaperCommanderUI.OnCommanderForceMoved -= _CommanderUI_OnCommanderForceMoved;
 		_stormshaperCommanderUI.OnStartDrag -= _CommanderUI_OnStartDrag;
 		_stormshaperCommanderUI.OnCommanderDrop -= _CommanderUI_OnCommanderDrop;
 		_stormshaperCommanderUI.OnCommanderGrounded -= _CommanderUI_Grounded;
@@ -82,7 +87,6 @@ public class OverworldUI : MonoBehaviour
         _CardDisplayUI.OnCardUse -= _CardDisplayUI_OnCardUse;
 		_CardDisplayUI.Hide();
         _HandUI._Enabled = false;
-        _HandUI.Hide();
 
         //disable components
         _battlebeardCommanderUI._Paused = true;
@@ -95,10 +99,15 @@ public class OverworldUI : MonoBehaviour
 
 	public void Hide() {
 		_ArmyUI.Hide();
+		_HandUI.Hide();
+		//show the card ui if there is a selected card
+		if (_HandUI.m_SelectedCardUI != null)
+			_CardDisplayUI.Show();
 	}
 
 	public void Show() {
 		_ArmyUI.Show();
+		_HandUI.Show();
 	}
 
 	public void ShowUnitSelectionUI(UnitSelection flags) {
@@ -117,12 +126,14 @@ public class OverworldUI : MonoBehaviour
     {
         //add event listeners
         _battlebeardCommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
+		_battlebeardCommanderUI.OnCommanderForceMoved += _CommanderUI_OnCommanderForceMoved;
 		_battlebeardCommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
 		_battlebeardCommanderUI.OnCommanderDrop += _CommanderUI_OnCommanderDrop;
 		_battlebeardCommanderUI.OnCommanderGrounded += _CommanderUI_Grounded;
 		_battlebeardCommanderUI.OnDropCommander += _CommanderUI_OnDropCommander;
 
 		_stormshaperCommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
+		_stormshaperCommanderUI.OnCommanderForceMoved += _CommanderUI_OnCommanderForceMoved;
 		_stormshaperCommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
 		_stormshaperCommanderUI.OnCommanderDrop += _CommanderUI_OnCommanderDrop;
 		_stormshaperCommanderUI.OnCommanderGrounded += _CommanderUI_Grounded;
@@ -131,11 +142,6 @@ public class OverworldUI : MonoBehaviour
 		_CardDisplayUI.OnCardUse += _CardDisplayUI_OnCardUse;
 
 		_HandUI._Enabled = true;
-        _HandUI.Show();
-
-		//show the card ui if there is a se4lected card
-		if (_HandUI.m_SelectedCardUI != null)
-			_CardDisplayUI.Show();
 
         //enable components
 		_stormshaperCommanderUI._Paused = false;
@@ -151,7 +157,7 @@ public class OverworldUI : MonoBehaviour
 		SwitchFocus (_CommanderUI);
 	}
 
-    public void _CardDisplayUI_OnCardUse(CardData cardData)
+	public void _CardDisplayUI_OnCardUse(CardData cardData)
     {
         Debug.Log("CardData: "+cardData.name);
         OnPlayerUseCard(cardData);
@@ -163,11 +169,12 @@ public class OverworldUI : MonoBehaviour
         _BoardUI.PlayerPrompt_DefaultTiles();
     }
 
-	void _CommanderUI_Grounded()
+	void _CommanderUI_Grounded(TileData tile)
 	{
 		//if camera is not moving to a new position then enable it 
 		if (!_CameraMovement.IsLerping ())
 			_CameraMovement.EnableCameraMovement ();
+		OnCommanderGrounded(tile);
 	}
 
 	void _CommanderUI_OnCommanderDrop(Vector3 vec)
@@ -183,8 +190,12 @@ public class OverworldUI : MonoBehaviour
 
     void _CommanderUI_OnCommanderMoved(TileData tile)
     {
-        OnCommanderMove(tile);
+		OnCommanderMove(tile);
     }
+
+	void _CommanderUI_OnCommanderForceMoved(TileData tile) {
+		OnCommanderForceMove(tile);
+	}
 
     public void AllowPlayerMovement(HashSet<TileData> reachableTiles)
     {
@@ -209,6 +220,8 @@ public class OverworldUI : MonoBehaviour
 	public void SwitchFocus(CommanderUI u){
 		_CameraMovement.MoveToNewTarget (u._Player.transform, u.getPosition ());
 		_ArmyUI.SwitchPlayer (u._Player.Type);
+		_ResourceUI.UpdateResources(u._Player.Currency.getPoints());
+		_ResourceUI.UpdatePlayerImage(u._Player);
 	}
 
 	public void AddPlayerCard(PlayerType pType, CardData cData)
@@ -227,6 +240,14 @@ public class OverworldUI : MonoBehaviour
 		{
 			_CommanderUI.DisplayInfo();
 		}
+	}
+
+	public void MoveCommander(TileData tile){
+		_CommanderUI.MoveCommander(tile);
+	}
+
+	public void ForceMoveCommander(TileData tile) {
+		_CommanderUI.ForceMoveCommander(tile);
 	}
 
     void Update()
