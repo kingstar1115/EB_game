@@ -10,11 +10,10 @@ public class CardDisplayUI : MonoBehaviour
 
     public CanvasGroup _CGLeftButton;
     public CanvasGroup _CGRightButton;
+	public Button _UseButton;
     public HandUI _HandUI;
     public Text _LeftValDis;
-    public Text _RightValDis;
     public Text _CenterValDis1;
-    public Text _CenterValDis2;
     public Image _LeftCard;
     public Image _RightCard;
     public Image _CentreCard;
@@ -35,7 +34,8 @@ public class CardDisplayUI : MonoBehaviour
 	}
 
 	public void RemoveListeners() {
-		OnCardUse = delegate { };
+		OnCardUse = delegate { };		
+		_UseButton.onClick.RemoveListener(UseSelectedCardHandler);
 	}
 
 	// Update is called once per frame
@@ -78,11 +78,9 @@ public class CardDisplayUI : MonoBehaviour
         _canvasGroup = this.GetComponent<CanvasGroup>();
 
         //events
-        _HandUI.OnCardSelect += _HandUI_OnCardSelect;
-        _HandUI.OnHandSet += _HandUI_OnHandSet;
-        _HandUI.OnCardDeselect += _HandUI_OnCardDeselect;
-
-        //hide
+		SetListeners ();	
+			
+			//hide
         Hide();
 
         //------TEST-------
@@ -90,7 +88,17 @@ public class CardDisplayUI : MonoBehaviour
          //   _HandUI.SelectCard(0);
     }
 
-    void _HandUI_OnCardDeselect()
+	public void SetListeners()
+	{
+		//events
+		_HandUI.OnCardSelect += _HandUI_OnCardSelect;
+		_HandUI.OnHandSet += _HandUI_OnHandSet;
+		_HandUI.OnCardDeselect += _HandUI_OnCardDeselect;
+		
+		_UseButton.onClick.AddListener(UseSelectedCardHandler);	
+	}
+	
+	void _HandUI_OnCardDeselect()
     {
         Hide();
 
@@ -111,14 +119,13 @@ public class CardDisplayUI : MonoBehaviour
 
         //focused sprite
         _CentreCard.sprite = _HandUI.GetSpriteOfCard(_HandUI.m_Cards[index]._Card.Type);
-        _CenterValDis1.text = _CenterValDis2.text = (_HandUI.m_Cards[index]._Card.Value > 0) ? _HandUI.m_Cards[index]._Card.Value.ToString() : "";
+        _CenterValDis1.text = (_HandUI.m_Cards[index]._Card.Value > 0) ? _HandUI.m_Cards[index]._Card.Value.ToString() : "";
 
         //Hide the sideimages if they dont represent a card.
         if (r_Index != -1)
         {
             _RightCard.sprite = _HandUI.GetSpriteOfCard(_HandUI.m_Cards[r_Index]._Card.Type);
             _RightCard.color = _LandR_Colour;
-            _RightValDis.text = (_HandUI.m_Cards[r_Index]._Card.Value > 0) ? _HandUI.m_Cards[r_Index]._Card.Value.ToString() : "";
 
             //if not already set visiable
             if (_CGRightButton.alpha == 0)
@@ -133,7 +140,7 @@ public class CardDisplayUI : MonoBehaviour
             _CGRightButton.alpha = 0.0f;
             _CGRightButton.interactable = false;
             _CGRightButton.blocksRaycasts = false;
-            _RightCard.color = new Color(0, 0, 0, 0);
+			_RightCard.color = new Color(0, 0, 0, 0);
         }
 
         if (l_Index != -1)
@@ -156,6 +163,7 @@ public class CardDisplayUI : MonoBehaviour
             _CGLeftButton.interactable = false;
             _CGLeftButton.blocksRaycasts = false;
             _LeftCard.color = new Color(0, 0, 0, 0);
+			_LeftValDis.text = "";
         }
 
         //remenber selected index

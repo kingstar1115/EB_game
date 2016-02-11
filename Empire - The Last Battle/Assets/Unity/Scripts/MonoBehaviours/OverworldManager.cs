@@ -77,11 +77,13 @@ public class OverworldManager : MonoBehaviour
 		_GameStateHolder._gameState = GameState.Overworld;
 
 		if (_BattleData._EndState == BattleEndState.None) {
-			setPlayer(PlayerType.Battlebeard);
 
 			//test by adding cards.
 			_BattlebeardPlayer.SetCards(_StartCards);
 			_StormshaperPlayer.SetCards(_StartCards);
+
+			setPlayer(PlayerType.Battlebeard);
+			_GameStateHolder._ActivePlayer.PlayerArmy.AddUnit(UnitType.Scout);
 
 			_BattlebeardPlayer.CastleProgress = 4;
 			_StormshaperPlayer.CastleProgress = 4;

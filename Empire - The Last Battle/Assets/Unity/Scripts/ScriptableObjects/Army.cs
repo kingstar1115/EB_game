@@ -12,15 +12,7 @@ public class Army : ScriptableObject {
 	public event UnitIndexCallback OnRemoveUnit = delegate { };
 
 	public void Initialise() {
-		if (units == null || units.Count == 0) {
-			if (defaultData.units != null && defaultData.units.Count != 0) {
-				// needs a  deep copy
-				units = defaultData.units;
-			}
-			else {
-				units = new List<Unit>();
-			}
-		}
+		units = new List<Unit>();
 	}
 
 	public Unit AddUnit(UnitType type) {
