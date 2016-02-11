@@ -22,8 +22,12 @@ public class BoardUI : MonoBehaviour
             nextAnimator = tile.TileObject.GetComponentInChildren<Animator>();
 
             //if already animating then reset it
-            if (nextAnimator.GetTime() > 0)
-                nextAnimator.SetTime(0);
+			nextAnimator.StartPlayback();
+
+			if (nextAnimator.playbackTime > 0)
+				nextAnimator.playbackTime = 0;
+
+			nextAnimator.StopPlayback();
 
             nextAnimator.SetBool("CanBeMovedTo", true);
             _animatingTiles.Add(nextAnimator);

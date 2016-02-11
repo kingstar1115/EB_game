@@ -13,11 +13,12 @@ public class Army : MonoBehaviour {
 		units = new List<Unit>();
 	}
 
-	public void AddUnit(UnitType type) {
+	public Unit AddUnit(UnitType type) {
 		Unit u = new Unit(_UnitDataManager.GetData(type));
 		units.Add(u);
 		u.OnUpdate += unitUpdated;
 		OnAddUnit(u);
+		return u;
 	}
 
 	public void RemoveUnit(Unit u) {
@@ -27,6 +28,14 @@ public class Army : MonoBehaviour {
 			u.OnUpdate -= unitUpdated;
 			OnRemoveUnit(u, i);
 		}
+	}
+
+	public List<Unit> GetUpgradableUnits() {
+		return units.FindAll(x => x.IsUpgradeable());
+	}
+
+	public List<Unit> GetTempUpgradableUnits() {
+		return units.FindAll(x => x.IsTempUpgradeable());
 	}
 
 	public List<Unit> GetUnits(UnitType type) {
