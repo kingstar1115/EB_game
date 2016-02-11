@@ -97,11 +97,11 @@ public class CommanderUI : MonoBehaviour
         else if (this.transform.position.y != _LiftedHeight)
         {
 			if (_forceMove) {
-				_Player.CommanderPosition = _destinationTile._Tile;
+				//_Player.CommanderPosition = _destinationTile._Tile;
 			}
 			OnCommanderGrounded(_Player.CommanderPosition);
 		
-			if (_destinationTile != null && _reachableTiles.Contains(_destinationTile._Tile)){
+			if (_destinationTile != null && GetReachableTiles().Contains(_destinationTile._Tile)){
 				if (_forceMove && _forceMoveEvents) {
 					OnCommanderForceMoved(_destinationTile._Tile);
 				}

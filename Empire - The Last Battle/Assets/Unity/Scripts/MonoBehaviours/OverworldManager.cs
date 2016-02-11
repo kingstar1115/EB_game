@@ -91,10 +91,10 @@ public class OverworldManager : MonoBehaviour
 		else {
 			setPlayer(_BattleData._InitialPlayer.Type);
 
-			// THIS STUFF IS BROKEN!!!
+			_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_GameStateHolder._ActivePlayer.Type, _GameStateHolder._ActivePlayer.CommanderPosition, 1));
 
-			 //_BattlebeardPlayer.CastleProgress = _BattlebeardPlayer.CastleProgress;
-			//_StormshaperPlayer.CastleProgress = _StormshaperPlayer.CastleProgress;
+			_BattlebeardPlayer.CastleProgress = _BattlebeardPlayer.CastleProgress;
+			_StormshaperPlayer.CastleProgress = _StormshaperPlayer.CastleProgress;
 			// run the battle end logic
 			endBattle();
 		}
@@ -175,6 +175,7 @@ public class OverworldManager : MonoBehaviour
     }
 
 	void _OverworldUI_OnCommanderForceMove(TileData tile) {
+		_GameStateHolder._ActivePlayer.CommanderPosition = tile;
 		//****JUST FOR TESTING**** set new reachable tiles
 		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_GameStateHolder._ActivePlayer.Type, _GameStateHolder._ActivePlayer.CommanderPosition, 1));
 	}
@@ -318,7 +319,9 @@ public class OverworldManager : MonoBehaviour
 					_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
 				}
 			} else {
-				p.ShowOK ("Battle", "You lost against the monster!", endTurn);
+				_OverworldUI.Enable();
+				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
+				p.ShowOK("Battle", "You lost against the monster!", endTurn);
 			}
 		}
 		else if (_BattleData._BattleType == BattleType.PvP) {
@@ -336,7 +339,9 @@ public class OverworldManager : MonoBehaviour
 				}
 				
 			} else {
-				p.ShowOK ("Battle", "You lost against the other player!", endTurn);
+				_OverworldUI.Enable();
+				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
+				p.ShowOK("Battle", "You lost against the other player!", endTurn);
 			}
 		}
 		else if (_BattleData._BattleType == BattleType.LostImmortal) {
@@ -346,7 +351,9 @@ public class OverworldManager : MonoBehaviour
 				_GameStateHolder._ActivePlayer.CastleProgress++;
 				p.ShowOK ("Battle", "You beat the lost immortal!", endTurn);
 			} else {
-				p.ShowOK ("Battle", "You lost against the lost immortal!", endTurn);
+				_OverworldUI.Enable();
+				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
+				p.ShowOK("Battle", "You lost against the lost immortal!", endTurn);
 			}
 		}
 	}
