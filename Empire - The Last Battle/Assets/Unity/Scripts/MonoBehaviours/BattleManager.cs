@@ -105,7 +105,8 @@ public class BattleManager : MonoBehaviour {
 
 
 		_tearDownScene();
-		Application.LoadLevel(_OverworldScene);
+
+		StartCoroutine(SceneSwitcher.ChangeScene(_OverworldScene));
 	}
 
 	void _tearDownScene() {

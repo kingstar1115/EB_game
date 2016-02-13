@@ -243,6 +243,7 @@ public class OverworldManager : MonoBehaviour
 					}
 				}
 				else {
+					Debug.Log("end turn");
 					endTurn();
 				}
 				break;
@@ -303,7 +304,7 @@ public class OverworldManager : MonoBehaviour
 		_BattleData._BattleType = type;
 		_BattleData._InitialPlayer = _GameStateHolder._ActivePlayer;
 		tearDownScene();
-		Application.LoadLevel(_BattleScene);
+		StartCoroutine(SceneSwitcher.ChangeScene(_BattleScene));
 	}
 
 
@@ -501,6 +502,10 @@ public class OverworldManager : MonoBehaviour
 
 	// Update is called once per frame
 	void Update() {
+		if (Input.GetKeyDown(KeyCode.Return)) {
+			StartCoroutine(SceneSwitcher.ChangeScene(0));
+		}
+
 		if (Input.GetKeyDown (KeyCode.M)) {
 			if (_GameStateHolder._ActivePlayer.PreviousCommanderPosition && _GameStateHolder._ActivePlayer.PreviousCommanderPosition != _GameStateHolder._ActivePlayer.CommanderPosition) {
 				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
