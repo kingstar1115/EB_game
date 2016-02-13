@@ -363,7 +363,7 @@ public class OverworldManager : MonoBehaviour
 	// Update is called once per frame
 	void Update() {
 		if (Input.GetKeyDown(KeyCode.Return)) {
-			StartCoroutine(SwitchPlayer());
+			StartCoroutine(SceneSwitcher.ChangeScene(0));
 		}
 
 		if (Input.GetKeyDown (KeyCode.M)) {
