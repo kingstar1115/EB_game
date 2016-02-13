@@ -92,16 +92,22 @@ public class CommanderUI : MonoBehaviour
         {
             _liftingPiece = false;
             _hasBeenLifted = true;
+
+			if (_forceMove) {
+				// move over the destination tile
+				_lerpPosition._LerpTime = _MoveTime;
+				_toGoTo = _destination;
+				_toGoTo.y = _LiftedHeight;
+				_lerpPosition.LerpTo(_toGoTo);
+			}
+
         }
 		// if commander has been dropped
         else if (this.transform.position.y != _LiftedHeight)
         {
-			if (_forceMove) {
-				//_Player.CommanderPosition = _destinationTile._Tile;
-			}
 			OnCommanderGrounded(_Player.CommanderPosition);
 		
-			if (_destinationTile != null && GetReachableTiles().Contains(_destinationTile._Tile)){
+			if (_destinationTile != null){
 				if (_forceMove && _forceMoveEvents) {
 					OnCommanderForceMoved(_destinationTile._Tile);
 				}
@@ -128,7 +134,7 @@ public class CommanderUI : MonoBehaviour
 	void Update () 
     {
         //update the lerp goto point
-        if (_hasBeenLifted && _lerpPosition.GetEndPosition() != _toGoTo) {
+		if (_hasBeenLifted && _lerpPosition.GetEndPosition() != _toGoTo) {
             _lerpPosition._LerpTime = _MoveTime;
             _lerpPosition.LerpTo(_toGoTo);
         }
@@ -141,7 +147,6 @@ public class CommanderUI : MonoBehaviour
 
     void OnMouseDrag()
     {
-
 		//only if movement is allowed
 		if (_allowMovement) {
 
@@ -203,6 +208,7 @@ public class CommanderUI : MonoBehaviour
         if (_destinationTile == null || !_reachableTiles.Contains(_destinationTile._Tile))
         {
 			//commander not moved
+			_destinationTile = null;
             GameObject posMarker = getCommanderMarker(_Player.CommanderPosition.TileObject.GetComponentInChildren<TileHolder>());
             _toGoTo = (posMarker!=null) ? posMarker.transform.position: _Player.CommanderPosition.TileObject.transform.position;
 			_targetY = _Player.CommanderPosition.Height;
@@ -227,26 +233,27 @@ public class CommanderUI : MonoBehaviour
 
 	// moves the commander to a certain position. fires events as usual
 	public void MoveCommander(TileData tile){
-		_forceMove = true;
-		LiftPiece();
+		if (_hasBeenLifted || _liftingPiece) {
+			return;
+		}
 		TileHolder tileHolder = tile.TileObject.GetComponentInChildren<TileHolder>();
 		if (tileHolder != null) {
+
+			_forceMove = true;
+			
 			//try get the commander position marker
 			GameObject posMarker = getCommanderMarker(tileHolder);
 			if (posMarker != null) {
-				_toGoTo = posMarker.transform.position;
-				_destination = _toGoTo;
+				_destination = posMarker.transform.position;
 			}
 			else {
-				_toGoTo = tileHolder.transform.position;
-				_destination = _toGoTo;
+				_destination = tileHolder.transform.position;
 			}
 
-			_toGoTo.y = _LiftedHeight;
-
 			_targetY = tileHolder._Tile.Height;
-
 			_destinationTile = tileHolder;
+
+			LiftPiece();
 		}
 	}
 

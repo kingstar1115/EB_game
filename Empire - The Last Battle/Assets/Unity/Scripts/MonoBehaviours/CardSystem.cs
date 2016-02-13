@@ -36,6 +36,7 @@ public bool CanUseCard(CardData cData, GameState gameState)
 	}
 
 	public void UseCard(CardData card, Player player, Player inactivePlayer) {
+		Debug.Log("use card - card class " + card.Name);
 		switch (card.Type) {
 			case CardType.Healing_Card:
 				int koUnits = player.PlayerArmy.GetKOUnits().Count,
@@ -99,7 +100,8 @@ public bool CanUseCard(CardData cData, GameState gameState)
 		//throw new NotImplementedException();
 	}
 
-	private void UseAllianceCard(CardData card, Player player) {	
+	private void UseAllianceCard(CardData card, Player player) {
+		Debug.Log("Using alliance card ");
 		List<UnitType>[] totalUnits = 
 		{
 			allianceCardLevel0,
@@ -138,10 +140,7 @@ public bool CanUseCard(CardData cData, GameState gameState)
 	private void UseScoutCard(CardData card, Player player) {
 		int availableScouts = player.PlayerArmy.GetActiveUnits(UnitType.Scout).Count;
 		bool success = false;
-        if (availableScouts > 0) {
-            Mathf.Clamp(availableScouts++, 2, 4);
-            player.IsScouting = true;
-            card.Value = availableScouts;
+        if (availableScouts > 0 && !player.IsScouting) {
 			success = true;
 		}
 		OnEffectApplied(success, card, player, null);

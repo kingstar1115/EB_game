@@ -20,6 +20,7 @@ public class HandUI : MonoBehaviour
     public CardUI m_SelectedCardUI;
     public bool m_CardsSelectable;
     public int m_focusedCardIndex;
+	public int m_NumberOfCards;
 
 	bool _enabled;
 	public bool _Enabled
@@ -58,15 +59,11 @@ public class HandUI : MonoBehaviour
 
     public void SetHand(CardList cardsToShow)
     {
-		Debug.Log (cardsToShow.cards.Count);
-		Debug.Log (m_Cards);
         //trim cards diplaying that are not needed
         if (m_Cards.Count > cardsToShow.cards.Count)
         {
             for (int i = cardsToShow.cards.Count; i < m_Cards.Count; i++)
             {
-				Debug.Log (m_Cards.Count);
-				Debug.Log(m_Cards[0]);
                 m_Cards[i].gameObject.SetActive(false);
             }
         }
@@ -88,7 +85,7 @@ public class HandUI : MonoBehaviour
                 AddNewCard(cardsToShow.cards[i]);
             }
         }
-
+		m_NumberOfCards = cardsToShow.cards.Count;
         //update spacing 
         UpdateRotations();
 
@@ -159,6 +156,10 @@ public class HandUI : MonoBehaviour
         m_SelectedCardUI = null;
         OnCardDeselect();
     }
+	public void DeselectCardNoPopdown(int index) {
+		m_SelectedCardUI = null;
+		OnCardDeselect();
+	}
 
     void cardUI_OnPointerExit(CardUI cardUI)
     {

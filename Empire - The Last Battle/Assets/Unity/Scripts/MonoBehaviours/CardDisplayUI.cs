@@ -110,10 +110,9 @@ public class CardDisplayUI : MonoBehaviour
     {
         //if there is a card selected then use its index, if not then use index 0
         int index = (_HandUI.m_SelectedCardUI != null) ? _HandUI.m_SelectedCardUI._Index : 0;
-        int r_Index = (index == _HandUI.m_Cards.Count - 1) ? -1 : index + 1;
+        int r_Index = (index == _HandUI.m_NumberOfCards - 1) ? -1 : index + 1;
         int l_Index = (index == 0) ? -1 : index - 1;
-
-		if (_HandUI.m_Cards.Count == 0) {
+		if (_HandUI.m_NumberOfCards == 0) {
 			return;
 		}
 
@@ -182,11 +181,10 @@ public class CardDisplayUI : MonoBehaviour
 
     public void UseSelectedCardHandler()
     {
+		Debug.Log("use card button");
         //event!
         OnCardUse(_HandUI.m_SelectedCardUI._Card);
-
-        //deselect card
-        _HandUI_OnCardDeselect();
+		_HandUI.DeselectCurrent();
     }
 
     public void OnScrollLeft()
@@ -199,7 +197,7 @@ public class CardDisplayUI : MonoBehaviour
     public void OnScrollRight()
     {
         //select next card right
-        if (_currentCentreIndex < _HandUI.m_Cards.Count - 1)
+		if (_currentCentreIndex < _HandUI.m_NumberOfCards - 1)
             _HandUI.SelectCard(_currentCentreIndex + 1);
     }
 

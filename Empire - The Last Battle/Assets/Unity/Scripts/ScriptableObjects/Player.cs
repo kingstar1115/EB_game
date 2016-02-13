@@ -8,8 +8,7 @@ public class Player : ScriptableObject
 {
     //card events
 	public delegate void CardAction(CardData cardData);
-	public event CardAction OnCardAdded = delegate {};
-	public event CardAction OnCardRemoved = delegate {};
+	public delegate void CardIntAction(CardData cardData, int index);
 
     public TileData PreviousCommanderPosition;
     public PlayerType Type;
@@ -22,6 +21,8 @@ public class Player : ScriptableObject
 	public event PlayerUnitCallback OnAddUnit = delegate { };
 	public event PlayerUnitIndexCallback OnRemoveUnit = delegate { };
 	public event PlayerCastleProgressCallback OnCastleProgress = delegate { };
+	public event CardAction OnCardAdded = delegate { };
+	public event CardIntAction OnCardRemoved = delegate { };
 
 	int castleProgress;
 	public int CastleProgress {
@@ -59,8 +60,10 @@ public class Player : ScriptableObject
         get { return commanderPosition; }
         set
         {
-            PreviousCommanderPosition = commanderPosition;
-            commanderPosition = value;
+			if (commanderPosition != value) {
+				PreviousCommanderPosition = commanderPosition;
+				commanderPosition = value;
+			}
         }
     }
 
@@ -97,6 +100,8 @@ public class Player : ScriptableObject
 		OnUpdateUnit = delegate { };
 		OnAddUnit = delegate { };
 		OnRemoveUnit = delegate { };
+		OnCardAdded = delegate { };
+		OnCardRemoved = delegate { };
 		OnCastleProgress = delegate { };
 		PlayerArmy.RemoveListeners();
 	}
@@ -105,19 +110,26 @@ public class Player : ScriptableObject
 	{
 		//update hand 
 		Hand.cards.Add (cardToAdd);
-
 		//event for adding card
 		OnCardAdded (cardToAdd);
+
 	}
 
-	public void RemoveCard(CardData cardToRemove)
-	{
+	public void RemoveCard(CardData cardToRemove) {
+		int index = Hand.cards.IndexOf(cardToRemove);
+		RemoveCard(index);	
+	}
+
+	public void RemoveCard(int index) {
 		//update hand and trigger event
-		if (Hand.cards.Remove (cardToRemove))
-			OnCardRemoved (cardToRemove);
-		else
-			Debug.LogError ("trying to remove card that doesnt exist :O");
-		
+		CardData card = Hand.cards[index];
+		if (card != null) {
+			Hand.cards.RemoveAt(index);
+			OnCardRemoved(card, index);
+		}
+		else {
+			Debug.LogError("trying to remove card that doesnt exist :O");
+		}
 	}
 
 	public void SetCards(CardList newCards)

@@ -113,6 +113,10 @@ public class LerpPosition : MonoBehaviour
         return percent * percent * (3f - 2f * percent);
     }
 
+	public Vector3 GetStartPosition() {
+		return _startPosition;
+	}
+
     public Vector3 GetEndPosition()
     {
         return _endPosition;

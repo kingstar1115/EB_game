@@ -12,7 +12,16 @@ public class Army : ScriptableObject {
 	public event UnitIndexCallback OnRemoveUnit = delegate { };
 
 	public void Initialise() {
-		units = new List<Unit>();
+		List<Unit> newList = new List<Unit>();
+		if (units != null) {
+			foreach (Unit u in units) {
+				if (u != null) {
+					newList.Add(u);
+				}
+			}
+		}
+		units.Clear();
+		units = newList;
 	}
 
 	public Unit AddUnit(UnitType type) {

@@ -45,7 +45,6 @@ public class BattleManager : MonoBehaviour {
 	void _setupScene() {
 		TerrainType t = _BattleData._InitialPlayer.CommanderPosition.Terrain;
 		BuildingType b = _BattleData._InitialPlayer.CommanderPosition.Building;
-		Debug.Log(t.ToString() + ' ' + b.ToString());
 	}
 
 	void _setupMonsterBattle() {
@@ -72,8 +71,8 @@ public class BattleManager : MonoBehaviour {
 
 		// for now it's like this
 
-		_BattleUnitsManager.SetOpposition(UnitType.Archer, _GameStateHolder._InactivePlayer.Type);
-		_BattleUnitsManager.SetActiveUnit(UnitType.Archer, _GameStateHolder._ActivePlayer.Type);
+		_BattleUnitsManager.SetOpposition(UnitType.Scout, _GameStateHolder._InactivePlayer.Type);
+		_BattleUnitsManager.SetActiveUnit(UnitType.Scout, _GameStateHolder._ActivePlayer.Type);
 		Debug.Log("Battle Player");
 	}
 
@@ -84,11 +83,33 @@ public class BattleManager : MonoBehaviour {
 
 	public void LoseBattle() {
 		_BattleData._EndState = BattleEndState.Loss;
+
+		// temporary
+		foreach (Unit u in _GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits()) {
+			u.ReduceHP(1000);
+		}
+
 		_endBattle();
 	}
 
 	void _endBattle() {
+
+		//heal all non-ko troops
+		foreach (Unit u in _GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits()) {
+			u.Heal();
+		}
+
+		foreach (Unit u in _GameStateHolder._InactivePlayer.PlayerArmy.GetActiveUnits()) {
+			u.Heal();
+		}
+
+
+		_tearDownScene();
 		Application.LoadLevel(_OverworldScene);
+	}
+
+	void _tearDownScene() {
+
 	}
 
 

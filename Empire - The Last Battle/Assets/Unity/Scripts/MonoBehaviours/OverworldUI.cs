@@ -27,6 +27,7 @@ public class OverworldUI : MonoBehaviour
     public CardDisplayUI _CardDisplayUI;
     public HandUI _HandUI;
 
+	bool _enabled;
     bool _paused;
     public bool _Paused
     {
@@ -69,6 +70,10 @@ public class OverworldUI : MonoBehaviour
 
     public void Disable()
     {
+		if (!_enabled) {
+			return;
+		}
+		Debug.Log("Disable");
         //remove event listeners
         _battlebeardCommanderUI.OnCommanderMoved -= _CommanderUI_OnCommanderMoved;
 		_battlebeardCommanderUI.OnCommanderForceMoved -= _CommanderUI_OnCommanderForceMoved;
@@ -87,12 +92,14 @@ public class OverworldUI : MonoBehaviour
         _HandUI._Enabled = false;
 
         //disable components
-        _battlebeardCommanderUI._Paused = true;
-		_stormshaperCommanderUI._Paused = true;
+		if (_CommanderUI) {
+			_CommanderUI._Paused = true;
+		}
 
 		_BoardUI.PlayerPrompt_DefaultTiles ();
         _CameraMovement.DisableCameraMovement();
 		_ArmyUI.Disable ();
+		_enabled = false;
     }
 
 	public void RemoveListeners() {
@@ -125,7 +132,7 @@ public class OverworldUI : MonoBehaviour
 
 	public void ShowUnitSelectionUI(UnitSelection flags) {
 		_ArmyUI.Show();
-		_ArmyUI.MakeSelectable(flags);	
+		_ArmyUI.MakeSelectable(flags);
 		Disable();
 	}
 
@@ -137,6 +144,9 @@ public class OverworldUI : MonoBehaviour
 
     public void Enable()
     {
+		if (_enabled) {
+			return;
+		}
         //add event listeners
         _battlebeardCommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
 		_battlebeardCommanderUI.OnCommanderForceMoved += _CommanderUI_OnCommanderForceMoved;
@@ -157,14 +167,17 @@ public class OverworldUI : MonoBehaviour
 		_HandUI._Enabled = true;
 
         //enable components
-		_stormshaperCommanderUI._Paused = false;
-		_battlebeardCommanderUI._Paused = false;
+		if (_CommanderUI) {
+			_CommanderUI._Paused = false;
+		}
         _CameraMovement.EnableCameraMovement();
 		_ArmyUI.Enable ();
+		_enabled = false;
     }
 
 	public void SetPlayer(Player p) {
-		_CommanderUI.DisablePlayerMovement ();
+		CommanderUI otherCommanderUI = p.Type == PlayerType.Battlebeard ? _stormshaperCommanderUI : _battlebeardCommanderUI;
+		otherCommanderUI.DisablePlayerMovement();
 		_CommanderUI = p.Type == PlayerType.Battlebeard ? _battlebeardCommanderUI : _stormshaperCommanderUI;
 		_CommanderUI.DisplayInfo();
 		SwitchFocus (_CommanderUI);
@@ -172,7 +185,7 @@ public class OverworldUI : MonoBehaviour
 
 	public void _CardDisplayUI_OnCardUse(CardData cardData)
     {
-        Debug.Log("CardData: "+cardData.name);
+		Debug.Log("Use Card");
         OnPlayerUseCard(cardData);
         _CardDisplayUI.Hide();
     }
@@ -246,11 +259,13 @@ public class OverworldUI : MonoBehaviour
 		}
 	}
 
-	public void RemovePlayerCard(PlayerType pType, CardData cData)
+	public void RemovePlayerCard(PlayerType pType, CardData cData, int index)
 	{
 		//update the hand ui here
 		if (_CommanderUI._Player.Type == pType) 
 		{
+			//deselect card
+			_HandUI.DeselectCardNoPopdown(index);
 			_CommanderUI.DisplayInfo();
 		}
 	}
