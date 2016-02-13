@@ -243,7 +243,6 @@ public class OverworldManager : MonoBehaviour
 					}
 				}
 				else {
-					Debug.Log("end turn");
 					endTurn();
 				}
 				break;
@@ -321,8 +320,9 @@ public class OverworldManager : MonoBehaviour
 				//p.ShowOK ("Battle", "You now own this tile!", endTurn);
 				endTurn();
 			} else {
+				Debug.Log("lose monster");
+				_OverworldUI.Enable();
 				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
-				//endTurn();
 				//p.ShowOK("Battle", "You lost against the monster!", );
 			}
 		}
@@ -354,6 +354,7 @@ public class OverworldManager : MonoBehaviour
 						units[i].Heal();
 					}
 					// move commander to start tile;
+					_OverworldUI.Enable();
 					TileData startTile = _GameStateHolder._ActivePlayer.Type == PlayerType.Battlebeard ? _Board._BBStartTile : _Board._SSStartTile;
 					_OverworldUI.ForceMoveCommander(startTile);
 					
@@ -364,7 +365,7 @@ public class OverworldManager : MonoBehaviour
 				if (tile != otherPlayerTile) {
 					// defending player gets 
 				}
-
+				_OverworldUI.Enable();
 				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
 				//endTurn();
 				//p.ShowOK("Battle", "You lost against the other player!", endTurn);
@@ -379,6 +380,7 @@ public class OverworldManager : MonoBehaviour
 				//p.ShowOK ("Battle", "You beat the lost immortal!", endTurn);
 				endTurn();
 			} else {
+				_OverworldUI.Enable();
 				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
 				//p.ShowOK("Battle", "You lost against the lost immortal!", endTurn);
 				//endTurn();
@@ -458,7 +460,6 @@ public class OverworldManager : MonoBehaviour
 	// --- turns
 
     void _TurnManager_OnTurnStart() {
-		_OverworldUI.Enable();
 		_OverworldUI.Show();
 		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_GameStateHolder._ActivePlayer, _GameStateHolder._ActivePlayer.CommanderPosition, 1));
     }
@@ -473,6 +474,7 @@ public class OverworldManager : MonoBehaviour
 		_BattleData._EndState = BattleEndState.None;
 		_OverworldUI.Disable();
 		StartCoroutine(SwitchPlayer());
+		_OverworldUI.Enable();
     }
 
 	//This is temporary until we actually have things that happen after the move

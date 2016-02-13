@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(LerpPosition), typeof(Collider))]
+[RequireComponent(typeof(LerpPosition), typeof(LerpRotation), typeof(Collider))]
 public class CommanderUI : MonoBehaviour
 {
     public event System.Action OnDraggingCommander = delegate { };
@@ -24,10 +24,12 @@ public class CommanderUI : MonoBehaviour
     public float _MoveTime;
 
     LerpPosition _lerpPosition;
+	LerpRotation _lerpRotation;
     Vector3 _toGoTo;
     HashSet<TileData> _reachableTiles;
     TileHolder _destinationTile;
     Vector3 _destination;
+	Quaternion _destinationRotation;
     bool _liftingPiece;
     bool _hasBeenLifted;
     bool _allowMovement;
@@ -80,6 +82,7 @@ public class CommanderUI : MonoBehaviour
 	public void Initialise () 
     {
         _lerpPosition = this.GetComponent<LerpPosition>();
+		_lerpRotation = this.GetComponent<LerpRotation>();
         _defaultLayer = this.gameObject.layer;
 
         //event listener
@@ -100,7 +103,6 @@ public class CommanderUI : MonoBehaviour
 				_toGoTo.y = _LiftedHeight;
 				_lerpPosition.LerpTo(_toGoTo);
 			}
-
         }
 		// if commander has been dropped
         else if (this.transform.position.y != _LiftedHeight)
@@ -127,6 +129,9 @@ public class CommanderUI : MonoBehaviour
 		// if commander has been force moved over a tile
 		else if (_forceMove && _hasBeenLifted) {
 			_toGoTo.y = _targetY;
+			if (_destinationRotation != null) {
+				_lerpRotation.LerpTo(_destinationRotation);
+			}
 		}
     }
 	
@@ -171,6 +176,7 @@ public class CommanderUI : MonoBehaviour
                 {
                     _toGoTo = posMarker.transform.position;
                     _destination = _toGoTo;
+					_destinationRotation = posMarker.transform.rotation;
                 }
                 else
                 {
@@ -223,6 +229,10 @@ public class CommanderUI : MonoBehaviour
 
         //drop the commander
         _toGoTo.y = _targetY;
+		if (_destinationRotation != null) {
+			// rotate to the new marker rotation
+			_lerpRotation.LerpTo(_destinationRotation);
+		}
         OnDropCommander(_Player.CommanderPosition);
 
 
@@ -245,6 +255,7 @@ public class CommanderUI : MonoBehaviour
 			GameObject posMarker = getCommanderMarker(tileHolder);
 			if (posMarker != null) {
 				_destination = posMarker.transform.position;
+				_destinationRotation = posMarker.transform.rotation;
 			}
 			else {
 				_destination = tileHolder.transform.position;
@@ -296,9 +307,13 @@ public class CommanderUI : MonoBehaviour
     {
         GameObject posMarker = getCommanderMarker(_Player.CommanderPosition.TileObject.GetComponentInChildren<TileHolder>());
         Vector3 newPosition = (posMarker != null) ? posMarker.transform.position : _Player.CommanderPosition.TileObject.transform.position;
+		Quaternion newRotation = (posMarker != null) ? posMarker.transform.rotation : _Player.CommanderPosition.TileObject.transform.rotation;
 		newPosition.y = _Player.CommanderPosition.Height;
         this.transform.position = newPosition;
-        
+		this.transform.rotation = newRotation;
+		Debug.Log(posMarker.transform.rotation);
+		Debug.Log(this.transform.rotation);
+		
         _lerpPosition.StopLerp();
     }
 

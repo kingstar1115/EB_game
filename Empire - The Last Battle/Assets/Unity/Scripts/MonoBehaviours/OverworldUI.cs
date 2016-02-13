@@ -73,7 +73,6 @@ public class OverworldUI : MonoBehaviour
 		if (!_enabled) {
 			return;
 		}
-		Debug.Log("Disable");
         //remove event listeners
         _battlebeardCommanderUI.OnCommanderMoved -= _CommanderUI_OnCommanderMoved;
 		_battlebeardCommanderUI.OnCommanderForceMoved -= _CommanderUI_OnCommanderForceMoved;
@@ -101,6 +100,38 @@ public class OverworldUI : MonoBehaviour
 		_ArmyUI.Disable ();
 		_enabled = false;
     }
+
+	public void Enable() {
+		if (_enabled) {
+			return;
+		}
+		//add event listeners
+		_battlebeardCommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
+		_battlebeardCommanderUI.OnCommanderForceMoved += _CommanderUI_OnCommanderForceMoved;
+		_battlebeardCommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
+		_battlebeardCommanderUI.OnCommanderDrop += _CommanderUI_OnCommanderDrop;
+		_battlebeardCommanderUI.OnCommanderGrounded += _CommanderUI_Grounded;
+		_battlebeardCommanderUI.OnDropCommander += _CommanderUI_OnDropCommander;
+
+		_stormshaperCommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
+		_stormshaperCommanderUI.OnCommanderForceMoved += _CommanderUI_OnCommanderForceMoved;
+		_stormshaperCommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
+		_stormshaperCommanderUI.OnCommanderDrop += _CommanderUI_OnCommanderDrop;
+		_stormshaperCommanderUI.OnCommanderGrounded += _CommanderUI_Grounded;
+		_stormshaperCommanderUI.OnDropCommander += _CommanderUI_OnDropCommander;
+
+		_CardDisplayUI.OnCardUse += _CardDisplayUI_OnCardUse;
+
+		_HandUI._Enabled = true;
+
+		//enable components
+		if (_CommanderUI) {
+			_CommanderUI._Paused = false;
+		}
+		_CameraMovement.EnableCameraMovement();
+		_ArmyUI.Enable();
+		_enabled = true;
+	}
 
 	public void RemoveListeners() {
 		OnCommanderMove = delegate { };
@@ -140,40 +171,6 @@ public class OverworldUI : MonoBehaviour
 		_ArmyUI.MakeUnselectable();
 		Enable();
 	}
-
-
-    public void Enable()
-    {
-		if (_enabled) {
-			return;
-		}
-        //add event listeners
-        _battlebeardCommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
-		_battlebeardCommanderUI.OnCommanderForceMoved += _CommanderUI_OnCommanderForceMoved;
-		_battlebeardCommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
-		_battlebeardCommanderUI.OnCommanderDrop += _CommanderUI_OnCommanderDrop;
-		_battlebeardCommanderUI.OnCommanderGrounded += _CommanderUI_Grounded;
-		_battlebeardCommanderUI.OnDropCommander += _CommanderUI_OnDropCommander;
-
-		_stormshaperCommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
-		_stormshaperCommanderUI.OnCommanderForceMoved += _CommanderUI_OnCommanderForceMoved;
-		_stormshaperCommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
-		_stormshaperCommanderUI.OnCommanderDrop += _CommanderUI_OnCommanderDrop;
-		_stormshaperCommanderUI.OnCommanderGrounded += _CommanderUI_Grounded;
-		_stormshaperCommanderUI.OnDropCommander += _CommanderUI_OnDropCommander;
-
-		_CardDisplayUI.OnCardUse += _CardDisplayUI_OnCardUse;
-
-		_HandUI._Enabled = true;
-
-        //enable components
-		if (_CommanderUI) {
-			_CommanderUI._Paused = false;
-		}
-        _CameraMovement.EnableCameraMovement();
-		_ArmyUI.Enable ();
-		_enabled = false;
-    }
 
 	public void SetPlayer(Player p) {
 		CommanderUI otherCommanderUI = p.Type == PlayerType.Battlebeard ? _stormshaperCommanderUI : _battlebeardCommanderUI;

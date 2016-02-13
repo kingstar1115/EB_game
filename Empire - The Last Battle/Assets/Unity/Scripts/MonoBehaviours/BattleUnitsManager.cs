@@ -71,7 +71,7 @@ public class BattleUnitsManager : MonoBehaviour {
 
 	public void SetActiveUnit(UnitType t, PlayerType p) {
 		List<GameObject> prefabs = p == PlayerType.Battlebeard ? _BattlebeardUnits : _StormshaperUnits;
-		setOpposition(prefabs[(int)t]);
+		Instantiate(prefabs[(int)t], _MarkerActivePlayerUnit.transform.position, _MarkerActivePlayerUnit.transform.rotation);
 	}
 
 	public void SetOpposition(UnitType t, PlayerType p) {
