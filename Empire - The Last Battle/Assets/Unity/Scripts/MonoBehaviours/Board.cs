@@ -204,19 +204,22 @@ public class Board : MonoBehaviour {
         return Random.Range(range.x, range.y);
     }
 
-	public HashSet<TileData> GetReachableTiles(PlayerType pType, TileData fromTile, int distance)
+	public HashSet<TileData> GetReachableTiles(Player p, TileData fromTile, int distance)
 	{
 		HashSet<TileData> foundTiles = new HashSet<TileData>();
 		if (distance == 0 || fromTile == null) {
 			return foundTiles;
 		}
 		foreach (TileData t in fromTile.GetConnectedTiles()) {
-			if ((pType == PlayerType.Battlebeard && t.Building != BuildingType.StartTileStormshaper) || (pType == PlayerType.Stormshaper && t.Building != BuildingType.StartTileBattlebeard))
+			if (t == p.CommanderPosition) {
+				continue;
+			}
+			if ((p.Type == PlayerType.Battlebeard && t.Building != BuildingType.StartTileStormshaper) || (p.Type == PlayerType.Stormshaper && t.Building != BuildingType.StartTileBattlebeard))
 			    foundTiles.Add(t);
-            HashSet<TileData> tilesForT = GetReachableTiles(pType, t, distance - 1);
+			HashSet<TileData> tilesForT = GetReachableTiles(p, t, distance - 1);
             foreach (TileData tt in tilesForT) {
                 //check that thetile is not the oponents start tile 
-				if ((pType == PlayerType.Battlebeard && t.Building != BuildingType.StartTileStormshaper) || (pType == PlayerType.Stormshaper && t.Building != BuildingType.StartTileBattlebeard))
+				if ((p.Type == PlayerType.Battlebeard && t.Building != BuildingType.StartTileStormshaper) || (p.Type == PlayerType.Stormshaper && t.Building != BuildingType.StartTileBattlebeard))
 				    foundTiles.Add(tt);
 			}
 		}

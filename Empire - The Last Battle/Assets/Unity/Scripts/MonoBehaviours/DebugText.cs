@@ -41,6 +41,7 @@ public class DebugText : MonoBehaviour
 		_text.text = "";
 		_canvasGroup.alpha = _baseAlpha;
 		Time = 0f;
+		this.gameObject.SetActive(false);
 	}
 
 	void Fade()

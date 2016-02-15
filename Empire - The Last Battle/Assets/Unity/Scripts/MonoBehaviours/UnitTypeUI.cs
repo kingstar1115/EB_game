@@ -94,6 +94,13 @@ public class UnitTypeUI : MonoBehaviour {
 		}
 	}
 
+	public void RemoveListeners() {
+		OnClickUnit = delegate { };
+		foreach (UnitUI u in _units) {
+			u.RemoveListeners();
+		}
+	}
+
 	public bool IsMouseOver() {
 		return Mouse.isOver;
 	}

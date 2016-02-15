@@ -31,7 +31,17 @@ public class ArmyUI : MonoBehaviour {
 	int previousSelection = 0;
 	int currentSelection = -1;
 
-	new bool enabled = true;
+	new bool enabled = false;
+
+	public void RemoveListeners() {
+		OnClickUnit = delegate { };
+		foreach(UnitTypeUI u in battlebeardUIData) {
+			u.RemoveListeners();
+		}
+		foreach (UnitTypeUI u in stormshaperUIData) {
+			u.RemoveListeners();
+		}
+	}
 
 	void setSelection(int i) {
 		if (i == currentSelection || getUnitTypeUI(currentPlayer) == null) {
@@ -63,7 +73,6 @@ public class ArmyUI : MonoBehaviour {
 
 		BattlebeardUI.SetActive(false);
 		StormshaperUI.SetActive(false);
-
 		if (battlebeard != null) {
 			GenerateUI(battlebeard);
 			battlebeard.OnAddUnit += unitAdded;
@@ -77,6 +86,7 @@ public class ArmyUI : MonoBehaviour {
 			stormshaper.OnRemoveUnit += unitRemoved;
 			stormshaper.OnUpdateUnit += unitUpdated;
 		}
+		enabled = true;
 	}
 
 	public void Enable() {
@@ -163,32 +173,27 @@ public class ArmyUI : MonoBehaviour {
 	}
 
 
-	public void GenerateUI(Player p) {
-
+	void GenerateUI(Player p) {
 		GameObject thisUI = p.Type == PlayerType.Battlebeard ? BattlebeardUI : StormshaperUI;
-
 		List<UnitTypeUI> data = getUnitTypeUI(p.Type);
-
 		data.ForEach(ui => ui.Reset()); // maybe not necesarry?
-
 		List<GameObject> children = new List<GameObject>();
 		foreach (Transform child in thisUI.transform) children.Add(child.gameObject);
 		children.ForEach(child => Destroy(child));
 
 		data.Clear();
-
 		List<Unit> allUnits = p.PlayerArmy.GetUnits();
 		List<UnitType> unitTypes = new List<UnitType>();
-		allUnits.ForEach(unit => {
+		foreach (Unit unit in allUnits) {
 			if (!unitTypes.Contains(unit.Type)) {
 				unitTypes.Add(unit.Type);
 			}
-		});
-		
-		unitTypes.ForEach(t => {
+		}
+		foreach (UnitType t in unitTypes) {
 			UnitTypeUI unitTypeUI = createUIForUnitType(thisUI, t, data);
 			p.PlayerArmy.GetUnits(t).ForEach(u => unitTypeUI.AddUnit(u));
-		});
+		}
+
 	}
 
 	UnitTypeUI createUIForUnitType(GameObject UI, UnitType t, List<UnitTypeUI> data) {
@@ -219,8 +224,9 @@ public class ArmyUI : MonoBehaviour {
 	}
 
 	void Update() {
+
 		// If there is anything in the UI
-		if (getUnitTypeUI(currentPlayer).Count > 0 && enabled) {
+		if (enabled && getUnitTypeUI(currentPlayer).Count > 0) {
 			bool leftDown = Input.GetKeyDown(KeyCode.LeftArrow);
 			bool rightDown = Input.GetKeyDown(KeyCode.RightArrow);
 			bool upDown = Input.GetKeyDown(KeyCode.UpArrow);

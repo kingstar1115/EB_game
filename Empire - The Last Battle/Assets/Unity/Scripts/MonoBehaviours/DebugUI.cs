@@ -7,7 +7,7 @@ using System.Linq;
 public class DebugUI : MonoBehaviour
 {
 	public float _duration;
-	public List<Text> _text;
+	public Pool TextPool;
 	static DebugUI ui;
 
 	void Awake() {
@@ -20,38 +20,12 @@ public class DebugUI : MonoBehaviour
 
 	public void SetMessage(string message, int fontSize, Color fontColour)
 	{
-		//Get text element that is most faded
-		var itemMostFaded = _text.OrderByDescending(x => x.gameObject.GetComponent<CanvasGroup>().alpha).Last();
-		var lastItem = _text.Last();
-
-		foreach (var item in _text)
-		{
-			//If debug text already is showing text then move to next text object
-			if (item.text.Length > 0)
-			{
-				//If on last item, and each text before is full then go ahead and assign variables to most faded text element
-				if (item.Equals(lastItem))
-				{
-					itemMostFaded.text = message;
-					itemMostFaded.fontSize = fontSize;
-					itemMostFaded.color = fontColour;
-
-					//Need to reset alpha on text that we just set
-					itemMostFaded.gameObject.GetComponent<CanvasGroup>().alpha = itemMostFaded.gameObject.GetComponent<DebugText>().BaseAlpha;
-					//Reset fade timer
-					itemMostFaded.gameObject.GetComponent<DebugText>().Time = 0f;
-
-				}
-				continue;
-			}
-
-			item.text = message;
-			item.fontSize = fontSize;
-			item.color = fontColour;
-
-			//variables have been assigned to new text so return from loop
-			//to make sure we don't assign more than 1 text object
-			break;
-		}
+		GameObject newTextObject = TextPool.GetPooledObject();
+		Text newText = newTextObject.GetComponent<Text>();
+		newTextObject.transform.SetParent(this.transform);
+		newText.text = message;
+		newText.fontSize = fontSize;
+		newText.color = fontColour;
+		newTextObject.SetActive(true);
 	}
 }

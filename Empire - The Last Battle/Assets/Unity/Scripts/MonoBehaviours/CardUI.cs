@@ -13,7 +13,6 @@ public class CardUI : MonoBehaviour
 
     public Image _Image;
     public Text _valDisplay1;
-    public Text _valDisplay2;
     public LerpPosition _PosLerp;
     public UIMouseEvents _MouseEvents;
     public float _ImageYAlt;
@@ -60,7 +59,7 @@ public class CardUI : MonoBehaviour
     {
         set
         {
-            _valDisplay1.text = _valDisplay2.text = (value > 0) ? value.ToString() : "";
+            _valDisplay1.text = (value > 0) ? value.ToString() : "";
         }
     }
 
