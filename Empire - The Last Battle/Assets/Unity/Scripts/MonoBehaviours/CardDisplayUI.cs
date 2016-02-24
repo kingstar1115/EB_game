@@ -181,7 +181,6 @@ public class CardDisplayUI : MonoBehaviour
 
     public void UseSelectedCardHandler()
     {
-		Debug.Log("use card button");
         //event!
         OnCardUse(_HandUI.m_SelectedCardUI._Card);
 		_HandUI.DeselectCurrent();

@@ -24,6 +24,12 @@ public class OverworldManager : MonoBehaviour
 		//new game setup
 
 		_Board.Initialise();
+
+        if(_BattleData._EndState == BattleEndState.None) {
+            _BattlebeardPlayer.ResetArmy();
+            _StormshaperPlayer.ResetArmy();
+        }
+
 		_BattlebeardPlayer.Initialise();
 		_StormshaperPlayer.Initialise();
 
@@ -111,7 +117,6 @@ public class OverworldManager : MonoBehaviour
 
 	void _OverworldUI_OnPlayerUseCard(CardData card)
     {
-		Debug.Log("Use Card");
         UseCard(card);
     }
 
@@ -165,7 +170,6 @@ public class OverworldManager : MonoBehaviour
 		ModalPanel p = ModalPanel.Instance();
 		Debug.Log("Use Card");
 		p.ShowOKCancel("Card", "Use " + card.Name + " card?", () => {
-			Debug.Log("use card " + card.Name);
 			_CardSystem.UseCard(card, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer);
 		}, null);
 
