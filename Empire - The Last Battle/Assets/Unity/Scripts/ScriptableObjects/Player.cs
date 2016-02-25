@@ -107,6 +107,7 @@ public class Player : ScriptableObject
 		OnCardRemoved = delegate { };
 		OnCastleProgress = delegate { };
 		PlayerArmy.RemoveListeners();
+		Currency.RemoveListeners ();
 	}
 
 	public void AddCard(CardData cardToAdd)

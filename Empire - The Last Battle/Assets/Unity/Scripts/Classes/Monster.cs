@@ -32,7 +32,7 @@ public class Monster : iBattleable {
     }
 
     public float GetHPPercentage() {
-       return ((float)currentHp / (float)hp);
+       return ((float)GetCurrentHP() / (float)hp);
     }
 
     public void ReduceHP(int HP) {
