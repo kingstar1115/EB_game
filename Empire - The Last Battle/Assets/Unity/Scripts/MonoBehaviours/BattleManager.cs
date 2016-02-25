@@ -36,6 +36,10 @@ public class BattleManager : MonoBehaviour {
 		// add player event listeners
 		_GameStateHolder._ActivePlayer.Initialise();
 
+        //ui event listeners
+        _BattleUnitPositionManager.OnPause += _BattleUnitPositionManager_OnPause;
+        _BattleUnitPositionManager.OnUnPause += _BattleUnitPositionManager_OnUnPause;
+
 		if (_BattleData._BattleType == BattleType.LostImmortal) {
 			_setupLostImmortalBattle();
 		}
@@ -52,6 +56,16 @@ public class BattleManager : MonoBehaviour {
 		// start pre battle stuff
 		StartCoroutine(_preBattle());
 	}
+
+    void _BattleUnitPositionManager_OnUnPause()
+    {
+        _BattleUnitPositionManager._Paused = false;
+    }
+
+    void _BattleUnitPositionManager_OnPause()
+    {
+        _BattleUnitPositionManager._Paused = true;
+    }
 
 	void removeListeners() {
 		_GameStateHolder._ActivePlayer.PlayerArmy.RemoveListeners();
@@ -156,6 +170,7 @@ public class BattleManager : MonoBehaviour {
 
 	void startTurnPlayer() {
 		// show player UI
+        _BattleUnitPositionManager.SetPlayer(GetActivePlayer());
 	}
 
 	void startTurnMonster() {
@@ -212,6 +227,12 @@ public class BattleManager : MonoBehaviour {
 		// generate a monster based on the player 
 
 		setOpposition(MonsterType.Minotaur);
+
+        //init the UI
+        if (GetActivePlayerType() == PlayerType.Battlebeard)
+            _BattleUnitPositionManager.Initialise(_BattlebeardPlayer, null);
+        else
+            _BattleUnitPositionManager.Initialise(null, _StormshaperPlayer);
 	}
 
 	void _setupLostImmortalBattle() {
@@ -221,6 +242,12 @@ public class BattleManager : MonoBehaviour {
 		setOpposition(MonsterType.LostImmortalBb1);
 		setOppositionA(MonsterType.Cyclops);
 		setOppositionB(MonsterType.Minotaur);
+
+        //init the UI
+        if (GetActivePlayerType() == PlayerType.Battlebeard)
+            _BattleUnitPositionManager.Initialise(_BattlebeardPlayer, null);
+        else
+            _BattleUnitPositionManager.Initialise(null, _StormshaperPlayer);
 	}
 
 	void _setupPvPBattle() {
@@ -231,6 +258,9 @@ public class BattleManager : MonoBehaviour {
 		setOpposition(_GameStateHolder._InactivePlayer.PlayerArmy.GetActiveUnits()[0]);
 		setActiveUnit(_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits()[0]);
 		Debug.Log("Battle Player");
+
+        //init the UI
+        _BattleUnitPositionManager.Initialise(_BattlebeardPlayer, _StormshaperPlayer);
 	}
 
 	public void AttackButton() {

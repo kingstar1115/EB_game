@@ -213,6 +213,7 @@ public class BattleUnitPositionManager : MonoBehaviour {
 
     public void SwitchFocus(PlayerType pType){
 		_ArmyUI.SwitchPlayer (pType);
+        _HandUI.SetHand(_BattleManager.GetActivePlayer().Hand);
 	}
 
 	public void PauseScreenClickHandler()
