@@ -22,8 +22,14 @@ public class OverworldManager : MonoBehaviour
 	// Use this for initialization
 	void Start() {
 		//new game setup
-
+		SceneFaderUI.ScreenFader.StartFadeOverTime(SceneFaderUI.FadeDir.FadeOut);
 		_Board.Initialise();
+
+        if(_BattleData._EndState == BattleEndState.None) {
+            _BattlebeardPlayer.ResetArmy();
+            _StormshaperPlayer.ResetArmy();
+        }
+
 		_BattlebeardPlayer.Initialise();
 		_StormshaperPlayer.Initialise();
 
@@ -111,7 +117,6 @@ public class OverworldManager : MonoBehaviour
 
 	void _OverworldUI_OnPlayerUseCard(CardData card)
     {
-		Debug.Log("Use Card");
         UseCard(card);
     }
 
@@ -140,7 +145,6 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void _CardSystem_OnEffectApplied(bool success, CardData card, Player player, Unit u) {
-		Debug.Log("Used card " + card.Name);
 		ModalPanel p = ModalPanel.Instance();
 		if (!success) {
 			// we wont bother with this in the final but for now it hides the previous modal after it shows this one.
@@ -163,9 +167,7 @@ public class OverworldManager : MonoBehaviour
 
 	void UseCard(CardData card) {
 		ModalPanel p = ModalPanel.Instance();
-		Debug.Log("Use Card");
 		p.ShowOKCancel("Card", "Use " + card.Name + " card?", () => {
-			Debug.Log("use card " + card.Name);
 			_CardSystem.UseCard(card, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer);
 		}, null);
 

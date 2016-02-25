@@ -36,7 +36,6 @@ public bool CanUseCard(CardData cData, GameState gameState)
 	}
 
 	public void UseCard(CardData card, Player player, Player inactivePlayer) {
-		Debug.Log("use card - card class " + card.Name);
 		switch (card.Type) {
 			case CardType.Healing_Card:
 				int koUnits = player.PlayerArmy.GetKOUnits().Count,
@@ -101,7 +100,6 @@ public bool CanUseCard(CardData cData, GameState gameState)
 	}
 
 	private void UseAllianceCard(CardData card, Player player) {
-		Debug.Log("Using alliance card ");
 		List<UnitType>[] totalUnits = 
 		{
 			allianceCardLevel0,

@@ -12,7 +12,7 @@ public class Player : ScriptableObject
 
     public TileData PreviousCommanderPosition;
     public PlayerType Type;
-	public PointsSystem Currency;
+	public PointsSystem Currency = new PointsSystem();
 	public CardList Hand;
 	public Army PlayerArmy;
 	public bool IsScouting;
@@ -69,11 +69,14 @@ public class Player : ScriptableObject
 
 	public void Initialise() {
 		PlayerArmy.Initialise();
-		Currency = new PointsSystem();
         PlayerArmy.OnUpdateUnit += PlayerArmy_OnUpdateUnit;
         PlayerArmy.OnRemoveUnit += PlayerArmy_OnRemoveUnit;
         PlayerArmy.OnAddUnit += PlayerArmy_OnAddUnit;
 	}
+
+    public void ResetArmy() {
+        PlayerArmy.Reset();
+    }
 
     private void PlayerArmy_OnAddUnit(Unit u)
     {
@@ -104,6 +107,7 @@ public class Player : ScriptableObject
 		OnCardRemoved = delegate { };
 		OnCastleProgress = delegate { };
 		PlayerArmy.RemoveListeners();
+		Currency.RemoveListeners ();
 	}
 
 	public void AddCard(CardData cardToAdd)
@@ -114,6 +118,10 @@ public class Player : ScriptableObject
 		OnCardAdded (cardToAdd);
 
 	}
+
+    public CardData GetCardOfType(CardType t) {
+        return Hand.cards.Find(x => x.Type == t);
+    }
 
 	public void RemoveCard(CardData cardToRemove) {
 		int index = Hand.cards.IndexOf(cardToRemove);
