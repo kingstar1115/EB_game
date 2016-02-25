@@ -16,10 +16,10 @@ public class OverworldUI : MonoBehaviour
     public event System.Action OnUnPause = delegate { };
 
     public bool _TileHover;
+    public CommanderUI _CommanderUI;
+	public CommanderUI _battlebeardCommanderUI;
+	public CommanderUI _stormshaperCommanderUI;
 	public ResourceUI _ResourceUI;
-	public CommanderUI _CommanderUI;
-	CommanderUI _battlebeardCommanderUI;
-	CommanderUI _stormshaperCommanderUI;
     public CameraMovement _CameraMovement;
     public BoardUI _BoardUI;
 	public ArmyUI _ArmyUI;
@@ -27,6 +27,7 @@ public class OverworldUI : MonoBehaviour
     public CardDisplayUI _CardDisplayUI;
     public HandUI _HandUI;
 
+	bool _enabled;
     bool _paused;
     public bool _Paused
     {
@@ -54,15 +55,13 @@ public class OverworldUI : MonoBehaviour
     public void Initialise(Player battlebeard, Player stormshaper)
     {
         _BoardUI.Init();
-
-		_battlebeardCommanderUI = battlebeard.GetComponent<CommanderUI>();
-		_stormshaperCommanderUI = stormshaper.GetComponent<CommanderUI>();
 		_battlebeardCommanderUI.Initialise();    
-		_stormshaperCommanderUI.Initialise();     
+		_stormshaperCommanderUI.Initialise();
 		//snap players to start position    
 		_battlebeardCommanderUI.UpdateToPlayerPosition();    
-		_stormshaperCommanderUI.UpdateToPlayerPosition();    
-		_ArmyUI.Initialise(battlebeard, stormshaper);  
+		_stormshaperCommanderUI.UpdateToPlayerPosition();
+		_ArmyUI.Initialise(battlebeard, stormshaper);
+
         _CardDisplayUI.Init();
 
         //add event listeners
@@ -71,6 +70,9 @@ public class OverworldUI : MonoBehaviour
 
     public void Disable()
     {
+		if (!_enabled) {
+			return;
+		}
         //remove event listeners
         _battlebeardCommanderUI.OnCommanderMoved -= _CommanderUI_OnCommanderMoved;
 		_battlebeardCommanderUI.OnCommanderForceMoved -= _CommanderUI_OnCommanderForceMoved;
@@ -89,43 +91,22 @@ public class OverworldUI : MonoBehaviour
         _HandUI._Enabled = false;
 
         //disable components
-        _battlebeardCommanderUI._Paused = true;
-		_stormshaperCommanderUI._Paused = true;
+		if (_CommanderUI) {
+			_CommanderUI._Paused = true;
+		}
 
 		_BoardUI.PlayerPrompt_DefaultTiles ();
         _CameraMovement.DisableCameraMovement();
 		_ArmyUI.Disable ();
+		_enabled = false;
     }
 
-	public void Hide() {
-		_ArmyUI.Hide();
-		_HandUI.Hide();
-		//show the card ui if there is a selected card
-		if (_HandUI.m_SelectedCardUI != null)
-			_CardDisplayUI.Show();
-	}
-
-	public void Show() {
-		_ArmyUI.Show();
-		_HandUI.Show();
-	}
-
-	public void ShowUnitSelectionUI(UnitSelection flags) {
-		_ArmyUI.Show();
-		_ArmyUI.MakeSelectable(flags);	
-		Disable();
-	}
-
-	public void HideUnitSelectionUI() {
-		_ArmyUI.MakeUnselectable();
-		Enable();
-	}
-
-
-    public void Enable()
-    {
-        //add event listeners
-        _battlebeardCommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
+	public void Enable() {
+		if (_enabled) {
+			return;
+		}
+		//add event listeners
+		_battlebeardCommanderUI.OnCommanderMoved += _CommanderUI_OnCommanderMoved;
 		_battlebeardCommanderUI.OnCommanderForceMoved += _CommanderUI_OnCommanderForceMoved;
 		_battlebeardCommanderUI.OnStartDrag += _CommanderUI_OnStartDrag;
 		_battlebeardCommanderUI.OnCommanderDrop += _CommanderUI_OnCommanderDrop;
@@ -143,15 +124,57 @@ public class OverworldUI : MonoBehaviour
 
 		_HandUI._Enabled = true;
 
-        //enable components
-		_stormshaperCommanderUI._Paused = false;
-		_battlebeardCommanderUI._Paused = false;
-        _CameraMovement.EnableCameraMovement();
-		_ArmyUI.Enable ();
-    }
+		//enable components
+		if (_CommanderUI) {
+			_CommanderUI._Paused = false;
+		}
+		_CameraMovement.EnableCameraMovement();
+		_ArmyUI.Enable();
+		_enabled = true;
+	}
+
+	public void RemoveListeners() {
+		OnCommanderMove = delegate { };
+		OnCommanderForceMove = delegate { };
+		OnCommanderGrounded = delegate { };
+		OnPlayerUseCard = delegate { };
+		OnPause = delegate { };
+		OnUnPause = delegate { };
+		_ArmyUI.RemoveListeners();
+		_CardDisplayUI.RemoveListeners();
+		_HandUI.RemoveListeners();
+		_battlebeardCommanderUI.RemoveListeners();
+		_stormshaperCommanderUI.RemoveListeners();
+
+	}
+
+	public void Hide() {
+		_ArmyUI.Hide();
+		_HandUI.Hide();
+		//show the card ui if there is a selected card
+		if (_HandUI.m_SelectedCardUI != null)
+			_CardDisplayUI.Show();
+	}
+
+	public void Show() {
+		_ArmyUI.Show();
+		_HandUI.Show();
+	}
+
+	public void ShowUnitSelectionUI(UnitSelection flags) {
+		_ArmyUI.Show();
+		_ArmyUI.MakeSelectable(flags);
+		Disable();
+	}
+
+	public void HideUnitSelectionUI() {
+		_ArmyUI.MakeUnselectable();
+		Enable();
+	}
 
 	public void SetPlayer(Player p) {
-		_CommanderUI.DisablePlayerMovement ();
+		CommanderUI otherCommanderUI = p.Type == PlayerType.Battlebeard ? _stormshaperCommanderUI : _battlebeardCommanderUI;
+		otherCommanderUI.DisablePlayerMovement();
 		_CommanderUI = p.Type == PlayerType.Battlebeard ? _battlebeardCommanderUI : _stormshaperCommanderUI;
 		_CommanderUI.DisplayInfo();
 		SwitchFocus (_CommanderUI);
@@ -159,7 +182,6 @@ public class OverworldUI : MonoBehaviour
 
 	public void _CardDisplayUI_OnCardUse(CardData cardData)
     {
-        Debug.Log("CardData: "+cardData.name);
         OnPlayerUseCard(cardData);
         _CardDisplayUI.Hide();
     }
@@ -218,7 +240,7 @@ public class OverworldUI : MonoBehaviour
     }
 
 	public void SwitchFocus(CommanderUI u){
-		_CameraMovement.MoveToNewTarget (u._Player.transform, u.getPosition ());
+		_CameraMovement.MoveToNewTarget(u.transform, u.getPosition());
 		_ArmyUI.SwitchPlayer (u._Player.Type);
 		_ResourceUI.UpdateResources(u._Player.Currency.getPoints());
 		_ResourceUI.UpdatePlayerImage(u._Player);
@@ -233,11 +255,13 @@ public class OverworldUI : MonoBehaviour
 		}
 	}
 
-	public void RemovePlayerCard(PlayerType pType, CardData cData)
+	public void RemovePlayerCard(PlayerType pType, CardData cData, int index)
 	{
 		//update the hand ui here
 		if (_CommanderUI._Player.Type == pType) 
 		{
+			//deselect card
+			_HandUI.DeselectCardNoPopdown(index);
 			_CommanderUI.DisplayInfo();
 		}
 	}

@@ -15,6 +15,10 @@ public class UnitUI : MonoBehaviour {
 	public bool IsUpgraded = false;
 	public bool isTempUpgraded = false;
 
+	public void RemoveListeners() {
+		OnClick = delegate { };
+	}
+
 	public void SetKO(bool b) {
 		IsKO = b;
 		KO.gameObject.SetActive(b);

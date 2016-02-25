@@ -5,6 +5,8 @@ using System.Collections;
 public class GameStateHolder : ScriptableObject
 {
 	public GameState _gameState;
+	public Player _ActivePlayer;
+	public Player _InactivePlayer;
 }
 
 public enum GameState

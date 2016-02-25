@@ -69,7 +69,8 @@ public bool CanUseCard(CardData cData, GameState gameState)
 				UseScoutCard(card, player);
 				break;
 			case CardType.Priority_Card:
-				RequestUnitSelection(card, 1, player, UsePriorityCard, OnEffectApplied);
+				//RequestUnitSelection(card, 1, player, UsePriorityCard, OnEffectApplied);
+				OnEffectApplied(false, card, player, null);
 				break;
 			case CardType.Upgrade_Card:
 				if (player.PlayerArmy.GetUpgradableUnits().Count == 0) {
@@ -98,7 +99,7 @@ public bool CanUseCard(CardData cData, GameState gameState)
 		//throw new NotImplementedException();
 	}
 
-	private void UseAllianceCard(CardData card, Player player) {	
+	private void UseAllianceCard(CardData card, Player player) {
 		List<UnitType>[] totalUnits = 
 		{
 			allianceCardLevel0,
@@ -137,10 +138,7 @@ public bool CanUseCard(CardData cData, GameState gameState)
 	private void UseScoutCard(CardData card, Player player) {
 		int availableScouts = player.PlayerArmy.GetActiveUnits(UnitType.Scout).Count;
 		bool success = false;
-        if (availableScouts > 0) {
-            Mathf.Clamp(availableScouts++, 2, 4);
-            player.IsScouting = true;
-            card.Value = availableScouts;
+        if (availableScouts > 0 && !player.IsScouting) {
 			success = true;
 		}
 		OnEffectApplied(success, card, player, null);
@@ -160,4 +158,9 @@ public bool CanUseCard(CardData cData, GameState gameState)
 		TempUpgrade.Strength = card.Value;
 		unitToUpgrade.AddTempUpgrade(TempUpgrade);
 	}
+	public void RemoveListeners() {
+		OnEffectApplied = delegate { };
+		RequestUnitSelection = delegate { };
+	}
+
 }

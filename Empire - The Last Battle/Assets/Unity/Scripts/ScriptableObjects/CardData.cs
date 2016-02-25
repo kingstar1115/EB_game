@@ -9,4 +9,5 @@ public class CardData : ScriptableObject
 	[EnumFlagAttribute]
 	public GameState UseableGameState;
 	public int Value;
+	public string Name;
 }

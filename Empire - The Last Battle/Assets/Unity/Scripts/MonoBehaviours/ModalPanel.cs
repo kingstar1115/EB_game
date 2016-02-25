@@ -33,8 +33,14 @@ public class ModalPanel : MonoBehaviour {
 		hide();
 	}
 
+	public static void RemoveListeners() {
+		modalPanel.okButton.onClick.RemoveAllListeners();
+		modalPanel.cancelButton.onClick.RemoveAllListeners();
+	}
+
 	void setupButton(Button b, GameObject p, UnityAction a) {
 		p.SetActive(true);
+		b.onClick.RemoveAllListeners();
 		if (a != null) {
 			b.onClick.AddListener(a);
 		}

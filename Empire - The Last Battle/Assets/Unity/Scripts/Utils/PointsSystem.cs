@@ -19,6 +19,10 @@ public class PointsSystem
         _currentModifier = modifierBase;
     }
 
+	public void RemoveListeners() {
+		OnChange = delegate {};
+	}
+
     public float getCurrentModifier()
     {
         return _currentModifier;
