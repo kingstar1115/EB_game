@@ -10,13 +10,16 @@ public class SceneFaderUI : MonoBehaviour
 		FadeOut
 	}
 
-	public RawImage FadeInOutTexture;
+	public CanvasGroup Canvas;
 	[Tooltip("Time to fade in seconds")]
 	public float FadeTime;
 
 	private float _alpha = 0.0f;
 	private const float _startAlpha = 0f;
 	private const float _endAlpha = 1.0f;
+	float currentTime;
+	bool fading = false;
+	FadeDir fadeDir;
 
 	static SceneFaderUI _screenFader;
 	public static SceneFaderUI ScreenFader
@@ -32,39 +35,40 @@ public class SceneFaderUI : MonoBehaviour
 		_screenFader = this;
 	}
 
-	void OnGUI()
+
+	public void StartFadeOverTime(FadeDir dir)
 	{
-		FadeInOutTexture.color = new Color(FadeInOutTexture.color.r, FadeInOutTexture.color.g, FadeInOutTexture.color.b, _alpha);
+		_alpha = Canvas.alpha;
+		fading = true;
+		currentTime = 0;
+		fadeDir = dir;
 	}
 
-	public void StartFadeOverTime(FadeDir fadeDir)
-	{
-		StartCoroutine(Fade(fadeDir));
-	}
+	void Update() {
 
-	IEnumerator Fade(FadeDir fadeDir)
-	{
-		for (float t = 0f; t < FadeTime; t += Time.deltaTime)
-		{
-			float normalizedTime = t / FadeTime;
-			//right here, you can now use normalizedTime as the third parameter in any Lerp from start to end
-			if (fadeDir == FadeDir.FadeIn)
-				_alpha = Mathf.Lerp(_startAlpha, _endAlpha, normalizedTime);
-			else
-				_alpha = Mathf.Lerp(_endAlpha, _startAlpha, normalizedTime);
+		if (!fading)
+			return;
 
-			yield return null;
+		currentTime += Time.deltaTime;
+		float normalizedTime = currentTime / FadeTime;
+		//right here, you can now use normalizedTime as the third parameter in any Lerp from start to end
+		if (fadeDir == FadeDir.FadeIn)
+			_alpha = Mathf.Lerp(_startAlpha, _endAlpha, normalizedTime);
+		else
+			_alpha = Mathf.Lerp(_endAlpha, _startAlpha, normalizedTime);
+
+		if (_alpha >= 1 && fadeDir == FadeDir.FadeIn) {
+			_alpha = _endAlpha;
+			fading = false;
+			currentTime = 0;
+		}
+		//without this, the value will end at something like 0.9992367
+		else if (_alpha <= 0 && fadeDir == FadeDir.FadeOut) {
+			_alpha = _startAlpha;
+			fading = false;
+			currentTime = 0;
 		}
 
-		if (fadeDir == FadeDir.FadeIn)
-			_alpha = _endAlpha; //without this, the value will end at something like 0.9992367
-		else
-			_alpha = _startAlpha;
-	}
-
-	void OnLevelWasLoaded()
-	{
-		_alpha = _endAlpha;
-		StartFadeOverTime((FadeDir.FadeOut));
+		Canvas.alpha = _alpha;
 	}
 }
