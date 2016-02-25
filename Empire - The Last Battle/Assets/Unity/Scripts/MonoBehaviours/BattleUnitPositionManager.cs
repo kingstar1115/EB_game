@@ -223,20 +223,22 @@ public class BattleUnitPositionManager : MonoBehaviour {
 	public void AddPlayerCard(PlayerType pType, CardData cData)
 	{
 		//update the hand ui here
-		if (_BattleManager. == pType) 
+		Player player = _BattleManager.GetActivePlayer ();
+		if (player.Type == pType) 
 		{
-			_CommanderUI.DisplayInfo();
+			_HandUI.SetHand(player.Hand);
 		}
 	}
 	
 	public void RemovePlayerCard(PlayerType pType, CardData cData, int index)
 	{
 		//update the hand ui here
-		if (_CommanderUI._Player.Type == pType) 
+		Player player = _BattleManager.GetActivePlayer ();
+		if (player.Type == pType) 
 		{
 			//deselect card
 			_HandUI.DeselectCardNoPopdown(index);
-			_CommanderUI.DisplayInfo();
+			_HandUI.SetHand(player.Hand);
 		}
 	}
 

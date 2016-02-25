@@ -322,6 +322,33 @@ public class BattleManager : MonoBehaviour {
 		_instigatorBattlers = _GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits();
 	}
 
+	public PlayerType GetPlayerTypeByBattler(BattlerType bType)
+	{
+		if (bType == BattlerType.Instigator) {
+			return _GameStateHolder._ActivePlayer.Type;
+		} else if (_BattleData._BattleType == BattleType.PvP){
+			return _GameStateHolder._InactivePlayer.Type;
+		}
+
+		return PlayerType.None;
+	}
+
+	public PlayerType GetActivePlayerType()
+	{
+		return GetPlayerTypeByBattler(activePlayer);
+	}
+
+	public Player GetActivePlayer()
+	{
+		if (activePlayer == BattlerType.Instigator) {
+			return _GameStateHolder._ActivePlayer;
+		} else if (_BattleData._BattleType == BattleType.PvP){
+			return _GameStateHolder._InactivePlayer;
+		}
+		
+		return null;
+	}
+
 	// Update is called once per frame
 	void Update () {
 	
