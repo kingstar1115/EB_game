@@ -13,9 +13,11 @@ public enum CardType {
 	Upgrade_Card
 }
 
+public delegate void BasicCardAction(CardData card, EndCardAction done, Player player);
 public delegate void CardAction(CardData card, Player player, Unit u);
 public delegate void EndCardAction(bool success, CardData card, Player player, Unit u);
 public delegate void UnitSelectionCallback(CardData card, int number, Player player, CardAction action, EndCardAction done);
+
 public class CardSystem : MonoBehaviour {	
 
 	public CardList cardList;
@@ -28,6 +30,7 @@ public class CardSystem : MonoBehaviour {
 
 	public event EndCardAction OnEffectApplied = delegate { };
 	public event UnitSelectionCallback RequestUnitSelection = delegate { };
+	public event BasicCardAction StartBattle = delegate {};
 
 public bool CanUseCard(CardData cData, GameState gameState)
 	{
@@ -52,7 +55,7 @@ public bool CanUseCard(CardData cData, GameState gameState)
 				UseResourceCard(card, player);
 				break;
 			case CardType.Battle_Card:
-				UseBattleCard(player);
+				UseBattleCard(player, card);
 				OnEffectApplied(true, card, player, null);
 				break;
 			case CardType.Tactic_Card:
@@ -96,8 +99,11 @@ public bool CanUseCard(CardData cData, GameState gameState)
 		OnEffectApplied(true, card, player, null);
 	}
 	
-	private void UseBattleCard(Player player) {
-		//throw new NotImplementedException();
+	private void UseBattleCard(Player player, CardData card) {
+		if (Debug.isDebugBuild)
+			Debug.Log ("Battle card used");
+
+		StartBattle (card, OnEffectApplied, player);
 	}
 
 	private void UseAllianceCard(CardData card, Player player) {

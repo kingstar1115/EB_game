@@ -67,6 +67,7 @@ public class OverworldManager : MonoBehaviour
 		_StormshaperPlayer.OnCardRemoved += _StormshapersPlayer_OnCardRemoved;
 
 		_CardSystem.RequestUnitSelection +=_CardSystem_RequestUnitSelection;
+		_CardSystem.StartBattle += _CardSystem_StartBattle;
 
 		_BattlebeardPlayer.OnCastleProgress += _Board.SetCastleState;
 		_StormshaperPlayer.OnCastleProgress += _Board.SetCastleState;
@@ -399,6 +400,15 @@ public class OverworldManager : MonoBehaviour
 		List<CardData> cardsOfType = availableCards.FindAll(x => x.Type == uniqueTypes[randomTypeIndex]);
 		int randomCardIndex = (short)Random.Range(0, cardsOfType.Count - 1);
 		return cardsOfType[randomCardIndex];
+	}
+	
+	void _CardSystem_StartBattle(CardData card, EndCardAction done, Player player)
+	{
+		done.Invoke (true, card, player, null);
+		startBattle (BattleType.Card);
+
+		if (Debug.isDebugBuild)		
+			Debug.Log ("Battle card has started battle");
 	}
 
 	void _CardSystem_RequestUnitSelection(CardData c, int numSelection, Player p, CardAction action, EndCardAction done) {
