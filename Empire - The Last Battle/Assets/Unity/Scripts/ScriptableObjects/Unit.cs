@@ -43,6 +43,10 @@ public class Unit : ScriptableObject {
 		return IsKO() || !HasTempUpgrade();
 	}
 
+	public bool IsDefending() {
+		return Position == null;
+	}
+
 	//For example if CurrentHP = -2 and CurrentUpgrade.HP is = 3 then this will return 1
 	public int GetCurrentHP() {
 		return CurrentUpgrade == null ? CurrentBaseHP : CurrentBaseHP + CurrentUpgrade.HP;

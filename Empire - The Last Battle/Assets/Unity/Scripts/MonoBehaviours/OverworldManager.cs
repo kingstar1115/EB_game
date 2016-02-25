@@ -307,6 +307,7 @@ public class OverworldManager : MonoBehaviour
 	}
 
 
+
 	void endBattle() {
 		ModalPanel p = ModalPanel.Instance ();
 		_OverworldUI.Disable ();
@@ -318,7 +319,11 @@ public class OverworldManager : MonoBehaviour
 					_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
 				}
 				//p.ShowOK ("Battle", "You now own this tile!", endTurn);
-				endTurn();
+				if (_GameStateHolder._ActivePlayer.PlayerArmy.GetTotalActiveUnits () > 1) {
+					p.ShowOKCancel ("Tile Defence", "This tile now belongs to your kingdom. Leave a unit to defend your honour?", DefendingUnitSelection, endTurn);
+				} else {
+					endTurn();
+				}
 			} else {
 				Debug.Log("lose monster");
 				_OverworldUI.Enable();
@@ -439,6 +444,21 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI._ArmyUI.OnClickUnit += selectUnit;
 	}
 
+	void DefendingUnitSelection() {
+		//Only allow active units
+		UnitSelection flags = UnitSelection.Active;
+
+		_OverworldUI.ShowUnitSelectionUI(flags);
+
+		UIPlayerUnitTypeIndexCallback selectUnit = null;
+		selectUnit = (PlayerType PlayerType, UnitType ut, int i) => {
+			Unit unit = _GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits(ut)[i];
+			unit.Position = 
+			Debug.Log(unit);
+		};
+		_OverworldUI._ArmyUI.OnClickUnit += selectUnit;
+
+	}
 
     public void Pause() {
         _OverworldUI.Disable();

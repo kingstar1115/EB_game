@@ -12,6 +12,9 @@ public class OverworldUI : MonoBehaviour
     public delegate void CardAction(CardData card);
     public event CardAction OnPlayerUseCard = delegate { };
 
+	public delegate void UnitLeaveAction(Unit unit);
+	public event UnitLeaveAction OnPlayerLeaveUnit = delegate { };
+
     public event System.Action OnPause = delegate { };
     public event System.Action OnUnPause = delegate { };
 
