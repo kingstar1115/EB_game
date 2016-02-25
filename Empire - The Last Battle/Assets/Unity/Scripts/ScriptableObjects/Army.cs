@@ -12,17 +12,22 @@ public class Army : ScriptableObject {
 	public event UnitIndexCallback OnRemoveUnit = delegate { };
 
 	public void Initialise() {
-		List<Unit> newList = new List<Unit>();
-		if (units != null) {
-			foreach (Unit u in units) {
-				if (u != null) {
-					newList.Add(u);
-				}
-			}
-		}
-		units.Clear();
-		units = newList;
-	}
+        // dont call this twice or it will keep adding listeners
+        foreach(Unit u in units) {
+            if(u != null) {
+                u.OnUpdate += unitUpdated;
+            }
+        }
+    }
+
+    public void Reset() {
+        foreach(Unit u in units) {
+            if (u != null) {
+                u.RemoveListeners();
+            }
+        }
+        units.Clear();
+    }
 
 	public Unit AddUnit(UnitType type) {
 		Unit u = ScriptableObject.CreateInstance<Unit>();
