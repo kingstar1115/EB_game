@@ -4,13 +4,29 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum SoundsEnum
-{
-	Catoonz,
+public enum SoundEffect {
+	Charge,
+	Dead,
+	Hit1,
+	Hit2,
+	Inn,
+	Roar1,
+	Roar2,
+	Sword
+}
+
+public enum MusicTrack {
+	Dungeon,
+	Mountain,
+	Peaceful1,
+	Peaceful2,
+	Town
 }
 
 public class Audio : MonoBehaviour
 {
+	private const int SFX = 0;
+	private const int MUSIC = 1;
 	private static Audio _audio;
 	public static Audio AudioInstance
 	{
@@ -19,53 +35,117 @@ public class Audio : MonoBehaviour
 			return _audio;
 		}
 	}
-	public List<AudioClip> AudioClips;
+	public List<AudioClip> AudioClips; // sfx
+	public List<AudioClip> MusicTracks; // background music
 	/// <summary>
 	/// Use 0 for SFX, 1 for Music
 	/// </summary>
-	public AudioSource[] AudioSources = new AudioSource[2];
+	public AudioSource[] AudioSources;
 
-	private Audio()
-	{
+	// playlist info
+	MusicTrack[] playlist;
+	int currentTrack;
+	bool shuffle;
 
-	}
 
 	void Awake()
 	{	
-		_audio = this;
+		if (!_audio) {
+			_audio = this;
+			DontDestroyOnLoad(_audio);
+		}
 	}
 
-	void Update()
-	{
-		Debug.Log("Dtes");
+	public void ChangeSFXOptions(float volume = 1f, bool mute = false, int priority = 125) {
+		changeOptions(SFX, volume, mute, priority, false);
 	}
 
-	public void ChangeOptions(AudioSource source, bool loop, int priority = 125, float volume = 1f, bool mute = false)
-	{
-		source.volume = volume;
-		source.mute = mute;
-		source.priority = priority;
-		source.loop = loop;
+	public void ChangeMusicOptions(float volume = 1f, bool mute = false, int priority = 125) {
+		changeOptions(MUSIC, volume, mute, priority, true);
 	}
 
-	public void PlayOnce(SoundsEnum sound, int priority = 125, float volume = 1f, bool mute = false)
+	void changeOptions(int source, float volume = 1f, bool mute = false, int priority = 125, bool loop = false) {
+		AudioSources[source].volume = volume;
+		AudioSources[source].mute = mute;
+		AudioSources[source].priority = priority;
+		AudioSources[source].loop = loop;
+	}
+
+	public void PlaySFX(SoundEffect sound)
 	{
 		var sfxToPlay = AudioClips[(int)sound];
-		AudioSources[0].volume = volume;
-		AudioSources[0].mute = mute;
-		AudioSources[0].priority = priority;
 
 		//PlayOneShot allows multiple sounds to be played on one audio source
-		AudioSources[0].PlayOneShot(sfxToPlay, AudioSources[0].volume);
+		AudioSources[0].PlayOneShot(sfxToPlay);
 	}
 
-	public void PlayLooped(SoundsEnum sound, int priority = 125, float volume = 1f, bool mute = false, bool loop = true)
+	public void PlayMusic(MusicTrack sound, float delay = 0)
 	{
-		AudioSources[1].volume = volume;
-		AudioSources[1].mute = mute;
-		AudioSources[1].priority = priority;
-		AudioSources[1].loop = loop;
+		StopMusic();
+		ClearPlaylist();
+		Debug.Log("Playing: " + sound);
+		AudioSources[MUSIC].clip = MusicTracks[(int)sound];
+		AudioSources[MUSIC].PlayDelayed(delay);
+	}
 
-		AudioSources[1].Play();
+	public void PlayMusic(MusicTrack[] tracks, bool shuffle = false) {
+		StopMusic();
+		ClearPlaylist();
+		playlist = tracks;
+		this.shuffle = shuffle;
+
+		playNext(true);
+	}
+
+	void playNext(bool start = false) {
+		int nextTrack;
+		if (shuffle) {
+			nextTrack = getRandomTrack(start ? -1 : currentTrack);
+		} else {
+			nextTrack = (currentTrack + 1) % playlist.Length;
+		}
+		Debug.Log("Playing: " + playlist[nextTrack]);
+		AudioSources[MUSIC].clip = MusicTracks[(int)playlist[nextTrack]];
+		currentTrack = nextTrack;
+		AudioSources[MUSIC].Play();
+	}
+
+	int getRandomTrack(int except = -1) {
+		int track = UnityEngine.Random.Range(0, playlist.Length);
+		if(except > -1 && track == except) {
+			while(except == track) {
+				track = UnityEngine.Random.Range(0, playlist.Length);
+			}
+		}
+		return track;
+	}
+
+	void Update() {
+		// check for the end of a song in the playlist
+		if (playlist != null && playlist.Length > 0) {
+			int currentTrackSamples = MusicTracks[(int)playlist[currentTrack]].samples;
+			if(AudioSources[MUSIC].timeSamples == currentTrackSamples) {
+				playNext();
+				Debug.Log("playnext called");
+			}
+		}
+	}
+
+	public void StopMusic() {
+		AudioSources[MUSIC].Stop();
+	}
+
+	public void ClearPlaylist() {
+		playlist = null;
+		currentTrack = 0;
+		shuffle = false;
+	}
+
+	public void PauseMusic() {
+		AudioSources[MUSIC].Pause();
+	}
+
+	public void UnPauseMusic() {
+		AudioSources[MUSIC].UnPause();
 	}
 }
