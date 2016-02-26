@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 using System.Linq;
+using System;
 
 public class OverworldManager : MonoBehaviour
 {
@@ -73,7 +74,7 @@ public class OverworldManager : MonoBehaviour
 		_StormshaperPlayer.OnCardRemoved += _StormshapersPlayer_OnCardRemoved;
 
 		_CardSystem.RequestUnitSelection +=_CardSystem_RequestUnitSelection;
-		_CardSystem.StartBattle += _CardSystem_StartBattle;
+		_CardSystem.RequestBattle += _CardSystem_RequestBattle;
 
 		_BattlebeardPlayer.OnCastleProgress += _Board.SetCastleState;
 		_StormshaperPlayer.OnCastleProgress += _Board.SetCastleState;
@@ -187,7 +188,7 @@ public class OverworldManager : MonoBehaviour
 		_GameStateHolder._ActivePlayer.CommanderPosition = tile;
 		//****JUST FOR TESTING**** set new reachable tiles
 		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_GameStateHolder._ActivePlayer, _GameStateHolder._ActivePlayer.CommanderPosition, 1));
-		if (_BattleData._EndState == BattleEndState.Loss) {
+		if (_BattleData._EndState == BattleEndState.Loss && _BattleData._BattleType != BattleType.Card) {
 			endTurn();
 		}
 	}
@@ -315,29 +316,30 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.Disable ();
 		TileData tile = _GameStateHolder._ActivePlayer.CommanderPosition;
 		TileData otherPlayerTile = _GameStateHolder._InactivePlayer.CommanderPosition;
-		if (_BattleData._BattleType == BattleType.Monster) {
-			if (_BattleData._EndState == BattleEndState.Win) {
-				if (tile.Building == BuildingType.Camp) {
+		if(_BattleData._BattleType == BattleType.Monster) {
+			if(_BattleData._EndState == BattleEndState.Win) {
+				if(tile.Building == BuildingType.Camp) {
 					_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
 				}
 				//p.ShowOK ("Battle", "You now own this tile!", endTurn);
 				endTurn();
-			} else {
+			}
+			else {
 				Debug.Log("lose monster");
 				_OverworldUI.Enable();
 				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
 				//p.ShowOK("Battle", "You lost against the monster!", );
 			}
 		}
-		else if (_BattleData._BattleType == BattleType.PvP) {
-			if (_BattleData._EndState == BattleEndState.Win) {
+		else if(_BattleData._BattleType == BattleType.PvP) {
+			if(_BattleData._EndState == BattleEndState.Win) {
 				_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
 
 				// need to do something if the other player was totally knocked out
 				//
 
 
-				if (tile.Building == BuildingType.Cave) {
+				if(tile.Building == BuildingType.Cave) {
 					CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
 					_GameStateHolder._ActivePlayer.AddCard(c);
 					p.ShowOK("Card Recieved!", "You beat the other player and recieved a " + c.Name + " card.", endTurn);
@@ -345,27 +347,28 @@ public class OverworldManager : MonoBehaviour
 				else {
 					endTurn();
 				}
-				
-			} else {
+
+			}
+			else {
 
 				// check for total KO
-				if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count == 0 && _GameStateHolder._InactivePlayer.CastleProgress != 4) {
-					
+				if(_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count == 0 && _GameStateHolder._InactivePlayer.CastleProgress != 4) {
+
 					// revive half the units;
 					List<Unit> units = _GameStateHolder._ActivePlayer.PlayerArmy.GetKOUnits();
-					for (int i = 0; i < units.Count / 2; i++) {
+					for(int i = 0; i < units.Count / 2; i++) {
 						units[i].Heal();
 					}
 					// move commander to start tile;
 					_OverworldUI.Enable();
 					TileData startTile = _GameStateHolder._ActivePlayer.Type == PlayerType.Battlebeard ? _Board._BBStartTile : _Board._SSStartTile;
 					_OverworldUI.ForceMoveCommander(startTile);
-					
+
 					return;
 				}
 
 				// if defense battle
-				if (tile != otherPlayerTile) {
+				if(tile != otherPlayerTile) {
 					// defending player gets 
 				}
 				_OverworldUI.Enable();
@@ -374,19 +377,29 @@ public class OverworldManager : MonoBehaviour
 				//p.ShowOK("Battle", "You lost against the other player!", endTurn);
 			}
 		}
-		else if (_BattleData._BattleType == BattleType.LostImmortal) {
-			if (_BattleData._EndState == BattleEndState.Win && tile.Building == BuildingType.Fortress) {
+		else if(_BattleData._BattleType == BattleType.LostImmortal) {
+			if(_BattleData._EndState == BattleEndState.Win && tile.Building == BuildingType.Fortress) {
 				tile.Owner = PlayerType.None;
 				_GameStateHolder._ActivePlayer.LostImmortalKillCount++;
 				// TODO: move this to armoury
 				_GameStateHolder._ActivePlayer.CastleProgress++;
 				//p.ShowOK ("Battle", "You beat the lost immortal!", endTurn);
 				endTurn();
-			} else {
+			}
+			else {
 				_OverworldUI.Enable();
 				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
 				//p.ShowOK("Battle", "You lost against the lost immortal!", endTurn);
 				//endTurn();
+			}
+		}
+		else if(_BattleData._BattleType == BattleType.Card) {
+			if(_BattleData._EndState == BattleEndState.Win) {
+				endTurn();
+			}
+			else {
+				_OverworldUI.Enable();
+				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
 			}
 		}
 	}
@@ -398,15 +411,26 @@ public class OverworldManager : MonoBehaviour
 	public CardData GenerateRandomCard(List<CardData> availableCards) {
 		//Generate a random card
 		List<CardType> uniqueTypes = availableCards.Select(x => x.Type).Distinct().ToList();
-		int randomTypeIndex = Random.Range(0, uniqueTypes.Count - 1);
+		int randomTypeIndex = UnityEngine.Random.Range(0, uniqueTypes.Count - 1);
 		List<CardData> cardsOfType = availableCards.FindAll(x => x.Type == uniqueTypes[randomTypeIndex]);
-		int randomCardIndex = (short)Random.Range(0, cardsOfType.Count - 1);
+		int randomCardIndex = (short)UnityEngine.Random.Range(0, cardsOfType.Count - 1);
 		return cardsOfType[randomCardIndex];
 	}
 	
-	void _CardSystem_StartBattle(CardData card, EndCardAction done, Player player)
+	void _CardSystem_RequestBattle(CardData card, EndCardAction done)
 	{
-		done.Invoke (true, card, player, null);
+		BuildingType currentTile = _GameStateHolder._ActivePlayer.CommanderPosition.Building;
+		BuildingType [] battleTiles = {
+			BuildingType.Camp,
+			BuildingType.Cave,
+			BuildingType.Fortress
+		};
+		if (Array.IndexOf(battleTiles, currentTile) == -1) {
+			done(false, card, _GameStateHolder._ActivePlayer, null);
+			return;
+		}
+
+		done(true, card, _GameStateHolder._ActivePlayer, null);
 		startBattle (BattleType.Card);
 
 		if (Debug.isDebugBuild)		
