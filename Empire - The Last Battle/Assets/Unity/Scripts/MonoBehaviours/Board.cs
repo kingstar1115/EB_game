@@ -98,10 +98,10 @@ public class Board : MonoBehaviour {
                 _FlagManager.SetFlagForTile(tile);
 
 				//if the tile is a start tile set them up
-				if(tile.Building == BuildingType.StartTileBattlebeard) {
+				if (tile.Building == BuildingType.StartTileBattlebeard) {
 					_BBStartTile = tile;
 				}
-				else if(tile.Building == BuildingType.StartTileStormshaper) {
+				else if (tile.Building == BuildingType.StartTileStormshaper) {
 					_SSStartTile = tile;	 
 				}
 				
