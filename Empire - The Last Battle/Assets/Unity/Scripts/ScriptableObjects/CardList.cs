@@ -10,7 +10,7 @@ public class CardList : ScriptableObject {
 	public CardData GetCardOfType(CardType type)
 	{
 		foreach (var card in cards) {
-			if(card.Type == type)
+			if (card.Type == type)
 				return card;
 		}
 

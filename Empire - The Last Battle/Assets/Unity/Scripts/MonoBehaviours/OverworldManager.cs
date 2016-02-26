@@ -12,7 +12,7 @@ public class OverworldManager : MonoBehaviour
 	public Board _Board;
 	public Player _BattlebeardPlayer;
 	public Player _StormshaperPlayer;
-    public TurnManager _TurnManager;
+	public TurnManager _TurnManager;
 	public GameStateHolder _GameStateHolder;
 	public BattleData _BattleData;
 	public string _BattleScene;
@@ -26,10 +26,10 @@ public class OverworldManager : MonoBehaviour
 		SceneFaderUI.ScreenFader.StartFadeOverTime(SceneFaderUI.FadeDir.FadeOut);
 		_Board.Initialise();
 
-        if(_BattleData._EndState == BattleEndState.None) {
-            _BattlebeardPlayer.ResetArmy();
-            _StormshaperPlayer.ResetArmy();
-        }
+		if (_BattleData._EndState == BattleEndState.None) {
+			_BattlebeardPlayer.ResetArmy();
+			_StormshaperPlayer.ResetArmy();
+		}
 
 		_BattlebeardPlayer.Initialise();
 		_StormshaperPlayer.Initialise();
@@ -51,21 +51,21 @@ public class OverworldManager : MonoBehaviour
 			}
 		}
 
-        //test by adding a scout card.
+		//test by adding a scout card.
 
 		_OverworldUI.Initialise(_BattlebeardPlayer, _StormshaperPlayer);
 
-        _TurnManager.OnTurnStart += _TurnManager_OnTurnStart;
-        _TurnManager.OnTurnEnd += _TurnManager_OnTurnEnd;
-        _TurnManager.OnSwitchTurn += _TurnManager_OnSwitchTurn;
+		_TurnManager.OnTurnStart += _TurnManager_OnTurnStart;
+		_TurnManager.OnTurnEnd += _TurnManager_OnTurnEnd;
+		_TurnManager.OnSwitchTurn += _TurnManager_OnSwitchTurn;
 
 
 		//event listeners
 		_OverworldUI.OnCommanderMove += _OverworldUI_OnCommanderMove;
 		_OverworldUI.OnCommanderForceMove += _OverworldUI_OnCommanderForceMove;
-        _OverworldUI.OnPause += _OverworldUI_OnPause;
-        _OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
-        _OverworldUI.OnPlayerUseCard += _OverworldUI_OnPlayerUseCard;
+		_OverworldUI.OnPause += _OverworldUI_OnPause;
+		_OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
+		_OverworldUI.OnPlayerUseCard += _OverworldUI_OnPlayerUseCard;
 		_BattlebeardPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_BattlebeardPlayer.OnCardAdded += _BattlebeardPlayer_OnCardAdded;
 		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
@@ -118,9 +118,9 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void _OverworldUI_OnPlayerUseCard(CardData card)
-    {
-        UseCard(card);
-    }
+	{
+		UseCard(card);
+	}
 
 	void _BattlebeardPlayer_OnCardAdded(CardData card)
 	{
@@ -188,7 +188,7 @@ public class OverworldManager : MonoBehaviour
 		_GameStateHolder._ActivePlayer.CommanderPosition = tile;
 		//****JUST FOR TESTING**** set new reachable tiles
 		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_GameStateHolder._ActivePlayer, _GameStateHolder._ActivePlayer.CommanderPosition, 1));
-		if (_BattleData._EndState == BattleEndState.Loss && _BattleData._BattleType != BattleType.Card) {
+		if (_BattleData._EndState == BattleEndState.Loss) {
 			endTurn();
 		}
 	}
@@ -205,7 +205,7 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void HandleTileEvent(TileData tile) {
-        _OverworldUI.Disable();
+		_OverworldUI.Disable();
 		if (_GameStateHolder._ActivePlayer.IsScouting) {
 			_GameStateHolder._ActivePlayer.IsScouting = false;
 			endTurn ();
@@ -316,9 +316,9 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.Disable ();
 		TileData tile = _GameStateHolder._ActivePlayer.CommanderPosition;
 		TileData otherPlayerTile = _GameStateHolder._InactivePlayer.CommanderPosition;
-		if(_BattleData._BattleType == BattleType.Monster) {
-			if(_BattleData._EndState == BattleEndState.Win) {
-				if(tile.Building == BuildingType.Camp) {
+		if (_BattleData._BattleType == BattleType.Monster) {
+			if (_BattleData._EndState == BattleEndState.Win) {
+				if (tile.Building == BuildingType.Camp) {
 					_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
 				}
 				//p.ShowOK ("Battle", "You now own this tile!", endTurn);
@@ -331,15 +331,14 @@ public class OverworldManager : MonoBehaviour
 				//p.ShowOK("Battle", "You lost against the monster!", );
 			}
 		}
-		else if(_BattleData._BattleType == BattleType.PvP) {
-			if(_BattleData._EndState == BattleEndState.Win) {
+		else if (_BattleData._BattleType == BattleType.PvP) {
+			if (_BattleData._EndState == BattleEndState.Win) {
 				_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
 
 				// need to do something if the other player was totally knocked out
 				//
 
-
-				if(tile.Building == BuildingType.Cave) {
+				if (tile.Building == BuildingType.Cave) {
 					CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
 					_GameStateHolder._ActivePlayer.AddCard(c);
 					p.ShowOK("Card Recieved!", "You beat the other player and recieved a " + c.Name + " card.", endTurn);
@@ -347,12 +346,9 @@ public class OverworldManager : MonoBehaviour
 				else {
 					endTurn();
 				}
-
-			}
-			else {
-
+			} else {
 				// check for total KO
-				if(_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count == 0 && _GameStateHolder._InactivePlayer.CastleProgress != 4) {
+				if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count == 0 && _GameStateHolder._InactivePlayer.CastleProgress != 4) {
 
 					// revive half the units;
 					List<Unit> units = _GameStateHolder._ActivePlayer.PlayerArmy.GetKOUnits();
@@ -363,12 +359,11 @@ public class OverworldManager : MonoBehaviour
 					_OverworldUI.Enable();
 					TileData startTile = _GameStateHolder._ActivePlayer.Type == PlayerType.Battlebeard ? _Board._BBStartTile : _Board._SSStartTile;
 					_OverworldUI.ForceMoveCommander(startTile);
-
 					return;
 				}
 
 				// if defense battle
-				if(tile != otherPlayerTile) {
+				if (tile != otherPlayerTile) {
 					// defending player gets 
 				}
 				_OverworldUI.Enable();
@@ -377,8 +372,8 @@ public class OverworldManager : MonoBehaviour
 				//p.ShowOK("Battle", "You lost against the other player!", endTurn);
 			}
 		}
-		else if(_BattleData._BattleType == BattleType.LostImmortal) {
-			if(_BattleData._EndState == BattleEndState.Win && tile.Building == BuildingType.Fortress) {
+		else if (_BattleData._BattleType == BattleType.LostImmortal) {
+			if (_BattleData._EndState == BattleEndState.Win && tile.Building == BuildingType.Fortress) {
 				tile.Owner = PlayerType.None;
 				_GameStateHolder._ActivePlayer.LostImmortalKillCount++;
 				// TODO: move this to armoury
@@ -393,8 +388,8 @@ public class OverworldManager : MonoBehaviour
 				//endTurn();
 			}
 		}
-		else if(_BattleData._BattleType == BattleType.Card) {
-			if(_BattleData._EndState == BattleEndState.Win) {
+		else if (_BattleData._BattleType == BattleType.Card) {
+			if (_BattleData._EndState == BattleEndState.Win) {
 				endTurn();
 			}
 			else {
@@ -476,14 +471,14 @@ public class OverworldManager : MonoBehaviour
 	}
 
 
-    public void Pause() {
-        _OverworldUI.Disable();
-    }
+	public void Pause() {
+		_OverworldUI.Disable();
+	}
 
-    public void UnPause()
-    {
-        _OverworldUI.Enable();
-    }
+	public void UnPause()
+	{
+		_OverworldUI.Enable();
+	}
 
 	void _OverworldUI_OnUnPause() {
 		_OverworldUI._Paused = false;
@@ -495,23 +490,23 @@ public class OverworldManager : MonoBehaviour
 
 	// --- turns
 
-    void _TurnManager_OnTurnStart() {
+	void _TurnManager_OnTurnStart() {
 		_OverworldUI.Show();
 		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_GameStateHolder._ActivePlayer, _GameStateHolder._ActivePlayer.CommanderPosition, 1));
-    }
+	}
 
 	void endTurn() {
 		_TurnManager.EndTurn();
 	}
 
-    void _TurnManager_OnTurnEnd() {
+	void _TurnManager_OnTurnEnd() {
 		_OverworldUI.Hide();
-        _OverworldUI.DisablePlayerMovement();
+		_OverworldUI.DisablePlayerMovement();
 		_BattleData._EndState = BattleEndState.None;
 		_OverworldUI.Disable();
 		StartCoroutine(SwitchPlayer());
 		_OverworldUI.Enable();
-    }
+	}
 
 	//This is temporary until we actually have things that happen after the move
 	IEnumerator SwitchPlayer() {

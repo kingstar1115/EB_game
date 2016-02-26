@@ -95,9 +95,9 @@ public class BattleManager : MonoBehaviour {
 		CardData activeCard = _GameStateHolder._ActivePlayer.GetCardOfType(CardType.Priority_Card),
 				 inactiveCard = _GameStateHolder._InactivePlayer.GetCardOfType(CardType.Priority_Card);
 
-		if(activeCard != null ^ inactiveCard != null) {
+		if (activeCard != null ^ inactiveCard != null) {
 			// one player has a priority card, which one?
-			if(inactiveCard != null) {
+			if (inactiveCard != null) {
 				_GameStateHolder._InactivePlayer.RemoveCard(inactiveCard);
 				activePlayer = BattlerType.Opposition;
 				Debug.Log(_GameStateHolder._InactivePlayer.GetType() + " used priority card to go first");
@@ -125,13 +125,13 @@ public class BattleManager : MonoBehaviour {
 
 		// if now get the chance that the instigator will go first
 		float chance = 0;
-		if(maxSpeedInstigator >= maxSpeedOpposition) {
+		if (maxSpeedInstigator >= maxSpeedOpposition) {
 			chance = 1 - getPercentage(maxSpeedOpposition, maxSpeedInstigator);
 		}
-		else if(maxSpeedOpposition > maxSpeedInstigator) {
+		else if (maxSpeedOpposition > maxSpeedInstigator) {
 			chance = getPercentage(maxSpeedInstigator, maxSpeedOpposition);
 		}
-		if(new System.Random().NextDouble() < chance) {
+		if (new System.Random().NextDouble() < chance) {
 			activePlayer = BattlerType.Instigator;
 		}
 		else {
@@ -240,7 +240,7 @@ public class BattleManager : MonoBehaviour {
 
 	public int Attack(BattlerType t, iBattleable target) {
 		int totalDamage = 0;
-		if(t == BattlerType.Instigator) {
+		if (t == BattlerType.Instigator) {
 			totalDamage = _instigatorBattlers.Sum(x => x.GetStrength());
 		}
 		else {
