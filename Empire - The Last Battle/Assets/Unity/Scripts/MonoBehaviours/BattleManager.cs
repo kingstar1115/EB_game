@@ -51,6 +51,7 @@ public class BattleManager : MonoBehaviour {
 
 		// start pre battle stuff
 		StartCoroutine(_preBattle());
+		Audio.AudioInstance.PlaySFX(SoundEffect.Charge);
 	}
 
 	void removeListeners() {
@@ -65,6 +66,10 @@ public class BattleManager : MonoBehaviour {
 	}
 
 	private void OnUpdateUnit(Player p, Unit u) {
+		if (u.IsKO()) {
+			Audio.AudioInstance.PlaySFX(SoundEffect.Dead);
+		}
+
 		if (u.IsKO() && !p.PlayerArmy.GetActiveUnitTypes().Contains(u.Type)) {
 			_BattleUnitPositionManager.RemoveUnit(u.Type);
 			_instigatorBattlers.Remove(u);
@@ -166,6 +171,7 @@ public class BattleManager : MonoBehaviour {
 		// just attack the first one for now
 		Debug.Log("Enemy attacks!");
 		Attack(activePlayer, _instigatorBattlers[0]);
+		Audio.AudioInstance.PlaySFX(SoundEffect.Roar1);
 		StartCoroutine(endTurn());
 	}
 
@@ -212,6 +218,7 @@ public class BattleManager : MonoBehaviour {
 		// generate a monster based on the player 
 
 		setOpposition(MonsterType.Minotaur);
+		Audio.AudioInstance.PlayMusic(MusicTrack.Dungeon);
 	}
 
 	void _setupLostImmortalBattle() {
@@ -221,6 +228,8 @@ public class BattleManager : MonoBehaviour {
 		setOpposition(MonsterType.LostImmortalBb1);
 		setOppositionA(MonsterType.Cyclops);
 		setOppositionB(MonsterType.Minotaur);
+
+		Audio.AudioInstance.PlayMusic(MusicTrack.Dungeon);
 	}
 
 	void _setupPvPBattle() {
@@ -230,11 +239,14 @@ public class BattleManager : MonoBehaviour {
 		// for now it's like this
 		setOpposition(_GameStateHolder._InactivePlayer.PlayerArmy.GetActiveUnits()[0]);
 		setActiveUnit(_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits()[0]);
+
+		Audio.AudioInstance.PlayMusic(MusicTrack.Dungeon);
 		Debug.Log("Battle Player");
 	}
 
 	public void AttackButton() {
 		Attack(activePlayer, _oppositionBattler);
+		Audio.AudioInstance.PlaySFX(SoundEffect.Hit1);
 		StartCoroutine(endTurn());
 	}
 

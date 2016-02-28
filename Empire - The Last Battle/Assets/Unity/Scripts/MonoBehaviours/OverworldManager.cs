@@ -16,6 +16,7 @@ public class OverworldManager : MonoBehaviour
 	public GameStateHolder _GameStateHolder;
 	public BattleData _BattleData;
 	public string _BattleScene;
+	public MusicTrack[] _OverworldMusic;
 
 	//****TESTS ONLY****
 	public CardList _StartCards;
@@ -83,6 +84,8 @@ public class OverworldManager : MonoBehaviour
 		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
 
 		_GameStateHolder._gameState = GameState.Overworld;
+
+		Audio.AudioInstance.PlayMusic(_OverworldMusic, true);
 
 		if (_BattleData._EndState == BattleEndState.None) {
 
@@ -269,6 +272,7 @@ public class OverworldManager : MonoBehaviour
 					// end turn
 				break;
 			case BuildingType.Inn:
+				Audio.AudioInstance.PlaySFX(SoundEffect.Inn);
 				if (_GameStateHolder._InactivePlayer.CastleProgress >= 4) {
 					p.ShowOK ("Oh No!", "The inn won't accept you!", endTurn);
 					break;
@@ -535,28 +539,37 @@ public class OverworldManager : MonoBehaviour
 
 	// Update is called once per frame
 	void Update() {
-		if (Input.GetKeyDown(KeyCode.Return)) {
-			StartCoroutine(SceneSwitcher.ChangeScene(0));
-		}
+        if (Debug.isDebugBuild)
+        {
+			if(Input.GetKeyDown(KeyCode.M)) {
+				if(_GameStateHolder._ActivePlayer.PreviousCommanderPosition && _GameStateHolder._ActivePlayer.PreviousCommanderPosition != _GameStateHolder._ActivePlayer.CommanderPosition) {
+					_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
+				}
+			}
 
-		if (Input.GetKeyDown (KeyCode.M)) {
-			if (_GameStateHolder._ActivePlayer.PreviousCommanderPosition && _GameStateHolder._ActivePlayer.PreviousCommanderPosition != _GameStateHolder._ActivePlayer.CommanderPosition) {
-				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
-			}
-		}
-		if (Input.GetKeyDown(KeyCode.N)) {
-			// move back using up a turn
-			if (_GameStateHolder._ActivePlayer.PreviousCommanderPosition && _GameStateHolder._ActivePlayer.PreviousCommanderPosition != _GameStateHolder._ActivePlayer.CommanderPosition) {
-				_OverworldUI.MoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
-			}
-		}
-		if (Input.GetKeyDown(KeyCode.C)) {
-			CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
-			_GameStateHolder._ActivePlayer.AddCard(c);
-		}
-		//Delete in final build. Used for testing, an example of how to call debug message class
-		if (Input.GetKeyDown (KeyCode.Alpha8)) {
-			DebugUI.getUI ().SetMessage ("Test", 22, Color.green);
+            if (Input.GetKeyDown(KeyCode.Alpha8))
+            {
+                DebugUI.getUI().SetMessage("Test", 22, Color.green);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha9))
+            {
+                _GameStateHolder._ActivePlayer.Currency.addPoints(10);
+            }
+
+            if (Input.GetKeyDown(KeyCode.N))
+            {
+                // move back using up a turn
+                if (_GameStateHolder._ActivePlayer.PreviousCommanderPosition && _GameStateHolder._ActivePlayer.PreviousCommanderPosition != _GameStateHolder._ActivePlayer.CommanderPosition)
+                {
+                    _OverworldUI.MoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
+				_GameStateHolder._ActivePlayer.AddCard(c);
+            }
 		}
 	}
 	void tearDownScene() {
