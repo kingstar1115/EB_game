@@ -15,6 +15,7 @@ public class BattleUnitPositionManager : MonoBehaviour {
     public List<GameObject> _BattlebeardUnits;
     public List<GameObject> _StormshaperUnits;
     public List<GameObject> _Monsters;
+    public List<Sprite> _PlayerLogos;
 
     public GameObject _MarkerActivePlayerUnit;
     public GameObject [] _MarkerActivePlayerUnits;
@@ -35,6 +36,7 @@ public class BattleUnitPositionManager : MonoBehaviour {
     public CardDisplayUI _CardDisplayUI;
     public HandUI _HandUI;
     public ArmyUI _ArmyUI;
+    public UnityEngine.UI.Image _PlayerLogo;
 
     // Use this for initialization
     void Start() {
@@ -214,6 +216,9 @@ public class BattleUnitPositionManager : MonoBehaviour {
     public void SwitchFocus(PlayerType pType){
 		_ArmyUI.SwitchPlayer (pType);
         _HandUI.SetHand(_BattleManager.GetActivePlayer().Hand);
+
+        //set logo as well
+        _PlayerLogo.sprite = _PlayerLogos[(int)pType];
 	}
 
 	public void PauseScreenClickHandler()
