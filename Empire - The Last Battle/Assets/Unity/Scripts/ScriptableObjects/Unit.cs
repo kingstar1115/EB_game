@@ -93,7 +93,7 @@ public class Unit : ScriptableObject, iBattleable {
 
 	public void AddUpgrade(UnitBaseData Upgrade) {
 		//Don't apply the upgrade if a unit is knocked out, should probably return something to acknowledge that it wasn't applied
-		if(!IsKO()) {
+		if (!IsKO()) {
 			CurrentUpgrade = Upgrade;
 			OnUpdate(this);
 		}

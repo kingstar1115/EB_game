@@ -14,7 +14,7 @@ public class Army : ScriptableObject {
 	public void Initialise() {
         // dont call this twice or it will keep adding listeners
         foreach(Unit u in units) {
-            if(u != null) {
+            if (u != null) {
                 u.OnUpdate += unitUpdated;
             }
         }

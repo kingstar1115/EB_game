@@ -47,7 +47,7 @@ public class BoardUI : MonoBehaviour
 		Collider outCollider;
 		if (GetTileHovered_Position (out outCollider)) {
 			TileHolder th;
-			if((th = outCollider.GetComponent<TileHolder>()) != null)
+			if ((th = outCollider.GetComponent<TileHolder>()) != null)
 				return th;
 			else
 			{
