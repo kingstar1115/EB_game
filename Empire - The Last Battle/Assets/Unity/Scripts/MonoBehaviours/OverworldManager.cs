@@ -72,6 +72,7 @@ public class OverworldManager : MonoBehaviour
 		_BattlebeardPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_BattlebeardPlayer.OnCardAdded += _BattlebeardPlayer_OnCardAdded;
 		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
+		_StormshaperPlayer.Currency.OnChange += _PointsSystem_CurrencyChanged;
 		_StormshaperPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_StormshaperPlayer.OnCardAdded += _StormshapersPlayer_OnCardAdded;
 		_StormshaperPlayer.OnCardRemoved += _StormshapersPlayer_OnCardRemoved;
