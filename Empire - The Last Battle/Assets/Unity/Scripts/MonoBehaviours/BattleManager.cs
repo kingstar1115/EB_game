@@ -230,9 +230,9 @@ public class BattleManager : MonoBehaviour {
 
         //init the UI
         if (GetActivePlayerType() == PlayerType.Battlebeard)
-            _BattleUnitPositionManager.Initialise(_BattlebeardPlayer, null);
+			_BattleUnitPositionManager.Initialise(_BattlebeardPlayer, null, _BattlebeardPlayer);
         else
-            _BattleUnitPositionManager.Initialise(null, _StormshaperPlayer);
+			_BattleUnitPositionManager.Initialise(null, _StormshaperPlayer, _StormshaperPlayer);
 	}
 
 	void _setupLostImmortalBattle() {
@@ -245,9 +245,9 @@ public class BattleManager : MonoBehaviour {
 
         //init the UI
         if (GetActivePlayerType() == PlayerType.Battlebeard)
-            _BattleUnitPositionManager.Initialise(_BattlebeardPlayer, null);
+			_BattleUnitPositionManager.Initialise(_BattlebeardPlayer, null, _BattlebeardPlayer);
         else
-            _BattleUnitPositionManager.Initialise(null, _StormshaperPlayer);
+			_BattleUnitPositionManager.Initialise(null, _StormshaperPlayer, _StormshaperPlayer);
 	}
 
 	void _setupPvPBattle() {
@@ -260,7 +260,7 @@ public class BattleManager : MonoBehaviour {
 		Debug.Log("Battle Player");
 
         //init the UI
-        _BattleUnitPositionManager.Initialise(_BattlebeardPlayer, _StormshaperPlayer);
+		_BattleUnitPositionManager.Initialise(_BattlebeardPlayer, _StormshaperPlayer, _GameStateHolder._ActivePlayer);
 	}
 
 	public void AttackButton() {
