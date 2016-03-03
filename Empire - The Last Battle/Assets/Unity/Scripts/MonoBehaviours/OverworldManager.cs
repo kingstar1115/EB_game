@@ -67,6 +67,8 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.OnPause += _OverworldUI_OnPause;
 		_OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
 		_OverworldUI.OnPlayerUseCard += _OverworldUI_OnPlayerUseCard;
+		_OverworldUI._ArmouryUI.OnPurchasedItem += _OverworldUI_ArmouryUI_OnPurchasedItem;
+		_BattlebeardPlayer.Currency.OnChange += _PointsSystem_CurrencyChanged;
 		_BattlebeardPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_BattlebeardPlayer.OnCardAdded += _BattlebeardPlayer_OnCardAdded;
 		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
@@ -185,7 +187,33 @@ public class OverworldManager : MonoBehaviour
 
 	}
 
+	void _PointsSystem_CurrencyChanged(int val)
+	{
+		_OverworldUI._ArmouryUI_OnCurrencyChanged(val, _GameStateHolder._ActivePlayer);
+	}
 
+	public void _OverworldUI_ArmouryUI_OnPurchasedItem(PurchasableItem purchasedItem)
+	{
+		PurchasableUnit purchasedUnit = purchasedItem as PurchasableUnit;
+		PurchasableCard purchasedCard = purchasedItem as PurchasableCard;
+		PurchasableCastlePiece purchasedCastlePiece = purchasedItem as PurchasableCastlePiece;
+
+		if (purchasedUnit != null)
+		{
+			_GameStateHolder._ActivePlayer.PlayerArmy.AddUnit(purchasedUnit.UNITTYPE);
+			_GameStateHolder._ActivePlayer.Currency.addPoints(-purchasedUnit.cost);
+		}
+		else if (purchasedCard != null)
+		{
+			_GameStateHolder._ActivePlayer.Hand.cards.Add(new CardData { Type = purchasedCard.Type });
+			_GameStateHolder._ActivePlayer.Currency.addPoints(-purchasedCard.cost);
+		}
+		else if (purchasedCastlePiece != null)
+		{
+			//ToDo: Give player a castle piece
+			_GameStateHolder._ActivePlayer.Currency.addPoints(-purchasedCastlePiece.cost);
+		}
+	}
 
 	void _OverworldUI_OnCommanderForceMove(TileData tile) {
 		_GameStateHolder._ActivePlayer.CommanderPosition = tile;
@@ -216,7 +244,8 @@ public class OverworldManager : MonoBehaviour
 			ModalPanel p = ModalPanel.Instance ();
 			switch (tile.Building) {
 			case BuildingType.Armoury:
-				p.ShowOK ("Armoury", "You landed on the Armoury.", endTurn);
+					_OverworldUI._ArmouryUI.ToggleShow(true, _GameStateHolder._ActivePlayer);
+					p.ShowOK ("Armoury", "You landed on the Armoury.", endTurn);
 				break;
 			case BuildingType.Camp:
 				if (tile.Owner != _GameStateHolder._ActivePlayer.Type) {
@@ -272,7 +301,7 @@ public class OverworldManager : MonoBehaviour
 					// end turn
 				break;
 			case BuildingType.Inn:
-				Audio.AudioInstance.PlaySFX(SoundEffect.Inn);
+					Audio.AudioInstance.PlaySFX(SoundEffect.Inn);
 				if (_GameStateHolder._InactivePlayer.CastleProgress >= 4) {
 					p.ShowOK ("Oh No!", "The inn won't accept you!", endTurn);
 					break;
@@ -570,6 +599,14 @@ public class OverworldManager : MonoBehaviour
                 CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
 				_GameStateHolder._ActivePlayer.AddCard(c);
             }
+			if (Input.GetKeyDown(KeyCode.Alpha5))
+			{
+				_GameStateHolder._ActivePlayer.Currency.addPoints(1000);
+			}
+			if (Input.GetKeyDown(KeyCode.Alpha4))
+			{
+				_GameStateHolder._ActivePlayer.Currency.addPoints(-1000);
+			}
 		}
 	}
 	void tearDownScene() {

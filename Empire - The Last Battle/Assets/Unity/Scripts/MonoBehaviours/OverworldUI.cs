@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class OverworldUI : MonoBehaviour
 {
@@ -22,6 +23,7 @@ public class OverworldUI : MonoBehaviour
 	public ResourceUI _ResourceUI;
     public CameraMovement _CameraMovement;
     public BoardUI _BoardUI;
+	public ArmouryUI _ArmouryUI;
 	public ArmyUI _ArmyUI;
     public GameObject _PauseScreen;
     public CardDisplayUI _CardDisplayUI;
@@ -86,7 +88,8 @@ public class OverworldUI : MonoBehaviour
 		_stormshaperCommanderUI.OnCommanderDrop -= _CommanderUI_OnCommanderDrop;
 		_stormshaperCommanderUI.OnCommanderGrounded -= _CommanderUI_Grounded;
 		_stormshaperCommanderUI.OnDropCommander -= _CommanderUI_OnDropCommander;
-        _CardDisplayUI.OnCardUse -= _CardDisplayUI_OnCardUse;
+		_ArmouryUI.OnShowToggled -= _ArmouryUI_OnShowToggled;
+		_CardDisplayUI.OnCardUse -= _CardDisplayUI_OnCardUse;
 		_CardDisplayUI.Hide();
         _HandUI._Enabled = false;
 
@@ -178,6 +181,16 @@ public class OverworldUI : MonoBehaviour
 		_CommanderUI = p.Type == PlayerType.Battlebeard ? _battlebeardCommanderUI : _stormshaperCommanderUI;
 		_CommanderUI.DisplayInfo();
 		SwitchFocus (_CommanderUI);
+	}
+
+	public void _ArmouryUI_OnCurrencyChanged(int val, Player player)
+	{
+		_ArmouryUI.CurrencyChangedUpdate(val, player);
+	}
+
+	public void _ArmouryUI_OnShowToggled(bool toggledOn)
+	{
+		throw new NotImplementedException();
 	}
 
 	public void _CardDisplayUI_OnCardUse(CardData cardData)
