@@ -58,7 +58,7 @@ public class OverworldUI : MonoBehaviour
     {
         _BoardUI.Init();
 		_battlebeardCommanderUI.Initialise();    
-		_stormshaperCommanderUI.Initialise();
+		_stormshaperCommanderUI.Initialise();		
 		//snap players to start position    
 		_battlebeardCommanderUI.UpdateToPlayerPosition();    
 		_stormshaperCommanderUI.UpdateToPlayerPosition();
@@ -82,13 +82,13 @@ public class OverworldUI : MonoBehaviour
 		_battlebeardCommanderUI.OnCommanderDrop -= _CommanderUI_OnCommanderDrop;
 		_battlebeardCommanderUI.OnCommanderGrounded -= _CommanderUI_Grounded;
 		_battlebeardCommanderUI.OnDropCommander -= _CommanderUI_OnDropCommander;
+
 		_stormshaperCommanderUI.OnCommanderMoved -= _CommanderUI_OnCommanderMoved;
 		_stormshaperCommanderUI.OnCommanderForceMoved -= _CommanderUI_OnCommanderForceMoved;
 		_stormshaperCommanderUI.OnStartDrag -= _CommanderUI_OnStartDrag;
 		_stormshaperCommanderUI.OnCommanderDrop -= _CommanderUI_OnCommanderDrop;
 		_stormshaperCommanderUI.OnCommanderGrounded -= _CommanderUI_Grounded;
 		_stormshaperCommanderUI.OnDropCommander -= _CommanderUI_OnDropCommander;
-		_ArmouryUI.OnShowToggled -= _ArmouryUI_OnShowToggled;
 		_CardDisplayUI.OnCardUse -= _CardDisplayUI_OnCardUse;
 		_CardDisplayUI.Hide();
         _HandUI._Enabled = false;
@@ -143,6 +143,8 @@ public class OverworldUI : MonoBehaviour
 		OnPlayerUseCard = delegate { };
 		OnPause = delegate { };
 		OnUnPause = delegate { };
+
+		_ArmouryUI.RemoveListeners();
 		_ArmyUI.RemoveListeners();
 		_CardDisplayUI.RemoveListeners();
 		_HandUI.RemoveListeners();
@@ -188,9 +190,9 @@ public class OverworldUI : MonoBehaviour
 		_ArmouryUI.CurrencyChangedUpdate(val, player);
 	}
 
-	public void _ArmouryUI_OnShowToggled(bool toggledOn)
+	public void _ArmouryUI_OnShowToggled(bool toggledOn, Player player)
 	{
-		throw new NotImplementedException();
+		_ArmouryUI.ToggleShow(toggledOn, player);
 	}
 
 	public void _CardDisplayUI_OnCardUse(CardData cardData)

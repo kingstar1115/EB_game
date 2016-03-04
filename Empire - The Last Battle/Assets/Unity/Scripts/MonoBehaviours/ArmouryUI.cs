@@ -4,6 +4,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
+//Don't want to ever create a scriptable object instance of just 
+//this class so leave it here and mark abstract
 public abstract class PurchasableItem : ScriptableObject
 {
 	public int cost;
@@ -15,9 +17,7 @@ public class ArmouryUI : MonoBehaviour
 	public List<PurchasableCard> purchasableCards;
 	public List<PurchasableCastlePiece> purchasableCastlePieces;
 
-	public delegate void PurchasedItemCallback(PurchasableItem purchasedItem);
-	public event PurchasedItemCallback OnPurchasedItem = delegate { };
-	public event Action<bool> OnShowToggled = delegate { };
+	public event Action<PurchasableItem> OnPurchasedItem = delegate { };
 
 	int previousCurrency;
 
@@ -47,6 +47,7 @@ public class ArmouryUI : MonoBehaviour
 		return purchasableCastlePieces.Where(x => player.LostImmortalKillCount >= x.purchaseLevel && x.b_AlreadyPurchased).ToList();
 	}
 
+	//When the currency is changed it will update what can be shown in the armoury
 	public void CurrencyChangedUpdate(int val, Player player)
 	{
 		bool disable = false;
@@ -77,6 +78,7 @@ public class ArmouryUI : MonoBehaviour
 	{
 		Transform section = null;
 
+		//Need to loop through children transforms to get correct section gameobject (Unit, Card or Castle UI)
         foreach (Transform child in transform)
 		{
 			section = child.Find(sectionName);
@@ -84,6 +86,9 @@ public class ArmouryUI : MonoBehaviour
 
 		if (section != null)
 		{
+			//Disables any images to stop them being clickable, usually when the user doesn't have enough money
+			//Else enable the images on the items that are passed into this method
+			//Gameobject UI items must contain the same name as scriptable objects purchasble items for this to work.
 			if (disableOn)
 				section.GetComponentsInChildren<Image>(true).Where(x => !purchasableItems.Any(z => x.name.Contains(z.name.ToString())))
 					.ToList().ForEach(x => { x.color = Color.grey; x.GetComponent<Button>().interactable = false; });
@@ -97,8 +102,6 @@ public class ArmouryUI : MonoBehaviour
 	{
 		gameObject.SetActive(toggledOn);
 		UpdateItems(player);
-
-		OnShowToggled(toggledOn);
 	}
 
 	public void BuyUnit(PurchasableUnit purchasedUnit)
@@ -123,5 +126,10 @@ public class ArmouryUI : MonoBehaviour
 
 		if (Debug.isDebugBuild)
 			Debug.Log("Castle Piece " + purchasedCastlePiece.name + " bought");
+	}
+
+	public void RemoveListeners()
+	{
+		OnPurchasedItem = delegate { };
 	}
 }
