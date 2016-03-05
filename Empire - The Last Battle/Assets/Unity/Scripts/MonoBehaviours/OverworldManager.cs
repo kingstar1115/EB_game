@@ -68,11 +68,11 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
 		_OverworldUI.OnPlayerUseCard += _OverworldUI_OnPlayerUseCard;
 		_OverworldUI._ArmouryUI.OnPurchasedItem += _OverworldUI_ArmouryUI_OnPurchasedItem;
-		_BattlebeardPlayer.Currency.OnChange += _PointsSystem_CurrencyChanged;
+		_BattlebeardPlayer.Currency.OnChange += _OverworldUI._ArmouryUI_OnCurrencyChanged;
 		_BattlebeardPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_BattlebeardPlayer.OnCardAdded += _BattlebeardPlayer_OnCardAdded;
 		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
-		_StormshaperPlayer.Currency.OnChange += _PointsSystem_CurrencyChanged;
+		_StormshaperPlayer.Currency.OnChange += _OverworldUI._ArmouryUI_OnCurrencyChanged;
 		_StormshaperPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_StormshaperPlayer.OnCardAdded += _StormshapersPlayer_OnCardAdded;
 		_StormshaperPlayer.OnCardRemoved += _StormshapersPlayer_OnCardRemoved;
@@ -187,23 +187,12 @@ public class OverworldManager : MonoBehaviour
 
 	}
 
-	void _PointsSystem_CurrencyChanged(int val)
+	//This method is for when the user finishes using the armoury by Key or Button
+	public void _ArmouryUI_EndTurn()
 	{
-		_OverworldUI._ArmouryUI_OnCurrencyChanged(val, _GameStateHolder._ActivePlayer);
+		_OverworldUI._ArmouryUI.Hide(_GameStateHolder._ActivePlayer);
+		endTurn();
 	}
-
-	//Listen to OnShowToggled here because we need to call endTurn and get active player
-	public void _OverworldUI_ArmouryUI_OnShowToggled(bool toggledOn)
-	{
-		//Bubble through the methods to armouryUI
-		_OverworldUI._ArmouryUI_OnShowToggled(toggledOn, _GameStateHolder._ActivePlayer);
-
-		//Armoury has been closed somehow, so user has finished purchasing stuff 
-		//and we need to end the turn
-		if (!toggledOn)
-			endTurn();
-			
-    }
 
 	//Handles all armoury purchases
 	public void _OverworldUI_ArmouryUI_OnPurchasedItem(PurchasableItem purchasedItem)
@@ -261,8 +250,8 @@ public class OverworldManager : MonoBehaviour
 			ModalPanel p = ModalPanel.Instance ();
 			switch (tile.Building) {
 			case BuildingType.Armoury:
-					_OverworldUI_ArmouryUI_OnShowToggled(true);
-                    p.ShowOK ("Armoury", "You landed on the Armoury.", endTurn);
+					_OverworldUI._ArmouryUI.Show(_GameStateHolder._ActivePlayer);
+					p.ShowOK ("Armoury", "You landed on the Armoury.", endTurn);
 				break;
 			case BuildingType.Camp:
 				if (tile.Owner != _GameStateHolder._ActivePlayer.Type) {

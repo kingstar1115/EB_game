@@ -98,10 +98,15 @@ public class ArmouryUI : MonoBehaviour
 		}
 	}
 
-	public void ToggleShow(bool toggledOn, Player player)
+	public void Show(Player player)
 	{
-		gameObject.SetActive(toggledOn);
+		gameObject.SetActive(true);
 		UpdateItems(player);
+	}
+
+	public void Hide(Player player)
+	{
+		gameObject.SetActive(false);
 	}
 
 	public void BuyUnit(PurchasableUnit purchasedUnit)

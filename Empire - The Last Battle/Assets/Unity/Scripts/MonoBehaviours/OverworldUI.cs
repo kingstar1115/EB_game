@@ -28,6 +28,7 @@ public class OverworldUI : MonoBehaviour
     public GameObject _PauseScreen;
     public CardDisplayUI _CardDisplayUI;
     public HandUI _HandUI;
+	public GameStateHolder _GameStateHolder;
 
 	bool _enabled;
     bool _paused;
@@ -185,14 +186,9 @@ public class OverworldUI : MonoBehaviour
 		SwitchFocus (_CommanderUI);
 	}
 
-	public void _ArmouryUI_OnCurrencyChanged(int val, Player player)
+	public void _ArmouryUI_OnCurrencyChanged(int val)
 	{
-		_ArmouryUI.CurrencyChangedUpdate(val, player);
-	}
-
-	public void _ArmouryUI_OnShowToggled(bool toggledOn, Player player)
-	{
-		_ArmouryUI.ToggleShow(toggledOn, player);
+		_ArmouryUI.CurrencyChangedUpdate(val, _GameStateHolder._ActivePlayer);
 	}
 
 	public void _CardDisplayUI_OnCardUse(CardData cardData)
