@@ -104,7 +104,7 @@ public class ArmouryUI : MonoBehaviour
 		UpdateItems(player);
 	}
 
-	public void Hide(Player player)
+	public void Hide()
 	{
 		gameObject.SetActive(false);
 	}

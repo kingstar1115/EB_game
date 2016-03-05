@@ -190,7 +190,7 @@ public class OverworldManager : MonoBehaviour
 	//This method is for when the user finishes using the armoury by Key or Button
 	public void _ArmouryUI_EndTurn()
 	{
-		_OverworldUI._ArmouryUI.Hide(_GameStateHolder._ActivePlayer);
+		_OverworldUI._ArmouryUI.Hide();
 		endTurn();
 	}
 
