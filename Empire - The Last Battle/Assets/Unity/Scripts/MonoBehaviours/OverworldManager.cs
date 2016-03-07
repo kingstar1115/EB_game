@@ -505,6 +505,7 @@ public class OverworldManager : MonoBehaviour
 
 	void _TurnManager_OnTurnEnd() {
 		_OverworldUI.Hide();
+		TutorialPanel.Instance().Hide();
 		_OverworldUI.DisablePlayerMovement();
 		_BattleData._EndState = BattleEndState.None;
 		_OverworldUI.Disable();
@@ -547,6 +548,11 @@ public class OverworldManager : MonoBehaviour
 				}
 			}
 
+			if(Input.GetKeyDown(KeyCode.T)) {
+				TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type, "title", "you should do this thing!", true);
+				TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type, "title 2", "page 2!", false);
+			}
+
             if (Input.GetKeyDown(KeyCode.Alpha8))
             {
                 DebugUI.getUI().SetMessage("Test", 22, Color.green);
@@ -578,6 +584,7 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.RemoveListeners();
 		_CardSystem.RemoveListeners();
 		ModalPanel.RemoveListeners();
+		TutorialPanel.RemoveListeners();
 	}
 
 
