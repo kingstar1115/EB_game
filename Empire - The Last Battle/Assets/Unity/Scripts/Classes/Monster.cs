@@ -6,17 +6,21 @@ public class Monster : iBattleable {
     int hp, currentHp, speed, strength;
     public MonsterType Type;
 
-    public Monster(MonsterBaseData data) {
+    public Monster(MonsterBaseData data, MonsterType type) {
         hp = data.HP;
         currentHp = data.HP;
         speed = data.Speed;
         strength = data.Strength;
-        Type = data.Type;
+        Type = type;
     }
 
     public bool IsKO() {
         return currentHp <= 0;
     }
+
+	public bool isLostImmortal() {
+		return (int)Type > 10 && (int)Type < 19;
+	}
 
     public int GetCurrentHP() {
 		if (currentHp < 0) { return 0; }
