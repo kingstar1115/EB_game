@@ -2,7 +2,7 @@ language: objective-c
 install:
 - "./Scripts/install.sh"
 script:
-- travis_wait "./Scripts/build.sh"
+- "./Scripts/build.sh"
 after_success:
 - "./Scripts/pushGHPages.sh"
 branches:
