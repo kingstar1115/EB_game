@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 using System.Linq;
+using UnityEngine.Events;
 
 public class OverworldManager : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class OverworldManager : MonoBehaviour
 	public GameStateHolder _GameStateHolder;
 	public BattleData _BattleData;
 	public string _BattleScene;
+
+	public delegate void EndUnitSelectionAction(bool success, Unit u);
+
 
 	//****TESTS ONLY****
 	public CardList _StartCards;
@@ -320,7 +324,9 @@ public class OverworldManager : MonoBehaviour
 				}
 				//p.ShowOK ("Battle", "You now own this tile!", endTurn);
 				if (_GameStateHolder._ActivePlayer.PlayerArmy.GetTotalActiveUnits () > 1) {
-					p.ShowOKCancel ("Tile Defence", "This tile now belongs to your kingdom. Leave a unit to defend your honour?", DefendingUnitSelection, endTurn);
+					p.ShowOKCancel ("Tile Defence", "This tile now belongs to your kingdom. Leave a unit to defend your honour?", () =>
+						DefendingUnitSelection(_GameStateHolder._ActivePlayer, p, endTurn), 
+						endTurn);
 				} else {
 					endTurn();
 				}
@@ -444,7 +450,7 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI._ArmyUI.OnClickUnit += selectUnit;
 	}
 
-	void DefendingUnitSelection() {
+	void DefendingUnitSelection(Player p, ModalPanel mp, UnityAction onDone) {
 		//Only allow active units
 		UnitSelection flags = UnitSelection.Active;
 
@@ -452,12 +458,19 @@ public class OverworldManager : MonoBehaviour
 
 		UIPlayerUnitTypeIndexCallback selectUnit = null;
 		selectUnit = (PlayerType PlayerType, UnitType ut, int i) => {
-			Unit unit = _GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits(ut)[i];
-			unit.Position = 
-			Debug.Log(unit);
+			Unit unit = p.PlayerArmy.GetActiveUnits(ut)[i];
+			TileData tile = p.CommanderPosition;
+			mp.ShowOKCancel("Confirm unit selection", "Leave behind " + unit.Type.ToString() + "?", 
+				() => SetupDefendedTile(unit, p, tile, onDone),
+				() => DefendingUnitSelection(p, mp, onDone));
 		};
 		_OverworldUI._ArmyUI.OnClickUnit += selectUnit;
+	}
 
+	void SetupDefendedTile(Unit u, Player p, TileData t, UnityAction onDone) {
+		t.Defended = true;
+		u.Position = t;
+		onDone();
 	}
 
     public void Pause() {

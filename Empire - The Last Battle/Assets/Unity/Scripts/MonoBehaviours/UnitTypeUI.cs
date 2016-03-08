@@ -120,22 +120,24 @@ public class UnitTypeUI : MonoBehaviour {
 	}
 
 	public void AddUnit(Unit u) {
-		GameObject obj = Instantiate(UnitPrefab);
-		obj.transform.SetParent(UnitList.transform);
+		GameObject obj = Instantiate (UnitPrefab);
+		obj.transform.SetParent (UnitList.transform);
 		obj.transform.localScale = Vector3.one;
-		UnitUI ui = obj.GetComponent<UnitUI>();
-		ui.SetImage(getSprite(u.Type));
-		ui.SetKO(u.IsKO());
-		ui.SetIndex(_units.Count);
-		ui.SetUpgrade(u.HasUpgrade());
+		UnitUI ui = obj.GetComponent<UnitUI> ();
+		ui.SetImage (getSprite (u.Type));
+		ui.SetKO (u.IsKO ());
+		ui.SetIndex (_units.Count);
+		ui.SetUpgrade (u.HasUpgrade ());
 		ui.OnClick += _clickUnit;
-		if (_selectMode) { ui.EnableSelection(); }
-		_units.Add(ui);
-		GameObject g = new GameObject();
-		Image image = g.AddComponent<Image>();
-		g.transform.SetParent(UnitOverview.transform);
+		if (_selectMode) {
+			ui.EnableSelection ();
+		}
+		_units.Add (ui);
+		GameObject g = new GameObject ();
+		Image image = g.AddComponent<Image> ();
+		g.transform.SetParent (UnitOverview.transform);
 		g.transform.localScale = Vector3.one;
-		if (u.IsKO()) {
+		if (u.IsKO ()) {
 			image.color = Color.clear;
 		} else {
 			image.color = OverviewColour;

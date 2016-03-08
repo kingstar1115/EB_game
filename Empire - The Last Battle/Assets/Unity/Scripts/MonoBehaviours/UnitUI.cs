@@ -8,12 +8,14 @@ public class UnitUI : MonoBehaviour {
 	public Image Icon;
 	public Image Upgrade;
 	public Image TempUpgrade;
+	public Image Defending;
 	public Button Button;
 	public UIUnitIndexCallback OnClick = delegate { };
 	int index;
 	public bool IsKO = false;
 	public bool IsUpgraded = false;
 	public bool isTempUpgraded = false;
+	public bool IsDefending = false;
 
 	public void RemoveListeners() {
 		OnClick = delegate { };
@@ -22,6 +24,11 @@ public class UnitUI : MonoBehaviour {
 	public void SetKO(bool b) {
 		IsKO = b;
 		KO.gameObject.SetActive(b);
+	}
+
+	public void SetDefending(bool b) {
+		IsDefending = b;
+		Defending.gameObject.SetActive (b);
 	}
 
 	public void SetIndex(int i) {
