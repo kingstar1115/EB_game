@@ -28,11 +28,11 @@ echo "Attempting to build $project for Web"
   -batchmode \
   -nographics \
   -silent-crashes \
-  -logFile $(pwd)/unity.log \
+  -logFile \
   -projectPath "$projectPath" \
   -buildWebPlayer  "$(pwd)/Build/ELB" \
   -quit
-# 
+#
 # echo 'Zipping files for distribution'
 # zip -r Build/ELB_OSX.zip Build/osx
 # zip -r Build/ELB_Win.zip Build/windows
