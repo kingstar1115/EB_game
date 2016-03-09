@@ -84,7 +84,7 @@ public class CardDisplayUI : MonoBehaviour
         Hide();
 
         //------TEST-------
-        //if(_HandUI.m_Cards.Count > 0)
+        //if (_HandUI.m_Cards.Count > 0)
          //   _HandUI.SelectCard(0);
     }
 

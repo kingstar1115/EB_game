@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 using System.Linq;
+using System;
 
 public class OverworldManager : MonoBehaviour
 {
@@ -11,10 +12,11 @@ public class OverworldManager : MonoBehaviour
 	public Board _Board;
 	public Player _BattlebeardPlayer;
 	public Player _StormshaperPlayer;
-    public TurnManager _TurnManager;
+	public TurnManager _TurnManager;
 	public GameStateHolder _GameStateHolder;
 	public BattleData _BattleData;
 	public string _BattleScene;
+	public MusicTrack[] _OverworldMusic;
 
 	//****TESTS ONLY****
 	public CardList _StartCards;
@@ -25,10 +27,10 @@ public class OverworldManager : MonoBehaviour
 		SceneFaderUI.ScreenFader.StartFadeOverTime(SceneFaderUI.FadeDir.FadeOut);
 		_Board.Initialise();
 
-        if(_BattleData._EndState == BattleEndState.None) {
-            _BattlebeardPlayer.ResetArmy();
-            _StormshaperPlayer.ResetArmy();
-        }
+		if (_BattleData._EndState == BattleEndState.None) {
+			_BattlebeardPlayer.ResetArmy();
+			_StormshaperPlayer.ResetArmy();
+		}
 
 		_BattlebeardPlayer.Initialise();
 		_StormshaperPlayer.Initialise();
@@ -50,21 +52,21 @@ public class OverworldManager : MonoBehaviour
 			}
 		}
 
-        //test by adding a scout card.
+		//test by adding a scout card.
 
 		_OverworldUI.Initialise(_BattlebeardPlayer, _StormshaperPlayer);
 
-        _TurnManager.OnTurnStart += _TurnManager_OnTurnStart;
-        _TurnManager.OnTurnEnd += _TurnManager_OnTurnEnd;
-        _TurnManager.OnSwitchTurn += _TurnManager_OnSwitchTurn;
+		_TurnManager.OnTurnStart += _TurnManager_OnTurnStart;
+		_TurnManager.OnTurnEnd += _TurnManager_OnTurnEnd;
+		_TurnManager.OnSwitchTurn += _TurnManager_OnSwitchTurn;
 
 
 		//event listeners
 		_OverworldUI.OnCommanderMove += _OverworldUI_OnCommanderMove;
 		_OverworldUI.OnCommanderForceMove += _OverworldUI_OnCommanderForceMove;
-        _OverworldUI.OnPause += _OverworldUI_OnPause;
-        _OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
-        _OverworldUI.OnPlayerUseCard += _OverworldUI_OnPlayerUseCard;
+		_OverworldUI.OnPause += _OverworldUI_OnPause;
+		_OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
+		_OverworldUI.OnPlayerUseCard += _OverworldUI_OnPlayerUseCard;
 		_BattlebeardPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_BattlebeardPlayer.OnCardAdded += _BattlebeardPlayer_OnCardAdded;
 		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
@@ -73,6 +75,7 @@ public class OverworldManager : MonoBehaviour
 		_StormshaperPlayer.OnCardRemoved += _StormshapersPlayer_OnCardRemoved;
 
 		_CardSystem.RequestUnitSelection +=_CardSystem_RequestUnitSelection;
+		_CardSystem.RequestBattle += _CardSystem_RequestBattle;
 
 		_BattlebeardPlayer.OnCastleProgress += _Board.SetCastleState;
 		_StormshaperPlayer.OnCastleProgress += _Board.SetCastleState;
@@ -81,6 +84,8 @@ public class OverworldManager : MonoBehaviour
 		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
 
 		_GameStateHolder._gameState = GameState.Overworld;
+
+		Audio.AudioInstance.PlayMusic(_OverworldMusic, true);
 
 		if (_BattleData._EndState == BattleEndState.None) {
 
@@ -116,9 +121,9 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void _OverworldUI_OnPlayerUseCard(CardData card)
-    {
-        UseCard(card);
-    }
+	{
+		UseCard(card);
+	}
 
 	void _BattlebeardPlayer_OnCardAdded(CardData card)
 	{
@@ -203,7 +208,7 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void HandleTileEvent(TileData tile) {
-        _OverworldUI.Disable();
+		_OverworldUI.Disable();
 		if (_GameStateHolder._ActivePlayer.IsScouting) {
 			_GameStateHolder._ActivePlayer.IsScouting = false;
 			endTurn ();
@@ -267,6 +272,7 @@ public class OverworldManager : MonoBehaviour
 					// end turn
 				break;
 			case BuildingType.Inn:
+				Audio.AudioInstance.PlaySFX(SoundEffect.Inn);
 				if (_GameStateHolder._InactivePlayer.CastleProgress >= 4) {
 					p.ShowOK ("Oh No!", "The inn won't accept you!", endTurn);
 					break;
@@ -321,7 +327,8 @@ public class OverworldManager : MonoBehaviour
 				}
 				//p.ShowOK ("Battle", "You now own this tile!", endTurn);
 				endTurn();
-			} else {
+			}
+			else {
 				Debug.Log("lose monster");
 				_OverworldUI.Enable();
 				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
@@ -335,7 +342,6 @@ public class OverworldManager : MonoBehaviour
 				// need to do something if the other player was totally knocked out
 				//
 
-
 				if (tile.Building == BuildingType.Cave) {
 					CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
 					_GameStateHolder._ActivePlayer.AddCard(c);
@@ -344,22 +350,19 @@ public class OverworldManager : MonoBehaviour
 				else {
 					endTurn();
 				}
-				
 			} else {
-
 				// check for total KO
 				if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count == 0 && _GameStateHolder._InactivePlayer.CastleProgress != 4) {
-					
+
 					// revive half the units;
 					List<Unit> units = _GameStateHolder._ActivePlayer.PlayerArmy.GetKOUnits();
-					for (int i = 0; i < units.Count / 2; i++) {
+					for(int i = 0; i < units.Count / 2; i++) {
 						units[i].Heal();
 					}
 					// move commander to start tile;
 					_OverworldUI.Enable();
 					TileData startTile = _GameStateHolder._ActivePlayer.Type == PlayerType.Battlebeard ? _Board._BBStartTile : _Board._SSStartTile;
 					_OverworldUI.ForceMoveCommander(startTile);
-					
 					return;
 				}
 
@@ -381,11 +384,21 @@ public class OverworldManager : MonoBehaviour
 				_GameStateHolder._ActivePlayer.CastleProgress++;
 				//p.ShowOK ("Battle", "You beat the lost immortal!", endTurn);
 				endTurn();
-			} else {
+			}
+			else {
 				_OverworldUI.Enable();
 				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
 				//p.ShowOK("Battle", "You lost against the lost immortal!", endTurn);
 				//endTurn();
+			}
+		}
+		else if (_BattleData._BattleType == BattleType.Card) {
+			if (_BattleData._EndState == BattleEndState.Win) {
+				endTurn();
+			}
+			else {
+				_OverworldUI.Enable();
+				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
 			}
 		}
 	}
@@ -397,10 +410,30 @@ public class OverworldManager : MonoBehaviour
 	public CardData GenerateRandomCard(List<CardData> availableCards) {
 		//Generate a random card
 		List<CardType> uniqueTypes = availableCards.Select(x => x.Type).Distinct().ToList();
-		int randomTypeIndex = Random.Range(0, uniqueTypes.Count - 1);
+		int randomTypeIndex = UnityEngine.Random.Range(0, uniqueTypes.Count - 1);
 		List<CardData> cardsOfType = availableCards.FindAll(x => x.Type == uniqueTypes[randomTypeIndex]);
-		int randomCardIndex = (short)Random.Range(0, cardsOfType.Count - 1);
+		int randomCardIndex = (short)UnityEngine.Random.Range(0, cardsOfType.Count - 1);
 		return cardsOfType[randomCardIndex];
+	}
+	
+	void _CardSystem_RequestBattle(CardData card, EndCardAction done)
+	{
+		BuildingType currentTile = _GameStateHolder._ActivePlayer.CommanderPosition.Building;
+		BuildingType [] battleTiles = {
+			BuildingType.Camp,
+			BuildingType.Cave,
+			BuildingType.Fortress
+		};
+		if (Array.IndexOf(battleTiles, currentTile) == -1) {
+			done(false, card, _GameStateHolder._ActivePlayer, null);
+			return;
+		}
+
+		done(true, card, _GameStateHolder._ActivePlayer, null);
+		startBattle (BattleType.Card);
+
+		if (Debug.isDebugBuild)		
+			Debug.Log ("Battle card has started battle");
 	}
 
 	void _CardSystem_RequestUnitSelection(CardData c, int numSelection, Player p, CardAction action, EndCardAction done) {
@@ -442,14 +475,14 @@ public class OverworldManager : MonoBehaviour
 	}
 
 
-    public void Pause() {
-        _OverworldUI.Disable();
-    }
+	public void Pause() {
+		_OverworldUI.Disable();
+	}
 
-    public void UnPause()
-    {
-        _OverworldUI.Enable();
-    }
+	public void UnPause()
+	{
+		_OverworldUI.Enable();
+	}
 
 	void _OverworldUI_OnUnPause() {
 		_OverworldUI._Paused = false;
@@ -461,23 +494,24 @@ public class OverworldManager : MonoBehaviour
 
 	// --- turns
 
-    void _TurnManager_OnTurnStart() {
+	void _TurnManager_OnTurnStart() {
 		_OverworldUI.Show();
 		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_GameStateHolder._ActivePlayer, _GameStateHolder._ActivePlayer.CommanderPosition, 1));
-    }
+	}
 
 	void endTurn() {
 		_TurnManager.EndTurn();
 	}
 
-    void _TurnManager_OnTurnEnd() {
+	void _TurnManager_OnTurnEnd() {
 		_OverworldUI.Hide();
-        _OverworldUI.DisablePlayerMovement();
+		TutorialPanel.Instance().Hide();
+		_OverworldUI.DisablePlayerMovement();
 		_BattleData._EndState = BattleEndState.None;
 		_OverworldUI.Disable();
 		StartCoroutine(SwitchPlayer());
 		_OverworldUI.Enable();
-    }
+	}
 
 	//This is temporary until we actually have things that happen after the move
 	IEnumerator SwitchPlayer() {
@@ -506,28 +540,42 @@ public class OverworldManager : MonoBehaviour
 
 	// Update is called once per frame
 	void Update() {
-		if (Input.GetKeyDown(KeyCode.Return)) {
-			StartCoroutine(SceneSwitcher.ChangeScene(0));
-		}
+        if (Debug.isDebugBuild)
+        {
+			if(Input.GetKeyDown(KeyCode.M)) {
+				if(_GameStateHolder._ActivePlayer.PreviousCommanderPosition && _GameStateHolder._ActivePlayer.PreviousCommanderPosition != _GameStateHolder._ActivePlayer.CommanderPosition) {
+					_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
+				}
+			}
 
-		if (Input.GetKeyDown (KeyCode.M)) {
-			if (_GameStateHolder._ActivePlayer.PreviousCommanderPosition && _GameStateHolder._ActivePlayer.PreviousCommanderPosition != _GameStateHolder._ActivePlayer.CommanderPosition) {
-				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
+			if(Input.GetKeyDown(KeyCode.T)) {
+				TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type, "title", "you should do this thing!", true);
+				TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type, "title 2", "page 2!", false);
 			}
-		}
-		if (Input.GetKeyDown(KeyCode.N)) {
-			// move back using up a turn
-			if (_GameStateHolder._ActivePlayer.PreviousCommanderPosition && _GameStateHolder._ActivePlayer.PreviousCommanderPosition != _GameStateHolder._ActivePlayer.CommanderPosition) {
-				_OverworldUI.MoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
-			}
-		}
-		if (Input.GetKeyDown(KeyCode.C)) {
-			CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
-			_GameStateHolder._ActivePlayer.AddCard(c);
-		}
-		//Delete in final build. Used for testing, an example of how to call debug message class
-		if (Input.GetKeyDown (KeyCode.Alpha8)) {
-			DebugUI.getUI ().SetMessage ("Test", 22, Color.green);
+
+            if (Input.GetKeyDown(KeyCode.Alpha8))
+            {
+                DebugUI.getUI().SetMessage("Test", 22, Color.green);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha9))
+            {
+                _GameStateHolder._ActivePlayer.Currency.addPoints(10);
+            }
+
+            if (Input.GetKeyDown(KeyCode.N))
+            {
+                // move back using up a turn
+                if (_GameStateHolder._ActivePlayer.PreviousCommanderPosition && _GameStateHolder._ActivePlayer.PreviousCommanderPosition != _GameStateHolder._ActivePlayer.CommanderPosition)
+                {
+                    _OverworldUI.MoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
+				_GameStateHolder._ActivePlayer.AddCard(c);
+            }
 		}
 	}
 	void tearDownScene() {
@@ -536,6 +584,7 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.RemoveListeners();
 		_CardSystem.RemoveListeners();
 		ModalPanel.RemoveListeners();
+		TutorialPanel.RemoveListeners();
 	}
 
 

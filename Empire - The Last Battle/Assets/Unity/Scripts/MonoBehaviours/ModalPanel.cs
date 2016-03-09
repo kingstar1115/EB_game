@@ -20,7 +20,7 @@ public class ModalPanel : MonoBehaviour {
 		if (!modalPanel) {
 			modalPanel = FindObjectOfType<ModalPanel>();
 			if (!modalPanel) {
-				Debug.LogError("No ModalWindow script attatched to any gameobject in the scene");
+				Debug.LogError("No ModalPanel script attatched to any gameobject in the scene");
 			}
 		}
 		return modalPanel;

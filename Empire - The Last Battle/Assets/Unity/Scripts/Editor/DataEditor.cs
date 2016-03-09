@@ -6,7 +6,7 @@ public class DataEditor : Editor {
         //get a save location
         string path = EditorUtility.SaveFilePanel("Create " + type,
                                                   "Assets/Unity/ScriptableObjects/" + subPath, "new" + type + ".asset", "asset");
-        if(path == "")
+        if (path == "")
             return;
 
         //get the location relative to the project

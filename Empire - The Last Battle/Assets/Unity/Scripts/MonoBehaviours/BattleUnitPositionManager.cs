@@ -201,11 +201,31 @@ public class BattleUnitPositionManager : MonoBehaviour {
 		_ActiveOpposition.SetActive(false);
 	}
 
+	public void SetReserveAAsOpposition() {
+		SetReserveAsOpposition(_ReserveOppositionA);
+	}
+
+	public void SetReserveBAsOpposition() {
+		SetReserveAsOpposition(_ReserveOppositionB);
+	}
+
+	public void SetReserveCAsOpposition() {
+		SetReserveAsOpposition(_ReserveOppositionC);
+	}
+
+	public void SetReserveAsOpposition(GameObject reserve) {
+		_ActiveOpposition = reserve;
+		reserve = null;
+		_ActiveOpposition.transform.position = _MarkerActiveOpposition.transform.position;
+		_ActiveOpposition.transform.rotation = _MarkerActiveOpposition.transform.rotation;
+		_ActiveOpposition.SetActive(true);
+	}
+
 	public void SetReserveOppositionA(MonsterType t) {
         GameObject g = _Monsters[(int)t];
         _ReserveOppositionA = (GameObject)Instantiate(g, _MarkerReserveOppositionA.transform.position, _MarkerReserveOppositionA.transform.rotation);
     }
-
+	
 	public void SetReserveOppositionB(MonsterType t) {
         GameObject g = _Monsters[(int)t];
         _ReserveOppositionB = (GameObject)Instantiate(g, _MarkerReserveOppositionB.transform.position, _MarkerReserveOppositionB.transform.rotation);
@@ -213,7 +233,7 @@ public class BattleUnitPositionManager : MonoBehaviour {
 
     public void SetReserveOppositionC(MonsterType t) {
         GameObject g = _Monsters[(int)t];
-        _ReserveOppositionC = (GameObject)Instantiate(g, _MarkerReserveOppositionB.transform.position, _MarkerReserveOppositionB.transform.rotation);
+        _ReserveOppositionC = (GameObject)Instantiate(g, _MarkerReserveOppositionC.transform.position, _MarkerReserveOppositionC.transform.rotation);
     }
 
     public void SwitchFocus(PlayerType pType){
@@ -264,27 +284,4 @@ public class BattleUnitPositionManager : MonoBehaviour {
 			}
 		}
 	}
-}
-
-
-public enum MonsterType {
-    Cyclops,
-    Minotaur,
-	Sasquatch,
-    FireElemental,
-    WaterElemental,
-    EarthElemental,
-    AirElemental,
-    Wyrm,
-    Wyvern,
-    Dragon,
-    Hydra,
-    LostImmortalSs1,
-    LostImmortalSs2,
-    LostImmortalSs3,
-    LostImmortalSs4,
-    LostImmortalBb1,
-    LostImmortalBb2,
-    LostImmortalBb3,
-    LostImmortalBb4
 }

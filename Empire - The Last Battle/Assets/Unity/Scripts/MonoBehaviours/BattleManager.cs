@@ -55,6 +55,7 @@ public class BattleManager : MonoBehaviour {
 
 		// start pre battle stuff
 		StartCoroutine(_preBattle());
+		Audio.AudioInstance.PlaySFX(SoundEffect.Charge);
 	}
 
     void _BattleUnitPositionManager_OnUnPause()
@@ -79,6 +80,10 @@ public class BattleManager : MonoBehaviour {
 	}
 
 	private void OnUpdateUnit(Player p, Unit u) {
+		if (u.IsKO()) {
+			Audio.AudioInstance.PlaySFX(SoundEffect.Dead);
+		}
+
 		if (u.IsKO() && !p.PlayerArmy.GetActiveUnitTypes().Contains(u.Type)) {
 			_BattleUnitPositionManager.RemoveUnit(u.Type);
 			_instigatorBattlers.Remove(u);
@@ -109,9 +114,9 @@ public class BattleManager : MonoBehaviour {
 		CardData activeCard = _GameStateHolder._ActivePlayer.GetCardOfType(CardType.Priority_Card),
 				 inactiveCard = _GameStateHolder._InactivePlayer.GetCardOfType(CardType.Priority_Card);
 
-		if(activeCard != null ^ inactiveCard != null) {
+		if (activeCard != null ^ inactiveCard != null) {
 			// one player has a priority card, which one?
-			if(inactiveCard != null) {
+			if (inactiveCard != null) {
 				_GameStateHolder._InactivePlayer.RemoveCard(inactiveCard);
 				activePlayer = BattlerType.Opposition;
 				Debug.Log(_GameStateHolder._InactivePlayer.GetType() + " used priority card to go first");
@@ -139,13 +144,13 @@ public class BattleManager : MonoBehaviour {
 
 		// if now get the chance that the instigator will go first
 		float chance = 0;
-		if(maxSpeedInstigator >= maxSpeedOpposition) {
+		if (maxSpeedInstigator >= maxSpeedOpposition) {
 			chance = 1 - getPercentage(maxSpeedOpposition, maxSpeedInstigator);
 		}
-		else if(maxSpeedOpposition > maxSpeedInstigator) {
+		else if (maxSpeedOpposition > maxSpeedInstigator) {
 			chance = getPercentage(maxSpeedInstigator, maxSpeedOpposition);
 		}
-		if(new System.Random().NextDouble() < chance) {
+		if (new System.Random().NextDouble() < chance) {
 			activePlayer = BattlerType.Instigator;
 		}
 		else {
@@ -181,6 +186,7 @@ public class BattleManager : MonoBehaviour {
 		// just attack the first one for now
 		Debug.Log("Enemy attacks!");
 		Attack(activePlayer, _instigatorBattlers[0]);
+		Audio.AudioInstance.PlaySFX(SoundEffect.Roar1);
 		StartCoroutine(endTurn());
 	}
 
@@ -192,9 +198,28 @@ public class BattleManager : MonoBehaviour {
 			LoseBattle();
 		} else if (_oppositionBattler.IsKO())  {
 
-			// there's some lost immortal switcharoo here but for now it's just one.
-			_BattleUnitPositionManager.RemoveOpposition();
-			WinBattle();
+			if(_BattleData._BattleType == BattleType.LostImmortal) {
+				if(_oppositionReserveB != null) {
+					_BattleUnitPositionManager.RemoveOpposition();
+					_BattleUnitPositionManager.SetReserveBAsOpposition();
+					_oppositionBattler = _oppositionReserveB;
+					_oppositionReserveB = null;
+				}
+				else if(_oppositionReserveC != null) {
+					_BattleUnitPositionManager.RemoveOpposition();
+					_BattleUnitPositionManager.SetReserveCAsOpposition();
+					_oppositionBattler = _oppositionReserveC;
+					_oppositionReserveC = null;
+				}
+				else {
+					_BattleUnitPositionManager.RemoveOpposition();
+					WinBattle();
+				}
+			} else {
+				_BattleUnitPositionManager.RemoveOpposition();
+				WinBattle();
+			}
+			
 		} else {
 			switchPlayer();
 		}
@@ -216,17 +241,15 @@ public class BattleManager : MonoBehaviour {
 
 
 		startTurn();
-		// 
-
 
 	}
 
 	void _setupMonsterBattle() {
 		Debug.Log("Battle Monster");
 		setActiveArmy();
-		// generate a monster based on the player 
 
-		setOpposition(MonsterType.Minotaur);
+		setOpposition(getMonster());
+		Audio.AudioInstance.PlayMusic(MusicTrack.Dungeon);
 
         //init the UI
         if (GetActivePlayerType() == PlayerType.Battlebeard)
@@ -238,16 +261,109 @@ public class BattleManager : MonoBehaviour {
 	void _setupLostImmortalBattle() {
 		Debug.Log("Battle Lost Immortal");
 		setActiveArmy();
-		// generate a lost immortal based on the beaten lost immortals (or random)
-		setOpposition(MonsterType.LostImmortalBb1);
-		setOppositionA(MonsterType.Cyclops);
-		setOppositionB(MonsterType.Minotaur);
+
+		// generate a lost immortal based on the beaten lost immortals
+		MonsterType[] monsters = getLostImmortalMonsters();
+		setOpposition(monsters[0]);
+		setOppositionB(monsters[1]);
+		setOppositionC(getLostImmortal());
+
+		// do some stuff to move reserve A into the active position (needs to be animated)
+		//_BattleUnitPositionManager.SetReserveAAsOpposition();
+		//_oppositionBattler = _oppositionReserveA;
+		//_oppositionReserveA = null;
 
         //init the UI
         if (GetActivePlayerType() == PlayerType.Battlebeard)
-			_BattleUnitPositionManager.Initialise(_BattlebeardPlayer, null, _BattlebeardPlayer);
+            _BattleUnitPositionManager.Initialise(_BattlebeardPlayer, null, _BattlebeardPlayer);
         else
-			_BattleUnitPositionManager.Initialise(null, _StormshaperPlayer, _StormshaperPlayer);
+            _BattleUnitPositionManager.Initialise(null, _StormshaperPlayer, _StormshaperPlayer);
+
+		Audio.AudioInstance.PlayMusic(MusicTrack.Dungeon);
+	}
+
+	MonsterType getLostImmortal() {
+		int count = _GameStateHolder._ActivePlayer.LostImmortalKillCount;
+		// ss immortals have an index of 11 - 14, bb is 15 - 18
+		int startIndex = _GameStateHolder._ActivePlayer.Type == PlayerType.Stormshaper ? 11 : 15;
+		return (MonsterType)startIndex + count;
+	}
+
+	MonsterType getMonster() {
+		float rand = Random.value;
+		MonsterType monster;
+		switch (_GameStateHolder._ActivePlayer.CastleProgress) {
+			case 0:
+				// cyclops/minotaur/(hard)wyrm
+				// 45/45/10
+				if (rand <= .45) { monster = MonsterType.Cyclops; }
+				else if (rand <= .85) { monster = MonsterType.Minotaur; }
+				else { monster = MonsterType.Wyrm; }
+				break;
+			case 1:
+				// (easy)minotaur/fire/wyrm/(hard)wyvern
+				// 5/45/45/5
+				if (rand <= .05) { monster = MonsterType.Minotaur; }
+				else if (rand <= .5) { monster = MonsterType.FireElemental; }
+				else if (rand <= .95) { monster = MonsterType.Wyrm; }
+				else { monster = MonsterType.Wyvern; }
+				break;
+			case 2:
+				// water/wyvern/(hard)dragon
+				// 45/45/10
+				if(rand <= .45) { monster = MonsterType.WaterElemental; }
+				else if(rand <= .85) { monster = MonsterType.Wyvern; }
+				else { monster = MonsterType.Dragon; }
+				break;
+			case 3:
+				// (easy)wyvern/sasquatch/earth/dragon/(hard)hydra
+				// 5/30/30/30/5
+				if(rand <= .05) { monster = MonsterType.Wyvern; }
+				else if(rand <= .35) { monster = MonsterType.Sasquatch; }
+				else if(rand <= .65) { monster = MonsterType.EarthElemental; }
+				else if(rand <= .95) { monster = MonsterType.Dragon; }
+				else { monster = MonsterType.Hydra; }
+				break;
+			case 4:
+				// (easy)sasquatch/air/hydra
+				// 10/45/45
+				if(rand <= .1) { monster = MonsterType.Sasquatch; }
+				else if(rand <= .55) { monster = MonsterType.AirElemental; }
+				else { monster = MonsterType.Hydra; }
+				break;
+			default:
+				monster = MonsterType.Cyclops;
+				break;
+		}
+		return monster;
+		;
+	}
+
+	MonsterType[] getLostImmortalMonsters() {
+		int rand = Random.Range(0,2);
+		MonsterType[] monsters;
+		switch(_GameStateHolder._ActivePlayer.LostImmortalKillCount) {
+			case 0:
+				monsters = new MonsterType[] { MonsterType.Wyrm, MonsterType.FireElemental };
+				break;
+			case 1:
+				monsters = new MonsterType[] { MonsterType.Wyvern, MonsterType.WaterElemental };
+				break;
+			case 2:
+				monsters = new MonsterType[] { MonsterType.Dragon, MonsterType.EarthElemental };
+				break;
+			case 3:
+				monsters = new MonsterType[] { MonsterType.Hydra, MonsterType.AirElemental };
+				break;
+			default:
+				monsters = new MonsterType[] { MonsterType.Hydra, MonsterType.AirElemental };
+				break;
+		}
+
+		if(rand == 0) {
+			monsters.Reverse();
+		}
+		return monsters;
 	}
 
 	void _setupPvPBattle() {
@@ -257,6 +373,8 @@ public class BattleManager : MonoBehaviour {
 		// for now it's like this
 		setOpposition(_GameStateHolder._InactivePlayer.PlayerArmy.GetActiveUnits()[0]);
 		setActiveUnit(_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits()[0]);
+
+		Audio.AudioInstance.PlayMusic(MusicTrack.Dungeon);
 		Debug.Log("Battle Player");
 
         //init the UI
@@ -264,13 +382,17 @@ public class BattleManager : MonoBehaviour {
 	}
 
 	public void AttackButton() {
+		if (_BattleData._BattleType != BattleType.PvP && activePlayer != BattlerType.Instigator) {
+			return;
+		}
 		Attack(activePlayer, _oppositionBattler);
+		Audio.AudioInstance.PlaySFX(SoundEffect.Hit1);
 		StartCoroutine(endTurn());
 	}
 
 	public int Attack(BattlerType t, iBattleable target) {
 		int totalDamage = 0;
-		if(t == BattlerType.Instigator) {
+		if (t == BattlerType.Instigator) {
 			totalDamage = _instigatorBattlers.Sum(x => x.GetStrength());
 		}
 		else {
@@ -289,16 +411,12 @@ public class BattleManager : MonoBehaviour {
 
 	public void LoseBattle() {
 		_BattleData._EndState = BattleEndState.Loss;
-
-		// temporary
-		foreach (Unit u in _GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits()) {
-			u.ReduceHP(1000);
-		}
-
 		_endBattle();
 	}
 
 	void _endBattle() {
+
+		_tearDownScene();
 
 		//heal all non-ko troops
 		foreach (Unit u in _GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits()) {
@@ -308,9 +426,6 @@ public class BattleManager : MonoBehaviour {
 		foreach (Unit u in _GameStateHolder._InactivePlayer.PlayerArmy.GetActiveUnits()) {
 			u.Heal();
 		}
-
-
-		_tearDownScene();
 
 		StartCoroutine(SceneSwitcher.ChangeScene(_OverworldScene));
 	}
@@ -322,12 +437,17 @@ public class BattleManager : MonoBehaviour {
 
 	void setOppositionA(MonsterType t) {
 		_BattleUnitPositionManager.SetReserveOppositionA(t);
-		_oppositionBattler = _MonsterManager.NewMonster(t);
+		_oppositionReserveA = _MonsterManager.NewMonster(t);
 	}
 
 	void setOppositionB(MonsterType t) {
 		_BattleUnitPositionManager.SetReserveOppositionB(t);
-		_oppositionBattler = _MonsterManager.NewMonster(t);
+		_oppositionReserveB = _MonsterManager.NewMonster(t);
+	}
+
+	void setOppositionC(MonsterType t) {
+		_BattleUnitPositionManager.SetReserveOppositionC(t);
+		_oppositionReserveC = _MonsterManager.NewMonster(t);
 	}
 
 	void setOpposition(MonsterType t) {
