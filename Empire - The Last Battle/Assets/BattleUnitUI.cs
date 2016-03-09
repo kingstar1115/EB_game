@@ -13,18 +13,13 @@ public class BattleUnitUI : MonoBehaviour
 		get{return _unit;}
 		set
 		{
-			if(_unit!=null)
-			{
-				//un-set event listeners
-				_unit.OnUnitTakeDamage -= UnitDamagedHandler;
-				_unit.OnUpdate -= UnitUpdateHandler;
-			}
-
 			if(value!=null)
 			{
 				//ste event listeners
 				value.OnUnitTakeDamage += UnitDamagedHandler;
 				value.OnUpdate += UnitUpdateHandler;
+
+                UnitUpdateHandler(value);
 			}
 
 			_unit = value;
@@ -39,11 +34,6 @@ public class BattleUnitUI : MonoBehaviour
 	// Update is called once per frame
 	void Update () {
 	
-	}
-
-	public void BreakDownThing()
-	{
-		_Unit = null;
 	}
 
 	public void UnitUpdateHandler(Unit unit)

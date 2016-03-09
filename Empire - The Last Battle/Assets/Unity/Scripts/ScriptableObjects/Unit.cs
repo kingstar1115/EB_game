@@ -20,6 +20,7 @@ public class Unit : ScriptableObject, iBattleable {
 	public TileData Position;
 	public UnitType Type;
 	public event UnitCallback OnUpdate = delegate { };
+    public event UnitIndexCallback OnUnitTakeDamage = delegate { };
 
 	public void Initialise(UnitBaseData data){
 		Type = data.Type;
@@ -29,6 +30,7 @@ public class Unit : ScriptableObject, iBattleable {
 
 	public void RemoveListeners() {
 		OnUpdate = delegate { };
+        OnUnitTakeDamage = delegate { };
 	}
 
 	public bool IsKO() {
@@ -75,6 +77,7 @@ public class Unit : ScriptableObject, iBattleable {
 
 	public void ReduceHP(int HP) {
 		CurrentBaseHP -= HP;
+        OnUnitTakeDamage(this, HP);
 		OnUpdate(this);
 	}
 
