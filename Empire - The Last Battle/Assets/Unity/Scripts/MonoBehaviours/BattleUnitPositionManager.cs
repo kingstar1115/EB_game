@@ -28,12 +28,17 @@ public class BattleUnitPositionManager : MonoBehaviour {
     public GameObject [] _ActivePlayerUnits = new GameObject[8];
 	public BattleUnitUI [] _ActivePlayerUnitUIs = new BattleUnitUI[8];
     public GameObject _ActiveOpposition;
+    public BattleUnitUI _ActiveOppositionUI;
     public GameObject _ReserveOppositionA;
+    public BattleUnitUI _ReserveOppositionAUI;
     public GameObject _ReserveOppositionB;
+    public BattleUnitUI _ReserveOppositionBUI;
     public GameObject _ReserveOppositionC;
+    public BattleUnitUI _ReserveOppositionCUI;
 
     //non unit ui stuff	
-	public Canvas _Canvas;
+	public Camera _WorldCamera;
+    public Canvas _Canvas;
     public GameObject _PauseScreen;
     public CardDisplayUI _CardDisplayUI;
     public HandUI _HandUI;
@@ -172,11 +177,18 @@ public class BattleUnitPositionManager : MonoBehaviour {
         //set up for check if already initialized
         GameObject marker = _MarkerActivePlayerUnits[(int)t];
         GameObject unitObject = _ActivePlayerUnits[(int)t];
-		GameObject unitUIObject = _ActivePlayerUnitUIs[(int)t].gameObject;
-        if (unitObject != null) {
+
+        if (unitObject != null)
+        {
+
+            //set the unit object active 
             unitObject.SetActive(true);
+
+            //grab the unit ui object and set it up
+            GameObject unitUIObject = _ActivePlayerUnitUIs[(int)t].gameObject;
 			unitUIObject.SetActive(true);
-			awakenUnitUI(unitUIObject, marker);
+            awakenUnitUI(unitUIObject, marker, unitObject);
+
             return;
         }
 
@@ -188,17 +200,24 @@ public class BattleUnitPositionManager : MonoBehaviour {
 
 		//battle unit ui 
 		GameObject unitUI = _UnitUIPool.GetPooledObject ();
-		awakenUnitUI (unitUI, marker);
+        awakenUnitUI(unitUI, marker, _ActivePlayerUnits[(int)t]);
 		_ActivePlayerUnitUIs [(int)t] = unitUI.GetComponent<BattleUnitUI> ();
     }
 
-	void awakenUnitUI(GameObject unitUI, GameObject marker)
+	void awakenUnitUI(GameObject unitUI, GameObject marker, GameObject unitModelPrefab)
 	{
 		//set position
 		unitUI.transform.SetParent (_Canvas.transform);
-		Vector2 viewportPos = _Canvas.worldCamera.WorldToViewportPoint (marker.transform.position);
-		unitUI.GetComponent<RectTransform>().anchorMin = viewportPos;  
-		unitUI.GetComponent<RectTransform>().anchorMax = viewportPos; 
+        Vector3 desiredUIWorldPosition = new Vector3(marker.transform.position.x, 
+            marker.transform.position.y + unitModelPrefab.GetComponentInChildren<Renderer>().bounds.extents.y,
+            marker.transform.position.z);
+
+        Vector2 viewportPos = _WorldCamera.WorldToViewportPoint(desiredUIWorldPosition);
+        RectTransform tansform = unitUI.GetComponent<RectTransform>();
+        tansform.anchorMin = viewportPos;
+        tansform.anchorMax = viewportPos;
+        tansform.anchoredPosition = new Vector2(0, 0);
+        tansform.localScale = new Vector3(1, 1, 1);
 		
 		//init
 		unitUI.SetActive (true);
@@ -221,17 +240,23 @@ public class BattleUnitPositionManager : MonoBehaviour {
         _ActivePlayerUnit = (GameObject)Instantiate(prefabs[(int)t], _MarkerActivePlayerUnit.transform.position, _MarkerActivePlayerUnit.transform.rotation);
 	}
 
-	public void SetOpposition(UnitType t, PlayerType p) {
+	public void SetOpposition(UnitType t, PlayerType p, iBattleable unit) {
 		List<GameObject> prefabs = p == PlayerType.Battlebeard ? _BattlebeardUnits : _StormshaperUnits;
-		setOpposition(prefabs[(int)t]);
+        setOpposition(prefabs[(int)t], unit);
 	}
 
-	public void SetOpposition(MonsterType t) {
-		setOpposition(_Monsters[(int)t]);
+	public void SetOpposition(MonsterType t, iBattleable monster) {
+        setOpposition(_Monsters[(int)t], monster);
 	}
 
-	void setOpposition(GameObject g) {
+	void setOpposition(GameObject g, iBattleable monster) {
 	    _ActiveOpposition = (GameObject)Instantiate(g, _MarkerActiveOpposition.transform.position, _MarkerActiveOpposition.transform.rotation);
+
+        //battle unit ui 
+        GameObject unitUI = _UnitUIPool.GetPooledObject();
+        awakenUnitUI(unitUI, _MarkerActiveOpposition, _ActiveOpposition);
+        _ActiveOppositionUI = unitUI.GetComponent<BattleUnitUI>();
+        _ActiveOppositionUI.AddUnit(monster);
 	}
 
 	public void RemoveOpposition() {
@@ -258,19 +283,40 @@ public class BattleUnitPositionManager : MonoBehaviour {
 		_ActiveOpposition.SetActive(true);
 	}
 
-	public void SetReserveOppositionA(MonsterType t) {
+    public void SetReserveOppositionA(MonsterType t, iBattleable monster)
+    {
         GameObject g = _Monsters[(int)t];
         _ReserveOppositionA = (GameObject)Instantiate(g, _MarkerReserveOppositionA.transform.position, _MarkerReserveOppositionA.transform.rotation);
-    }
-	
-	public void SetReserveOppositionB(MonsterType t) {
-        GameObject g = _Monsters[(int)t];
-        _ReserveOppositionB = (GameObject)Instantiate(g, _MarkerReserveOppositionB.transform.position, _MarkerReserveOppositionB.transform.rotation);
+
+        //battle unit ui 
+        GameObject unitUI = _UnitUIPool.GetPooledObject();
+        awakenUnitUI(unitUI, _MarkerReserveOppositionA, _ReserveOppositionA);
+        _ReserveOppositionAUI = unitUI.GetComponent<BattleUnitUI>();
+        _ReserveOppositionAUI.AddUnit(monster);
     }
 
-    public void SetReserveOppositionC(MonsterType t) {
+    public void SetReserveOppositionB(MonsterType t, iBattleable monster)
+    {
+        GameObject g = _Monsters[(int)t];
+        _ReserveOppositionB = (GameObject)Instantiate(g, _MarkerReserveOppositionB.transform.position, _MarkerReserveOppositionB.transform.rotation);
+
+        //battle unit ui 
+        GameObject unitUI = _UnitUIPool.GetPooledObject();
+        awakenUnitUI(unitUI, _MarkerReserveOppositionB, _ReserveOppositionB);
+        _ReserveOppositionBUI = unitUI.GetComponent<BattleUnitUI>();
+        _ReserveOppositionBUI.AddUnit(monster);
+    }
+
+    public void SetReserveOppositionC(MonsterType t, iBattleable monster)
+    {
         GameObject g = _Monsters[(int)t];
         _ReserveOppositionC = (GameObject)Instantiate(g, _MarkerReserveOppositionC.transform.position, _MarkerReserveOppositionC.transform.rotation);
+
+        //battle unit ui 
+        GameObject unitUI = _UnitUIPool.GetPooledObject();
+        awakenUnitUI(unitUI, _MarkerReserveOppositionC, _ReserveOppositionC);
+        _ReserveOppositionCUI = unitUI.GetComponent<BattleUnitUI>();
+        _ReserveOppositionCUI.AddUnit(monster);
     }
 
     public void SwitchFocus(PlayerType pType){

@@ -5,6 +5,11 @@ using System.Linq;
 
 public class BattleManager : MonoBehaviour {
 
+    public delegate void BattleAction(iBattleable battleAbleObject);
+    public static event BattleAction OnBattleAbleUpdate = delegate { };
+    public delegate void BattleIntAction(iBattleable battleAbleObject, int val);
+    public static event BattleIntAction OnBattleAbleTakeDamage = delegate { };
+
 	public GameStateHolder _GameStateHolder;
 	public BattleData _BattleData;
 	public BattleUnitPositionManager _BattleUnitPositionManager;
@@ -437,27 +442,28 @@ public class BattleManager : MonoBehaviour {
 
 
 	void setOppositionA(MonsterType t) {
-		_BattleUnitPositionManager.SetReserveOppositionA(t);
-		_oppositionReserveA = _MonsterManager.NewMonster(t);
+        _oppositionReserveA = _MonsterManager.NewMonster(t);
+        _BattleUnitPositionManager.SetReserveOppositionA(t, _oppositionReserveA);
 	}
 
-	void setOppositionB(MonsterType t) {
-		_BattleUnitPositionManager.SetReserveOppositionB(t);
-		_oppositionReserveB = _MonsterManager.NewMonster(t);
+    void setOppositionB(MonsterType t){
+        _oppositionReserveB = _MonsterManager.NewMonster(t);
+        _BattleUnitPositionManager.SetReserveOppositionB(t, _oppositionReserveB);
 	}
 
-	void setOppositionC(MonsterType t) {
-		_BattleUnitPositionManager.SetReserveOppositionC(t);
-		_oppositionReserveC = _MonsterManager.NewMonster(t);
+    void setOppositionC(MonsterType t){
+        _oppositionReserveC = _MonsterManager.NewMonster(t);
+        _BattleUnitPositionManager.SetReserveOppositionC(t, _oppositionReserveC);
 	}
 
 	void setOpposition(MonsterType t) {
-		_BattleUnitPositionManager.SetOpposition(t);
-		_oppositionBattler = _MonsterManager.NewMonster(t);
+        _oppositionBattler = _MonsterManager.NewMonster(t);
+        _BattleUnitPositionManager.SetOpposition(t, _oppositionBattler);
+		
 	}
 
 	void setOpposition(Unit u) {
-		_BattleUnitPositionManager.SetOpposition(u.Type, _GameStateHolder._InactivePlayer.Type);
+		_BattleUnitPositionManager.SetOpposition(u.Type, _GameStateHolder._InactivePlayer.Type, u);
 		_oppositionBattler = u;
 	}
 

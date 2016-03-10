@@ -20,7 +20,6 @@ public class Unit : ScriptableObject, iBattleable {
 	public TileData Position;
 	public UnitType Type;
 	public event UnitCallback OnUpdate = delegate { };
-	public event UnitIndexCallback OnUnitTakeDamage = delegate { };
 
 	public void Initialise(UnitBaseData data){
 		Type = data.Type;
@@ -76,7 +75,6 @@ public class Unit : ScriptableObject, iBattleable {
 
 	public void ReduceHP(int HP) {
 		CurrentBaseHP -= HP;
-		OnUnitTakeDamage (this, HP);
 		OnUpdate(this);
 	}
 
@@ -84,6 +82,11 @@ public class Unit : ScriptableObject, iBattleable {
 		CurrentBaseHP = BaseData.HP;
 		OnUpdate(this);
 	}
+
+    public int GetUniqueID()
+    {
+        return this.GetHashCode();
+    }
 
 	public bool HasUpgrade() {
 		return CurrentUpgrade != null;

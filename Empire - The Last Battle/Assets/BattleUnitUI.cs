@@ -9,9 +9,9 @@ public class BattleUnitUI : MonoBehaviour
 	public GameObject _HealthBarDisplays;
 	public UnitType _UnitType;
 
-	Dictionary<Unit, Slider> _healthBarSliders;
+	Dictionary<int, Slider> _healthBarSliders;
 	Pool _healthBarPool;
-	List<Unit> _units;
+	List<iBattleable> _units;
 
 	// Use this for initialization
 	void Start () {
@@ -25,8 +25,8 @@ public class BattleUnitUI : MonoBehaviour
 
 	public void Init(Pool healthBarPool)
 	{
-		_units = new List<Unit> ();
-		_healthBarSliders = new Dictionary<Unit, Slider> ();
+        _units = new List<iBattleable>();
+		_healthBarSliders = new Dictionary<int, Slider> ();
 
 		//keep health bar reference
 		_healthBarPool = healthBarPool;
@@ -34,13 +34,15 @@ public class BattleUnitUI : MonoBehaviour
 
 	public void OnDisable()
 	{
-		Debug.Log (this.name + " Disabled");
-
 		//clear all health bars
-		foreach (var healthBar in _healthBarSliders.Values) {
-			healthBar.transform.transform.SetParent(null);
-			healthBar.gameObject.SetActive(false);
-		}
+        if (_healthBarSliders != null)
+        {
+            foreach (var healthBar in _healthBarSliders.Values)
+            {
+                healthBar.transform.transform.SetParent(null);
+                healthBar.gameObject.SetActive(false);
+            }
+        }
 	}
 
 	public void ClearUnits ()
@@ -48,38 +50,37 @@ public class BattleUnitUI : MonoBehaviour
 		_units.Clear();
 	}
 
-	public void AddUnit(Unit unit)
+    public void AddUnit(iBattleable unit)
 	{
 		if (unit == null)
 			return;
 
-		//set up event listeners before add
-		unit.OnUnitTakeDamage += UnitDamagedHandler;
-		unit.OnUpdate += UnitUpdateHandler;
+        BattleManager.OnBattleAbleUpdate += BattleManager_OnBattleAbleUpdate;
+        BattleManager.OnBattleAbleTakeDamage+=BattleManager_OnBattleAbleTakeDamage;
 
 		//init a new health bar 
 		GameObject healthBar = _healthBarPool.GetPooledObject ();
 		healthBar.SetActive (true);
 		healthBar.transform.SetParent (_HealthBarDisplays.transform);
-		_healthBarSliders.Add(unit, healthBar.GetComponentInChildren<Slider>());
+        healthBar.transform.localScale = new Vector3(1, 1, 1);
+		_healthBarSliders.Add(unit.GetHashCode(), healthBar.GetComponentInChildren<Slider>());
 
 		//refresh
-		UnitUpdateHandler(unit);
+        BattleManager_OnBattleAbleUpdate(unit);
 
 		_units.Add (unit);
 	}
 
-	public void UnitUpdateHandler(Unit unit)
-	{
-		//set the health bar
-		_healthBarSliders[unit].value = unit.GetHPPercentage();
-	}
+    void BattleManager_OnBattleAbleTakeDamage(iBattleable battleAbleObject, int val)
+    {
+        //damage flash 
+        TakeDamage(val);
+    }
 
-	public void UnitDamagedHandler(Unit unit, int damage)
-	{
-		//damage flash 
-		TakeDamage (damage);
-	}
+    void BattleManager_OnBattleAbleUpdate(iBattleable battleAbleObject)
+    {
+        _healthBarSliders[battleAbleObject.GetUniqueID()].value = battleAbleObject.GetHPPercentage();
+    }
 
 	public void TakeDamage(int amount)
 	{
