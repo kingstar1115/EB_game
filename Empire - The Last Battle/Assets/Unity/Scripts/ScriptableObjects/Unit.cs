@@ -5,7 +5,7 @@ public delegate void UnitCallback(Unit u);
 public delegate void UnitIndexCallback(Unit u, int i);
 
 [System.Serializable]
-public class Unit : ScriptableObject {
+public class Unit : ScriptableObject, iBattleable {
 
 	[SerializeField]
 	UnitBaseData BaseData;
@@ -54,7 +54,11 @@ public class Unit : ScriptableObject {
 
 	//For example if CurrentHP = -2 and CurrentUpgrade.HP is = 3 then this will return 1
 	public int GetCurrentHP() {
-		return CurrentUpgrade == null ? CurrentBaseHP : CurrentBaseHP + CurrentUpgrade.HP;
+		int currentHP = CurrentUpgrade == null ? CurrentBaseHP : CurrentBaseHP + CurrentUpgrade.HP;
+        if (currentHP < 0) {
+            return 0;
+        }
+        return currentHP;
 	}
 
 	public int GetStrength() {
@@ -74,7 +78,7 @@ public class Unit : ScriptableObject {
 
 	public float GetHPPercentage() {
 		int MaxHp = CurrentUpgrade == null ? BaseData.HP : BaseData.HP + CurrentUpgrade.HP;
-		float Percentage = ((float)GetCurrentHP() / (float)MaxHp) * 100;
+		float Percentage = ((float)GetCurrentHP() / (float)MaxHp);
 		return Percentage;
 	}
 
@@ -98,7 +102,7 @@ public class Unit : ScriptableObject {
 
 	public void AddUpgrade(UnitBaseData Upgrade) {
 		//Don't apply the upgrade if a unit is knocked out, should probably return something to acknowledge that it wasn't applied
-		if(!IsKO()) {
+		if (!IsKO()) {
 			CurrentUpgrade = Upgrade;
 			OnUpdate(this);
 		}

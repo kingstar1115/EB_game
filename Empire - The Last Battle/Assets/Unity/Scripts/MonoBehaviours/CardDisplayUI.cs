@@ -84,7 +84,7 @@ public class CardDisplayUI : MonoBehaviour
         Hide();
 
         //------TEST-------
-        //if(_HandUI.m_Cards.Count > 0)
+        //if (_HandUI.m_Cards.Count > 0)
          //   _HandUI.SelectCard(0);
     }
 
@@ -181,7 +181,6 @@ public class CardDisplayUI : MonoBehaviour
 
     public void UseSelectedCardHandler()
     {
-		Debug.Log("use card button");
         //event!
         OnCardUse(_HandUI.m_SelectedCardUI._Card);
 		_HandUI.DeselectCurrent();

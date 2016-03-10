@@ -311,8 +311,6 @@ public class CommanderUI : MonoBehaviour
 		newPosition.y = _Player.CommanderPosition.Height;
         this.transform.position = newPosition;
 		this.transform.rotation = newRotation;
-		Debug.Log(posMarker.transform.rotation);
-		Debug.Log(this.transform.rotation);
 		
         _lerpPosition.StopLerp();
     }

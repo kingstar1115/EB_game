@@ -185,7 +185,6 @@ public class OverworldUI : MonoBehaviour
 
 	public void _CardDisplayUI_OnCardUse(CardData cardData)
     {
-		Debug.Log("Use Card");
         OnPlayerUseCard(cardData);
         _CardDisplayUI.Hide();
     }
