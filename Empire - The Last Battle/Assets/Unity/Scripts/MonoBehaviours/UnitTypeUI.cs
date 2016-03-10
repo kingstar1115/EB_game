@@ -128,6 +128,7 @@ public class UnitTypeUI : MonoBehaviour {
 		ui.SetKO (u.IsKO ());
 		ui.SetIndex (_units.Count);
 		ui.SetUpgrade (u.HasUpgrade ());
+		ui.SetDefending (u.IsDefending ());
 		ui.OnClick += _clickUnit;
 		if (_selectMode) {
 			ui.EnableSelection ();
@@ -137,7 +138,7 @@ public class UnitTypeUI : MonoBehaviour {
 		Image image = g.AddComponent<Image> ();
 		g.transform.SetParent (UnitOverview.transform);
 		g.transform.localScale = Vector3.one;
-		if (u.IsKO ()) {
+		if (u.IsKO () || u.IsDefending()) {
 			image.color = Color.clear;
 		} else {
 			image.color = OverviewColour;
@@ -160,8 +161,9 @@ public class UnitTypeUI : MonoBehaviour {
 	public void UpdateUnit(int i, Unit u) {
 		UnitUI ui = _units[i];
 		ui.SetKO(u.IsKO());
+		ui.SetDefending (u.IsDefending ());
 		ui.SetUpgrade(u.HasUpgrade());
-		if (u.IsKO()) {
+		if (u.IsKO() || u.IsDefending()) {
 			UnitOverview.transform.GetChild(i).GetComponent<Image>().color = Color.clear;
 		} else {
 			UnitOverview.transform.GetChild(i).GetComponent<Image>().color = OverviewColour;

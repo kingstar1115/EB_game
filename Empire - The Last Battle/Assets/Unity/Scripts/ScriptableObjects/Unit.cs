@@ -36,15 +36,20 @@ public class Unit : ScriptableObject {
 	}
 
 	public bool IsUpgradeable() {
-		return IsKO () || !HasUpgrade();
+		return !IsKO () || !HasUpgrade();
 	}
 
 	public bool IsTempUpgradeable() {
-		return IsKO() || !HasTempUpgrade();
+		return !IsKO() || !HasTempUpgrade();
 	}
 
 	public bool IsDefending() {
-		return Position == null;
+		return Position != null;
+	}
+
+	public bool IsActive() {
+		bool x = (!IsDefending () && !IsKO ());
+		return x;
 	}
 
 	//For example if CurrentHP = -2 and CurrentUpgrade.HP is = 3 then this will return 1

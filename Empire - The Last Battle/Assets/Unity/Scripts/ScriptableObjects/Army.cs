@@ -51,6 +51,14 @@ public class Army : ScriptableObject {
 		return units.FindAll(x => x.IsDefending());
 	}
 
+	public List<Unit> GetNonDefendingUnits() {
+		return units.FindAll (x => !x.IsDefending ());
+	}
+
+	public Unit GetDefendingUnit(TileData tile) {
+		return units.Find (_Unit => _Unit.Position == tile);
+	}
+
 	public List<Unit> GetTempUpgradableUnits() {
 		return units.FindAll(x => x.IsTempUpgradeable());
 	}
@@ -64,12 +72,12 @@ public class Army : ScriptableObject {
 	}
 
 	public int GetTotalActiveUnits() {
-		List<Unit> activeUnits = units.FindAll(x => (!x.IsKO() || !x.IsDefending() ));
+		List<Unit> activeUnits = units.FindAll(x => x.IsActive());
 		return activeUnits.Count;
 	}
 
 	public List<Unit> GetActiveUnits(UnitType type) {
-		return units.FindAll(x => (!x.IsKO() || !x.IsDefending() )&& x.Type == type);
+		return units.FindAll(x => (!x.IsKO() || !x.IsDefending() ) && x.Type == type);
 	}
 
 	public List<UnitType> GetActiveUnitTypes() {

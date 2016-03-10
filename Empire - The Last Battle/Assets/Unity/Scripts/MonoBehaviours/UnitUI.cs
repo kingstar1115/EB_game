@@ -28,7 +28,7 @@ public class UnitUI : MonoBehaviour {
 
 	public void SetDefending(bool b) {
 		IsDefending = b;
-		Defending.gameObject.SetActive (b);
+		KO.gameObject.SetActive (b);
 	}
 
 	public void SetIndex(int i) {
