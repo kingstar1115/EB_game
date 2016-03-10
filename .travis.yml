@@ -12,13 +12,13 @@ env:
   global:
   - GH_REF: eharris93/ELB
   - secure: o8MuFzwOWDcoTnUIP0ijX0U+4EhFbTipPgDD4lxFEYJeAmPU2dLEb/6nkKWoCohTeBDBJsgX9tXubjrjwcLPu6LPrf8ITJNTy3ikkH1ZjIwujXrt6BIN7M/i5K92/7IYy7FsnA2an0aw6EZpYOIKOIE8lb2NWVEBnfGscuJsz2DW7wT0TFl9d1ClFtkMyQCAk0NAuEqOMlmw4RYharZATzi97XWzbpOPkO7a2AslPFYs9xp7A2ennj06YKPUQCFBRWl/r4wvm0jvvF8tX9gRJmMgTyMzLme4qn2UwDveCrbrMWJFyNgX1yjTfikENSl3sTLHkVVvqUko70XGAp6VjWdoBrMbZRahQUibF3XQi6tROiCfjaxIxS07lc/Dn1EbaVTsT+GmPNc0tCZkRsx3B42M1d7sj6Ms1c5yrmJ8UtmGQpFDw5HaOc3skv1CUGRb1hbP0fmNtuqPu6QOE1e3B7aiiG0WLHDhEFt2n5BP1GnSK/vlNMS6auJm2AmXkzjy73NaCTPUwQgrqmm0p8Ev5Lyzq08CrrqIAtoMRlHzsP4CAYfXNMq+7Om3t/0WIhX6KPzUsuWrJKy6GPbJQzyK1NY7eNG8L4e8dqE7qtRQbpBEHgwW1M/0H57iTrbljek5DxokRElMGb9drOVnnlOiIz+mHWcFEU6UZBfCX12wL+s=
-deploy:
-  provider: s3
-  access_key_id: "$ACCESS_KEY_ID"
-  secret_access_key: "$SECRET_ACCESS_KEY"
-  bucket: spacesausage
-  local-dir: Build
-  upload-dir: ELB
-  skip_cleanup: true
-  on:
-    repo: eharris93/ELB
+# deploy:
+#   provider: s3
+#   access_key_id: "$ACCESS_KEY_ID"
+#   secret_access_key: "$SECRET_ACCESS_KEY"
+#   bucket: spacesausage
+#   local-dir: Build
+#   upload-dir: ELB
+#   skip_cleanup: true
+#   on:
+#     repo: eharris93/ELB
