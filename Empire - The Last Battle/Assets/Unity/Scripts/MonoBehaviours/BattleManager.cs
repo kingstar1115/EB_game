@@ -74,11 +74,13 @@ public class BattleManager : MonoBehaviour {
 
 	private void OnAddUnit(Player p, Unit u) {
 		_instigatorBattlers.Add(u);
-		_BattleUnitPositionManager.SetUnit(u.Type, p.Type);
+		_BattleUnitPositionManager.InitUnitUI(u.Type, p.Type);
 		
 	}
 
 	private void OnUpdateUnit(Player p, Unit u) {
+		//toto - a case where there is a ko but there are more units of that type 
+
 		if (u.IsKO() && !p.PlayerArmy.GetActiveUnitTypes().Contains(u.Type)) {
 			_BattleUnitPositionManager.RemoveUnit(u.Type);
 			_instigatorBattlers.Remove(u);
@@ -347,9 +349,33 @@ public class BattleManager : MonoBehaviour {
 
 	void setActiveArmy() {
 		foreach(UnitType t in _GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnitTypes()) {
-			_BattleUnitPositionManager.SetUnit(t, _GameStateHolder._ActivePlayer.Type);
+			_BattleUnitPositionManager.InitUnitUI(t, _GameStateHolder._ActivePlayer.Type);
 		}
 		_instigatorBattlers = _GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits();
+
+		//wanna get all the units here to check if active, if new type and pass in unit to add unit
+		List<UnitType> types = new List<UnitType> ();
+		foreach (var unit in _GameStateHolder._ActivePlayer.PlayerArmy.GetUnits()) {
+
+			if(!unit.IsKO())
+			{
+				//log unit
+				_instigatorBattlers.Add(unit);
+
+				//set up ui 
+				if(!types.Contains(unit.Type))
+				{
+					//init for new type
+					_BattleUnitPositionManager.InitUnitUI(unit.Type, _GameStateHolder._ActivePlayer.Type);
+
+					//log type
+					types.Add(unit.Type);
+				}
+
+				//add individual unit ui 
+				_BattleUnitPositionManager.AddUnitToUI(unit);
+			}
+		}
 	}
 
 	public PlayerType GetPlayerTypeByBattler(BattlerType bType)

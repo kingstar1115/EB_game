@@ -26,17 +26,21 @@ public class BattleUnitPositionManager : MonoBehaviour {
 
     public GameObject _ActivePlayerUnit;
     public GameObject [] _ActivePlayerUnits = new GameObject[8];
+	public BattleUnitUI [] _ActivePlayerUnitUIs = new BattleUnitUI[8];
     public GameObject _ActiveOpposition;
     public GameObject _ReserveOppositionA;
     public GameObject _ReserveOppositionB;
     public GameObject _ReserveOppositionC;
 
     //non unit ui stuff	
+	public Canvas _Canvas;
     public GameObject _PauseScreen;
     public CardDisplayUI _CardDisplayUI;
     public HandUI _HandUI;
     public ArmyUI _ArmyUI;
     public UnityEngine.UI.Image _PlayerLogo;
+	public Pool _UnitUIPool;
+	public Pool _HealthBarPool;
 
     // Use this for initialization
     void Start() {
@@ -164,19 +168,52 @@ public class BattleUnitPositionManager : MonoBehaviour {
         _CardDisplayUI.Hide();
     }
 
-    public void SetUnit(UnitType t, PlayerType p) {
-        List<GameObject> prefabs = p == PlayerType.Battlebeard ? _BattlebeardUnits : _StormshaperUnits;
+    public void InitUnitUI(UnitType t, PlayerType p) {
+        //set up for check if already initialized
         GameObject marker = _MarkerActivePlayerUnits[(int)t];
         GameObject unitObject = _ActivePlayerUnits[(int)t];
+		GameObject unitUIObject = _ActivePlayerUnitUIs[(int)t].gameObject;
         if (unitObject != null) {
             unitObject.SetActive(true);
+			unitUIObject.SetActive(true);
+			awakenUnitUI(unitUIObject, marker);
             return;
         }
+
+		//initialize new uis if needed 
+		List<GameObject> prefabs = p == PlayerType.Battlebeard ? _BattlebeardUnits : _StormshaperUnits;
+
+		//models
         _ActivePlayerUnits[(int)t] = (GameObject)Instantiate(prefabs[(int)t], marker.transform.position, marker.transform.rotation);
+
+		//battle unit ui 
+		GameObject unitUI = _UnitUIPool.GetPooledObject ();
+		awakenUnitUI (unitUI, marker);
+		_ActivePlayerUnitUIs [(int)t] = unitUI.GetComponent<BattleUnitUI> ();
     }
+
+	void awakenUnitUI(GameObject unitUI, GameObject marker)
+	{
+		//set position
+		unitUI.transform.SetParent (_Canvas.transform);
+		Vector2 viewportPos = _Canvas.worldCamera.WorldToViewportPoint (marker.transform.position);
+		unitUI.GetComponent<RectTransform>().anchorMin = viewportPos;  
+		unitUI.GetComponent<RectTransform>().anchorMax = viewportPos; 
+		
+		//init
+		unitUI.SetActive (true);
+		unitUI.GetComponent<BattleUnitUI> ().Init (_HealthBarPool); 
+	}
+
+	public void AddUnitToUI(Unit unit) 
+	{
+		//get the apropriate unit ui and add a unit to track
+		_ActivePlayerUnitUIs [(int)unit.Type].AddUnit (unit);
+	}
 
     public void RemoveUnit(UnitType t) {
         _ActivePlayerUnits[(int)t].SetActive(false);
+		_ActivePlayerUnitUIs [(int)t].gameObject.SetActive (false);
     }
 
     public void SetActiveUnit(UnitType t, PlayerType p) {
