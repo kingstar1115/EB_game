@@ -251,7 +251,6 @@ public class OverworldManager : MonoBehaviour
 			switch (tile.Building) {
 			case BuildingType.Armoury:
 					_OverworldUI._ArmouryUI.Show(_GameStateHolder._ActivePlayer);
-					p.ShowOK ("Armoury", "You landed on the Armoury.", endTurn);
 				break;
 			case BuildingType.Camp:
 				if (tile.Owner != _GameStateHolder._ActivePlayer.Type) {
@@ -307,6 +306,7 @@ public class OverworldManager : MonoBehaviour
 					// end turn
 				break;
 			case BuildingType.Inn:
+				_OverworldUI._ArmouryUI.Show(_GameStateHolder._ActivePlayer);
 					Audio.AudioInstance.PlaySFX(SoundEffect.Inn);
 				if (_GameStateHolder._InactivePlayer.CastleProgress >= 4) {
 					p.ShowOK ("Oh No!", "The inn won't accept you!", endTurn);
@@ -587,11 +587,6 @@ public class OverworldManager : MonoBehaviour
                 DebugUI.getUI().SetMessage("Test", 22, Color.green);
             }
 
-            if (Input.GetKeyDown(KeyCode.Alpha9))
-            {
-                _GameStateHolder._ActivePlayer.Currency.addPoints(10);
-            }
-
             if (Input.GetKeyDown(KeyCode.N))
             {
                 // move back using up a turn
@@ -612,6 +607,14 @@ public class OverworldManager : MonoBehaviour
 			if (Input.GetKeyDown(KeyCode.Alpha4))
 			{
 				_GameStateHolder._ActivePlayer.Currency.addPoints(-1000);
+			}
+			if (Input.GetKeyDown(KeyCode.Alpha6))
+			{
+				_GameStateHolder._ActivePlayer.LostImmortalKillCount++;
+			}
+			if (Input.GetKeyDown(KeyCode.Alpha7))
+			{
+				_GameStateHolder._ActivePlayer.CastleProgress++;
 			}
 		}
 	}

@@ -13,9 +13,11 @@ public abstract class PurchasableItem : ScriptableObject
 
 public class ArmouryUI : MonoBehaviour
 {
-	public List<PurchasableUnit> purchasableUnits;
-	public List<PurchasableCard> purchasableCards;
-	public List<PurchasableCastlePiece> purchasableCastlePieces;
+	public List<PurchasableUnit> PurchasableUnits;
+	public List<PurchasableCard> PurchasableCards;
+	public List<PurchasableCastlePiece> PurchasableCastlePieces;
+	public List<GameObject> CastlePieceImages;
+	public Button CastlesButton;
 
 	public event Action<PurchasableItem> OnPurchasedItem = delegate { };
 
@@ -27,24 +29,23 @@ public class ArmouryUI : MonoBehaviour
 
 	public IEnumerable<PurchasableUnit> AvailableUnits(Player player)
 	{
-		return purchasableUnits.Where(x => x.purchaseLevel <= player.CastleProgress && x.cost <= player.Currency.getPoints()).ToList();
+		return PurchasableUnits.Where(x => x.purchaseLevel <= player.CastleProgress && x.cost <= player.Currency.getPoints()).ToList();
 	}
 
 	public IEnumerable<PurchasableCard> AvailableCards(Player player)
 	{
-		return purchasableCards.Where(x => x.cost <= player.Currency.getPoints()).ToList();
+		return PurchasableCards.Where(x => x.cost <= player.Currency.getPoints()).ToList();
 	}
 
 	public IEnumerable<PurchasableCastlePiece> AvailableCastlePieces(Player player)
 	{
-		//return early if no purchasable castle pieces
-		if (purchasableCastlePieces.Count == 0)
-		{
-			Debug.Log("No purchasable castle peices at all");
-			return Enumerable.Empty<PurchasableCastlePiece>();
-		}
-
-		return purchasableCastlePieces.Where(x => player.LostImmortalKillCount >= x.purchaseLevel && x.b_AlreadyPurchased).ToList();
+		////return early if no purchasable castle pieces
+		//if (PurchasableCastlePieces.Count == 0)
+		//{
+		//	Debug.Log("No purchasable castle peices at all");
+		//	return Enumerable.Empty<PurchasableCastlePiece>();
+		//}
+		return PurchasableCastlePieces.Where(x => x.purchaseLevel <= player.LostImmortalKillCount && !x.b_AlreadyPurchased && x.cost <= player.Currency.getPoints()).ToList();
 	}
 
 	//When the currency is changed it will update what can be shown in the armoury
@@ -54,27 +55,27 @@ public class ArmouryUI : MonoBehaviour
 
 		if (val <= previousCurrency)
 			disable = true;
-
+		
 		var units = AvailableUnits(player).ToList();
-		ToggleUIImages(units, k_UnitsSection, disable);
+		ToggleUIImages(units, k_UnitsSection, player, disable);
 
 		var cards = AvailableCards(player).ToList();
-		ToggleUIImages(cards, k_CardsSection, disable);
+		ToggleUIImages(cards, k_CardsSection, player, disable);
 
 		var castlePieces = AvailableCastlePieces(player).ToList();
-		ToggleUIImages(castlePieces, k_CastleSection, disable);
+		ToggleUIImages(castlePieces, k_CastleSection, player, disable);
 
 		previousCurrency = val;
 	}
 
 	void UpdateItems(Player player)
 	{
-		ToggleUIImages(AvailableUnits(player).ToList(), k_UnitsSection);
-		ToggleUIImages(AvailableCards(player).ToList(), k_CardsSection);
-		ToggleUIImages(AvailableCastlePieces(player).ToList(), k_CastleSection);
+		ToggleUIImages(AvailableUnits(player).ToList(), k_UnitsSection, player);
+		ToggleUIImages(AvailableCards(player).ToList(), k_CardsSection, player);
+		ToggleUIImages(AvailableCastlePieces(player).ToList(), k_CastleSection, player);
 	}
 
-	void ToggleUIImages<T>(IList<T> purchasableItems, string sectionName, bool disableOn = true) where T : PurchasableItem
+	void ToggleUIImages<T>(IList<T> purchasableItems, string sectionName, Player player, bool disableOn = true) where T : PurchasableItem
 	{
 		Transform section = null;
 
@@ -96,6 +97,33 @@ public class ArmouryUI : MonoBehaviour
 				section.GetComponentsInChildren<Image>(true).Where(x => purchasableItems.Any(z => x.name.Contains(z.name.ToString())))
 					.ToList().ForEach(x => { x.color = Color.white; x.GetComponent<Button>().interactable = true; });
 		}
+
+		//Set each castle piece inactive then set active
+		//correct castle piece active based on immortal kill counts
+		foreach (var item in CastlePieceImages) {
+			item.SetActive(false);
+		}
+
+		if (player.LostImmortalKillCount > 0) {
+			CastlesButton.interactable = true;
+		}
+//
+//		switch (player.LostImmortalKillCount) {
+//		case 1:
+//			CastlePieceImages.Single(x => x.name.Contains("CastlePiece_01")).SetActive(true);
+//			break;
+//		case 2:
+//			CastlePieceImages.Single(x => x.name.Contains("CastlePiece_02")).SetActive(true);
+//			break;
+//		case 3:
+//			CastlePieceImages.Single(x => x.name.Contains("CastlePiece_03")).SetActive(true);
+//			break;
+//		case 4:
+//			CastlePieceImages.Single(x => x.name.Contains("CastlePiece_04")).SetActive(true);
+//			break;
+//		default:
+//			break;
+//		}
 	}
 
 	public void Show(Player player)
