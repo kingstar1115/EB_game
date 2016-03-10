@@ -15,7 +15,24 @@ public class Player : ScriptableObject
 	public PointsSystem Currency = new PointsSystem();
 	public CardList Hand;
 	public Army PlayerArmy;
+	public bool HasMoved;
 	public bool IsScouting;
+	public bool LandedInn;
+	public bool LandedCave;
+	public bool LandedArmoury;
+	public bool LandedeCamp;
+	public bool HasBattled;
+	public bool HasBattledMonster;
+	public bool HasBattledLostImmortal;
+	public bool HasBattledPvP;
+	public bool HasWon;
+	public bool HasLost;
+	public bool HasTotallyLost;
+	public bool HasPurchasedCastle;
+	public bool HasWonLostImmortal;
+	public bool HasCaptured;
+	public bool HasLeftDefender;
+	public bool HasLandedInnNoEntry;
 
 	public event PlayerUnitCallback OnUpdateUnit = delegate { };
 	public event PlayerUnitCallback OnAddUnit = delegate { };

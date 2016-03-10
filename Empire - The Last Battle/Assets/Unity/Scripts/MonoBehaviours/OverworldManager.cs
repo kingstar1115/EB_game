@@ -496,7 +496,20 @@ public class OverworldManager : MonoBehaviour
 
 	void _TurnManager_OnTurnStart() {
 		_OverworldUI.Show();
-		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(_GameStateHolder._ActivePlayer, _GameStateHolder._ActivePlayer.CommanderPosition, 1));
+		Player p = _GameStateHolder._ActivePlayer;
+		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(p, p.CommanderPosition, 1));
+
+		if (!p.HasMoved) {
+			TutorialPanel.Instance().Tutor(p.Type,
+				"Tutorial", 
+				"Hello fellow " + p.Type.ToString() + ", and welcome to 'Empire, the Last Battle'!\n"+
+				"I will be guiding you through the gameplay mechanics.",
+				true);
+			TutorialPanel.Instance().Tutor(p.Type, 
+				"Tutorial", 
+				"On left side of the screen, you can see some icons. These represent the units in your army." +
+				"", false);
+		}
 	}
 
 	void endTurn() {
@@ -573,7 +586,7 @@ public class OverworldManager : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.C))
             {
-                CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
+                CardData c = GenerateRandomCard(_CardSystem.cardList.cards);
 				_GameStateHolder._ActivePlayer.AddCard(c);
             }
 		}
