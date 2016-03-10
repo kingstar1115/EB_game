@@ -1,30 +1,17 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class BattleUnitUI : MonoBehaviour 
 {
 	public TextFlash _DamageFlashDisplay;
-	public Slider _HealthBarSlider;
+	public GameObject _HealthBarDisplays;
+	public UnitType _UnitType;
 
-	Unit _unit;
-	public Unit _Unit
-	{
-		get{return _unit;}
-		set
-		{
-			if(value!=null)
-			{
-				//ste event listeners
-				value.OnUnitTakeDamage += UnitDamagedHandler;
-				value.OnUpdate += UnitUpdateHandler;
-
-                UnitUpdateHandler(value);
-			}
-
-			_unit = value;
-		}
-	}
+	Dictionary<Unit, Slider> _healthBarSliders;
+	Pool _healthBarPool;
+	List<Unit> _units;
 
 	// Use this for initialization
 	void Start () {
@@ -36,10 +23,56 @@ public class BattleUnitUI : MonoBehaviour
 	
 	}
 
+	public void Init(Pool healthBarPool)
+	{
+		_units = new List<Unit> ();
+		_healthBarSliders = new Dictionary<Unit, Slider> ();
+
+		//keep health bar reference
+		_healthBarPool = healthBarPool;
+	}
+
+	public void OnDisable()
+	{
+		Debug.Log (this.name + " Disabled");
+
+		//clear all health bars
+		foreach (var healthBar in _healthBarSliders.Values) {
+			healthBar.transform.transform.SetParent(null);
+			healthBar.gameObject.SetActive(false);
+		}
+	}
+
+	public void ClearUnits ()
+	{
+		_units.Clear();
+	}
+
+	public void AddUnit(Unit unit)
+	{
+		if (unit == null)
+			return;
+
+		//set up event listeners before add
+		unit.OnUnitTakeDamage += UnitDamagedHandler;
+		unit.OnUpdate += UnitUpdateHandler;
+
+		//init a new health bar 
+		GameObject healthBar = _healthBarPool.GetPooledObject ();
+		healthBar.SetActive (true);
+		healthBar.transform.SetParent (_HealthBarDisplays.transform);
+		_healthBarSliders.Add(unit, healthBar.GetComponentInChildren<Slider>());
+
+		//refresh
+		UnitUpdateHandler(unit);
+
+		_units.Add (unit);
+	}
+
 	public void UnitUpdateHandler(Unit unit)
 	{
 		//set the health bar
-		_HealthBarSlider.value = unit.GetHPPercentage();
+		_healthBarSliders[unit].value = unit.GetHPPercentage();
 	}
 
 	public void UnitDamagedHandler(Unit unit, int damage)
