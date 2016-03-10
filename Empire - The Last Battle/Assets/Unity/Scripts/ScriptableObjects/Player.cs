@@ -20,7 +20,7 @@ public class Player : ScriptableObject
 	public bool LandedInn;
 	public bool LandedCave;
 	public bool LandedArmoury;
-	public bool LandedeCamp;
+	public bool LandedCamp;
 	public bool HasBattled;
 	public bool HasBattledMonster;
 	public bool HasBattledLostImmortal;

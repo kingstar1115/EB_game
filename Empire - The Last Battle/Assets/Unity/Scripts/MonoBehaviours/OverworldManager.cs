@@ -106,7 +106,7 @@ public class OverworldManager : MonoBehaviour
 			_BattlebeardPlayer.CastleProgress = 0;
 			_StormshaperPlayer.CastleProgress = 0;
 
-			_TurnManager.StartTurn();    
+			_TurnManager.StartTurn();
 		}
 		else {
 			setPlayer(_BattleData._InitialPlayer.Type);
@@ -209,6 +209,7 @@ public class OverworldManager : MonoBehaviour
 
 	void HandleTileEvent(TileData tile) {
 		_OverworldUI.Disable();
+        _GameStateHolder._ActivePlayer.HasMoved = true;
 		if (_GameStateHolder._ActivePlayer.IsScouting) {
 			_GameStateHolder._ActivePlayer.IsScouting = false;
 			endTurn ();
@@ -216,32 +217,46 @@ public class OverworldManager : MonoBehaviour
 			ModalPanel p = ModalPanel.Instance ();
 			switch (tile.Building) {
 			case BuildingType.Armoury:
-				p.ShowOK ("Armoury", "You landed on the Armoury.", endTurn);
+				if (!_GameStateHolder._ActivePlayer.LandedArmoury) {
+					_GameStateHolder._ActivePlayer.LandedArmoury = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+					   "Armoury",
+					   "Welcome to the Armoury!\n" +
+						"You can use resources that you have earned to expand your army or purchase upgrades.",
+					   false);
+				}
 				break;
 			case BuildingType.Camp:
+				if (!_GameStateHolder._ActivePlayer.LandedCamp) {
+					_GameStateHolder._ActivePlayer.LandedCamp = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Camp",
+						"You just landed on a camp occupied by a monster.",
+					   false);
+				}
 				if (tile.Owner != _GameStateHolder._ActivePlayer.Type) {
 					if (tile.Owner == PlayerType.None) {
 						// MONSTER BATTLE
-						p.ShowOK("Camp", "You landed on a camp full of monsters.", () => {
-							startBattle(BattleType.Monster);
-						});
+						startBattle(BattleType.Monster);
 					} else {
 						// PVP BATTLE
-						p.ShowOK("Camp", "You landed on the other player's camp.", () => {
-							startBattle(BattleType.PvP);
-						});
+						startBattle(BattleType.PvP);
 					}
 					break;
 				}
-				//p.ShowOK("Camp", "Nothing happened.", endTurn);
 				endTurn();
 				break;
 			case BuildingType.Cave:
+				if (!_GameStateHolder._ActivePlayer.LandedCave) {
+					_GameStateHolder._ActivePlayer.LandedCave = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cave",
+						"You just landed on a camp occupied by a monster.",
+					   false);
+				}
 				if (tile.Owner != _GameStateHolder._ActivePlayer.Type) {
 					if (tile.Owner != PlayerType.None) {
-						p.ShowOK("Cave", "You landed on the other player's cave.", () => {
-							startBattle(BattleType.PvP);
-						});
+						startBattle(BattleType.PvP);
 					} else {
 						CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
 						_GameStateHolder._ActivePlayer.AddCard(c);
@@ -254,6 +269,13 @@ public class OverworldManager : MonoBehaviour
 				}
 				break;
 			case BuildingType.Fortress:
+				if (!_GameStateHolder._ActivePlayer.lan) {
+					_GameStateHolder._ActivePlayer.LandedCave = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cave",
+						"You just landed on a camp occupied by a monster.",
+					   false);
+				}
 					// Make sure that the fortress type matches the player type
 				if (tile.Owner == _GameStateHolder._ActivePlayer.Type) {
 					// make sure the player owns at least 3 surrounding tiles
@@ -498,17 +520,47 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.Show();
 		Player p = _GameStateHolder._ActivePlayer;
 		_OverworldUI.AllowPlayerMovement(_Board.GetReachableTiles(p, p.CommanderPosition, 1));
-
 		if (!p.HasMoved) {
 			TutorialPanel.Instance().Tutor(p.Type,
 				"Tutorial", 
-				"Hello fellow " + p.Type.ToString() + ", and welcome to 'Empire, the Last Battle'!\n"+
-				"I will be guiding you through the gameplay mechanics.",
+				"Hello fellow " + p.Type.ToString() + ", and welcome to 'Empire, the Last Battle'!",
 				true);
+            TutorialPanel.Instance().Tutor(p.Type,
+                "Tutorial",
+                "I will be telling what you need to know in order to defeat the enemies that get in your way and retake the land of Nekark!",
+                false);
 			TutorialPanel.Instance().Tutor(p.Type, 
 				"Tutorial", 
-				"On left side of the screen, you can see some icons. These represent the units in your army." +
-				"", false);
+				"On left side of the screen, you can see some icons. These represent the units in your army.\n"+
+                "There is an individual icon representing each type of unit.",
+                false);
+            TutorialPanel.Instance().Tutor(p.Type,
+                "Tutorial",
+                "The red bars to the right of them represent individual unit's health.\n" +
+                 "Hovering your mouse over each icon will show the individual units of that type.",
+                false);
+            TutorialPanel.Instance().Tutor(p.Type,
+                "Tutorial",
+                "Throughout the game you will come across chance items known as cards.\n" +
+                "The cards you have collected are shown in the bottom right.\n" +
+                "Click on a card, and press use to use a specific card.",
+                false);
+            TutorialPanel.Instance().Tutor(p.Type,
+                "Tutorial",
+                "You can admire the view by holding down the right mouse button and moving the mouse.",
+                false);
+            TutorialPanel.Instance().Tutor(p.Type,
+                "Tutorial",
+                "You can also move by holding and dragging me to an adjacent tile on the board.",
+                false);
+            TutorialPanel.Instance().Tutor(p.Type,
+                "Tutorial",
+                "You will notice that the accessible tiles get highlighted while you are moving me.",
+                false);
+            TutorialPanel.Instance().Tutor(p.Type,
+                "Tutorial",
+                "Now go forth!",
+                false);
 		}
 	}
 
