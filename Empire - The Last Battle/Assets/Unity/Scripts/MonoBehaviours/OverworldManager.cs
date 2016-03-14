@@ -271,7 +271,8 @@ public class OverworldManager : MonoBehaviour
 						CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
 						_GameStateHolder._ActivePlayer.AddCard(c);
 						_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
-						p.ShowOK("Card Recieved!", "You recieved a " + c.Name + " card.", endTurn);
+//						p.ShowOK("Card Recieved!", "You recieved a " + c.Name + " card.", null);
+						PromptForDefendingUnit ("Your land is undefended. Would you like to leave a unit to defend?", _GameStateHolder._ActivePlayer, p, endTurn);
 					}
 				}
 				else {
@@ -375,14 +376,15 @@ public class OverworldManager : MonoBehaviour
 		else if (_BattleData._BattleType == BattleType.PvP) {
 			if (_BattleData._EndState == BattleEndState.Win) {
 				_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
-
+				_Board.SetTilePrisoner(tile);
 				// need to do something if the other player was totally knocked out
 				//
 
 				if (tile.Building == BuildingType.Cave) {
 					CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
 					_GameStateHolder._ActivePlayer.AddCard(c);
-					p.ShowOK("Card Recieved!", "You beat the other player and recieved a " + c.Name + " card.", endTurn);
+//					p.ShowOK("Card Recieved!", "You beat the other player and recieved a " + c.Name + " card.", endTurn);
+					PromptForDefendingUnit ("This tile now belongs to your kingdom. Leave a unit to defend your honour?", _GameStateHolder._ActivePlayer, p, endTurn);
 				}
 				else {
 					if (_GameStateHolder._ActivePlayer.PlayerArmy.GetTotalActiveUnits () > 1) {
@@ -547,6 +549,7 @@ public class OverworldManager : MonoBehaviour
 	void SetupDefendedTile(Unit u, Player p, TileData t, UnityAction onDone, UIPlayerUnitTypeIndexCallback remove) {
 		t.Defended = true;
 		u.Position = t;
+		_Board.SetTileDefence (t);
 		_OverworldUI._ArmyUI.OnClickUnit -= remove;
 
 		onDone();

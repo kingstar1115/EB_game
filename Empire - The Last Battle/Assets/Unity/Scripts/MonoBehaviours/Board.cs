@@ -13,6 +13,7 @@ public class Board : MonoBehaviour {
     public string _MarkerCommanderSS_Tag;
 	public GameObject[] _BattlebeardCastles;
 	public GameObject[] _StormshaperCastles;
+	public DefendingUnitManager _DefendingUnitManager;
 
 	int battlebeardCastleState = 0;
 	int stormshaperCastleState = 0;
@@ -20,6 +21,7 @@ public class Board : MonoBehaviour {
     public void Initialise() {
         _TileTypeDataManager.Initialise();
         _FlagManager.Initialise();
+		_DefendingUnitManager.Initialise();
         Generate(this.gameObject.transform.position);
     }
 
@@ -135,6 +137,14 @@ public class Board : MonoBehaviour {
         t.Owner = p;
         _FlagManager.SetFlagForTile(t);
     }
+
+	public void SetTileDefence(TileData t) {
+		_DefendingUnitManager.SetDefenderForTile(t);
+	}
+
+	public void SetTilePrisoner(TileData t){
+		_DefendingUnitManager.SetPrisonerForTile(t);
+	}
 
 	// set the state of a specific castle. 0-4. 0 is no castle, 4 is fully built.
 	public void SetCastleState(PlayerType p, int state) {
