@@ -16,7 +16,6 @@ public class ArmouryUI : MonoBehaviour
 	public List<PurchasableUnit> PurchasableUnits;
 	public List<PurchasableCard> PurchasableCards;
 	public List<PurchasableCastlePiece> PurchasableCastlePieces;
-	public List<GameObject> CastlePieceImages;
 	public Button CastlesButton;
 
 	public event Action<PurchasableItem> OnPurchasedItem = delegate { };
@@ -39,12 +38,6 @@ public class ArmouryUI : MonoBehaviour
 
 	public IEnumerable<PurchasableCastlePiece> AvailableCastlePieces(Player player)
 	{
-		////return early if no purchasable castle pieces
-		//if (PurchasableCastlePieces.Count == 0)
-		//{
-		//	Debug.Log("No purchasable castle peices at all");
-		//	return Enumerable.Empty<PurchasableCastlePiece>();
-		//}
 		return PurchasableCastlePieces.Where(x => x.purchaseLevel <= player.LostImmortalKillCount && !x.b_AlreadyPurchased && x.cost <= player.Currency.getPoints()).ToList();
 	}
 
@@ -98,32 +91,9 @@ public class ArmouryUI : MonoBehaviour
 					.ToList().ForEach(x => { x.color = Color.white; x.GetComponent<Button>().interactable = true; });
 		}
 
-		//Set each castle piece inactive then set active
-		//correct castle piece active based on immortal kill counts
-		foreach (var item in CastlePieceImages) {
-			item.SetActive(false);
-		}
-
 		if (player.LostImmortalKillCount > 0) {
 			CastlesButton.interactable = true;
 		}
-//
-//		switch (player.LostImmortalKillCount) {
-//		case 1:
-//			CastlePieceImages.Single(x => x.name.Contains("CastlePiece_01")).SetActive(true);
-//			break;
-//		case 2:
-//			CastlePieceImages.Single(x => x.name.Contains("CastlePiece_02")).SetActive(true);
-//			break;
-//		case 3:
-//			CastlePieceImages.Single(x => x.name.Contains("CastlePiece_03")).SetActive(true);
-//			break;
-//		case 4:
-//			CastlePieceImages.Single(x => x.name.Contains("CastlePiece_04")).SetActive(true);
-//			break;
-//		default:
-//			break;
-//		}
 	}
 
 	public void Show(Player player)
@@ -156,6 +126,8 @@ public class ArmouryUI : MonoBehaviour
 	public void BuyCastlePiece(PurchasableCastlePiece purchasedCastlePiece)
 	{
 		OnPurchasedItem(purchasedCastlePiece);
+
+		PurchasableCastlePieces.Remove(purchasedCastlePiece);
 
 		if (Debug.isDebugBuild)
 			Debug.Log("Castle Piece " + purchasedCastlePiece.name + " bought");
