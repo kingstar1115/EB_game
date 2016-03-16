@@ -58,8 +58,8 @@ public class OverworldUI : MonoBehaviour
     public void Initialise(Player battlebeard, Player stormshaper)
     {
         _BoardUI.Init();
-		_battlebeardCommanderUI.Initialise();    
-		_stormshaperCommanderUI.Initialise();		
+		_battlebeardCommanderUI.Initialise();
+		_stormshaperCommanderUI.Initialise();
 		//snap players to start position    
 		_battlebeardCommanderUI.UpdateToPlayerPosition();    
 		_stormshaperCommanderUI.UpdateToPlayerPosition();
