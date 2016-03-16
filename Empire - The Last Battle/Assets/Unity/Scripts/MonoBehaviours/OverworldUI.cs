@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class OverworldUI : MonoBehaviour
 {
@@ -22,10 +23,12 @@ public class OverworldUI : MonoBehaviour
 	public ResourceUI _ResourceUI;
     public CameraMovement _CameraMovement;
     public BoardUI _BoardUI;
+	public ArmouryUI _ArmouryUI;
 	public ArmyUI _ArmyUI;
     public GameObject _PauseScreen;
     public CardDisplayUI _CardDisplayUI;
     public HandUI _HandUI;
+	public GameStateHolder _GameStateHolder;
 
 	bool _enabled;
     bool _paused;
@@ -55,7 +58,7 @@ public class OverworldUI : MonoBehaviour
     public void Initialise(Player battlebeard, Player stormshaper)
     {
         _BoardUI.Init();
-		_battlebeardCommanderUI.Initialise();    
+		_battlebeardCommanderUI.Initialise();
 		_stormshaperCommanderUI.Initialise();
 		//snap players to start position    
 		_battlebeardCommanderUI.UpdateToPlayerPosition();    
@@ -80,13 +83,14 @@ public class OverworldUI : MonoBehaviour
 		_battlebeardCommanderUI.OnCommanderDrop -= _CommanderUI_OnCommanderDrop;
 		_battlebeardCommanderUI.OnCommanderGrounded -= _CommanderUI_Grounded;
 		_battlebeardCommanderUI.OnDropCommander -= _CommanderUI_OnDropCommander;
+
 		_stormshaperCommanderUI.OnCommanderMoved -= _CommanderUI_OnCommanderMoved;
 		_stormshaperCommanderUI.OnCommanderForceMoved -= _CommanderUI_OnCommanderForceMoved;
 		_stormshaperCommanderUI.OnStartDrag -= _CommanderUI_OnStartDrag;
 		_stormshaperCommanderUI.OnCommanderDrop -= _CommanderUI_OnCommanderDrop;
 		_stormshaperCommanderUI.OnCommanderGrounded -= _CommanderUI_Grounded;
 		_stormshaperCommanderUI.OnDropCommander -= _CommanderUI_OnDropCommander;
-        _CardDisplayUI.OnCardUse -= _CardDisplayUI_OnCardUse;
+		_CardDisplayUI.OnCardUse -= _CardDisplayUI_OnCardUse;
 		_CardDisplayUI.Hide();
         _HandUI._Enabled = false;
 
@@ -140,6 +144,8 @@ public class OverworldUI : MonoBehaviour
 		OnPlayerUseCard = delegate { };
 		OnPause = delegate { };
 		OnUnPause = delegate { };
+
+		_ArmouryUI.RemoveListeners();
 		_ArmyUI.RemoveListeners();
 		_CardDisplayUI.RemoveListeners();
 		_HandUI.RemoveListeners();
@@ -178,6 +184,11 @@ public class OverworldUI : MonoBehaviour
 		_CommanderUI = p.Type == PlayerType.Battlebeard ? _battlebeardCommanderUI : _stormshaperCommanderUI;
 		_CommanderUI.DisplayInfo();
 		SwitchFocus (_CommanderUI);
+	}
+
+	public void _ArmouryUI_OnCurrencyChanged(int val)
+	{
+		_ArmouryUI.CurrencyChangedUpdate(val, _GameStateHolder._ActivePlayer);
 	}
 
 	public void _CardDisplayUI_OnCardUse(CardData cardData)
