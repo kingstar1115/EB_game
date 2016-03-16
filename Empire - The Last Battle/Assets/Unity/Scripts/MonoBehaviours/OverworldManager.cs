@@ -73,8 +73,8 @@ public class OverworldManager : MonoBehaviour
 		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
 		_BattlebeardPlayer.Currency.OnChange += _OverworldUI._ArmouryUI_OnCurrencyChanged;
 		_StormshaperPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
-		_StormshaperPlayer.OnCardAdded += _StormshapersPlayer_OnCardAdded;
-		_StormshaperPlayer.OnCardRemoved += _StormshapersPlayer_OnCardRemoved;
+		_StormshaperPlayer.OnCardAdded += _StormshaperPlayer_OnCardAdded;
+		_StormshaperPlayer.OnCardRemoved += _StormshaperPlayer_OnCardRemoved;
 		_StormshaperPlayer.Currency.OnChange += _OverworldUI._ArmouryUI_OnCurrencyChanged;
 
 		_CardSystem.RequestUnitSelection +=_CardSystem_RequestUnitSelection;
@@ -131,6 +131,7 @@ public class OverworldManager : MonoBehaviour
 	void _BattlebeardPlayer_OnCardAdded(CardData card)
 	{
 		//inform ui
+		onCardAdded(getPlayer(PlayerType.Battlebeard), card);
 		_OverworldUI.AddPlayerCard (PlayerType.Battlebeard, card);
 	}
 
@@ -140,13 +141,15 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.RemovePlayerCard (PlayerType.Battlebeard, card, index);
 	}
 
-	void _StormshapersPlayer_OnCardAdded(CardData card)
+	void _StormshaperPlayer_OnCardAdded(CardData card)
 	{
 		//inform ui
+
+		onCardAdded(getPlayer(PlayerType.Stormshaper), card);
 		_OverworldUI.AddPlayerCard (PlayerType.Stormshaper, card);
 	}
 
-	void _StormshapersPlayer_OnCardRemoved(CardData card, int index)
+	void _StormshaperPlayer_OnCardRemoved(CardData card, int index)
 	{
 		//inform ui
 		_OverworldUI.RemovePlayerCard (PlayerType.Stormshaper, card, index);
@@ -155,30 +158,90 @@ public class OverworldManager : MonoBehaviour
 	void onCardAdded(Player p, CardData c) {
 		switch (c.Type) {
 			case CardType.Healing_Card:
-				//if p.HasCardHealing 
-				
-				{
-					_GameStateHolder._ActivePlayer.LandedArmoury = true;
+				if (!p.HasGotCardHealing) {
+					p.HasGotCardHealing = true;
 					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
-					   "Armoury",
-					   "Welcome to the Armoury!\n" +
-						"You can use resources that you have earned to expand your army or purchase upgrades.",
-					   false);
+						"Cards",
+						"You just got a healing card!\n" +
+						"You can use this to heal your units at any time./n" +
+						"The number of units the can be healed is written on the card.",
+					   true);
 				}
 				break;
 			case CardType.Scout_Card:
+				if(!p.HasGotCardScout) {
+					p.HasGotCardScout = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"You just got a scout card!\n" +
+						"Scouting allows you to make use of the scouts in your army./n" +
+						"Using this card allows you can move further in a turn without alerting anybody./n" +
+						"Having more Sscouts allows you to move further.",
+					   true);
+				}
 				break;
 			case CardType.Resource_Card:
+				if(!p.HasGotCardResource) {
+					p.HasGotCardResource = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"You just got a resource card!\n" +
+						"With more resources you can purchase things in the Armoury located in the centre of Nekark." + 
+						"Your resources are shown in the top left of the screen.",
+					   true);
+				}
 				break;
 			case CardType.Battle_Card:
+				if(!p.HasGotCardBattle) {
+					p.HasGotCardBattle = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"You just got a battle card!\n" +
+						"...and an enemy appeared out of nowhere!",
+					   true);
+				}
 				break;
 			case CardType.Tactic_Card:
+				if(!p.HasGotCardTactic) {
+					p.HasGotCardTactic = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"You just got a tactic card!\n" +
+						"With this card you can temporarily increase the strength of a unit in battle./n" +
+						"It only lasts for one attack, so use wisely.",
+					   true);
+				}
 				break;
 			case CardType.Alliance_Card:
+				if(!p.HasGotCardAlliance) {
+					p.HasGotCardAlliance = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"You just got an alliance card!\n" +
+						"Using this card calls forth a new unit to fight for you.",
+					   true);
+				}
 				break;
 			case CardType.Priority_Card:
+				if(!p.HasGotCardPriority) {
+					p.HasGotCardPriority = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"You just got a priority card!\n" +
+						"This will give you a speed advantage at the beginning of upcoming battles.",
+					   true);
+				}
 				break;
 			case CardType.Upgrade_Card:
+				if(!p.HasGotCardPriority) {
+					p.HasGotCardPriority = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"You just got an upgrade card!\n" +
+						"With this card you can increase the strength of a unit./n" +
+						"Be careful though, as it will wear off if the unit is knocked out!",
+					   true);
+				}
 				break;
 			default:
 				break;
@@ -311,18 +374,26 @@ public class OverworldManager : MonoBehaviour
 				endTurn();
 				break;
 			case BuildingType.Cave:
-				if (!_GameStateHolder._ActivePlayer.LandedCave) {
-					_GameStateHolder._ActivePlayer.LandedCave = true;
-					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
-						"Cave",
-						"There's a decent stash of treasure in this cave.",
-					   true);
-				}
-				if (tile.Owner != _GameStateHolder._ActivePlayer.Type) {
+				
+					if (tile.Owner != _GameStateHolder._ActivePlayer.Type) {
 					if (tile.Owner != PlayerType.None) {
 						startBattle(BattleType.PvP);
 					} else {
-						CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
+						if(!_GameStateHolder._ActivePlayer.LandedCave) {
+							_GameStateHolder._ActivePlayer.LandedCave = true;
+							TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+								"Cave",
+								"There's a decent stash of treasure in this cave.",
+								true);
+						}
+						if(!_GameStateHolder._ActivePlayer.HasCaptured) {
+							_GameStateHolder._ActivePlayer.HasCaptured = true;
+							TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+								"Cave",
+								"You captured the cave and made it part of your empire!",
+								true);
+						}
+							CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
 						_GameStateHolder._ActivePlayer.AddCard(c);
 						_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
 						p.ShowOK("Card Recieved!", "You recieved a " + c.Name + " card.", endTurn);
@@ -428,13 +499,14 @@ public class OverworldManager : MonoBehaviour
 
 
 	void endBattle() {
-		
+		bool hasMessage = false;
 		if (_BattleData._EndState == BattleEndState.Loss && !_GameStateHolder._ActivePlayer.HasLost) {
 			_GameStateHolder._ActivePlayer.HasLost = true;
 			TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
 				"Battle",
 				"We lost this fight, but there are many more battles to win!",
 				true);
+			hasMessage = true;
 		}
 
 		if(_BattleData._EndState == BattleEndState.Win && !_GameStateHolder._ActivePlayer.HasWon) {
@@ -443,6 +515,7 @@ public class OverworldManager : MonoBehaviour
 				"Battle",
 				"We won this fight and reaped the spoils, but there are many more battles to win!",
 				true);
+			hasMessage = true;
 		}
 
 		ModalPanel p = ModalPanel.Instance ();
@@ -452,6 +525,13 @@ public class OverworldManager : MonoBehaviour
 		if (_BattleData._BattleType == BattleType.Monster) {
 			if (_BattleData._EndState == BattleEndState.Win) {
 				if (tile.Building == BuildingType.Camp) {
+					if(!_GameStateHolder._ActivePlayer.HasCaptured) {
+						_GameStateHolder._ActivePlayer.HasCaptured = true;
+						TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+							"Camp",
+							"You captured the camp and made it part of your empire!",
+							!hasMessage);
+					}
 					_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
 				}
 				//p.ShowOK ("Battle", "You now own this tile!", endTurn);
@@ -472,6 +552,13 @@ public class OverworldManager : MonoBehaviour
 				//
 
 				if (tile.Building == BuildingType.Cave) {
+					if(!_GameStateHolder._ActivePlayer.HasCaptured) {
+						_GameStateHolder._ActivePlayer.HasCaptured = true;
+						TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+							"Cave",
+							"You captured the camp and made it part of your empire!",
+							!hasMessage);
+					}
 					CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
 					_GameStateHolder._ActivePlayer.AddCard(c);
 					p.ShowOK("Card Recieved!", "You beat the other player and recieved a " + c.Name + " card.", endTurn);
