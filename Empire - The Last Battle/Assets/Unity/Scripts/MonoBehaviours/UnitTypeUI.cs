@@ -129,6 +129,7 @@ public class UnitTypeUI : MonoBehaviour {
 		ui.SetIndex (_units.Count);
 		ui.SetUpgrade (u.HasUpgrade ());
 		ui.SetDefending (u.IsDefending ());
+		ui.SetPrisoner (u.IsPrisoner ());
 		ui.OnClick += _clickUnit;
 		if (_selectMode) {
 			ui.EnableSelection ();
@@ -162,6 +163,7 @@ public class UnitTypeUI : MonoBehaviour {
 		UnitUI ui = _units[i];
 		ui.SetKO(u.IsKO());
 		ui.SetDefending (u.IsDefending ());
+		ui.SetPrisoner (u.IsPrisoner ());
 		ui.SetUpgrade(u.HasUpgrade());
 		if (u.IsKO() || u.IsDefending()) {
 			UnitOverview.transform.GetChild(i).GetComponent<Image>().color = Color.clear;

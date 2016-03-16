@@ -19,12 +19,16 @@ public class Unit : ScriptableObject, iBattleable {
 	int CurrentBaseHP;
 	public TileData Position;
 	public UnitType Type;
+	public bool Prisoner;
+	public bool Defending;
 	public event UnitCallback OnUpdate = delegate { };
 
 	public void Initialise(UnitBaseData data){
 		Type = data.Type;
 		BaseData = data;
 		CurrentBaseHP = data.HP;
+		Prisoner = false;
+		Defending = false;
 	}
 
 	public void RemoveListeners() {
@@ -44,12 +48,16 @@ public class Unit : ScriptableObject, iBattleable {
 	}
 
 	public bool IsDefending() {
-		return Position != null;
+		return Defending;
 	}
 
 	public bool IsActive() {
 		bool x = (!IsDefending () && !IsKO ());
 		return x;
+	}
+
+	public bool IsPrisoner() { 
+		return Prisoner;
 	}
 
 	//For example if CurrentHP = -2 and CurrentUpgrade.HP is = 3 then this will return 1
@@ -128,6 +136,21 @@ public class Unit : ScriptableObject, iBattleable {
 	public void RemoveTempUpgrade() {
 		CurrentTempUpgrade = null;
 		OnUpdate(this);
+	}
+
+	public void SetPosition(TileData t) {
+		Position = t;
+		OnUpdate (this);
+	}
+
+	public void SetDefending(bool b) {
+		Defending = b;
+		OnUpdate (this);
+	}
+
+	public void SetPrisoner(bool b) {
+		Prisoner = b;
+		OnUpdate (this);
 	}
 
 	public UnitBaseData CreateUpgrade() {
