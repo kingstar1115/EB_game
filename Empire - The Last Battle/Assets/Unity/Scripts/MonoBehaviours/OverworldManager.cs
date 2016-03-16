@@ -67,12 +67,15 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.OnPause += _OverworldUI_OnPause;
 		_OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
 		_OverworldUI.OnPlayerUseCard += _OverworldUI_OnPlayerUseCard;
+		_OverworldUI._ArmouryUI.OnPurchasedItem += _OverworldUI_ArmouryUI_OnPurchasedItem;
 		_BattlebeardPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_BattlebeardPlayer.OnCardAdded += _BattlebeardPlayer_OnCardAdded;
 		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
+		_BattlebeardPlayer.Currency.OnChange += _OverworldUI._ArmouryUI_OnCurrencyChanged;
 		_StormshaperPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_StormshaperPlayer.OnCardAdded += _StormshapersPlayer_OnCardAdded;
 		_StormshaperPlayer.OnCardRemoved += _StormshapersPlayer_OnCardRemoved;
+		_StormshaperPlayer.Currency.OnChange += _OverworldUI._ArmouryUI_OnCurrencyChanged;
 
 		_CardSystem.RequestUnitSelection +=_CardSystem_RequestUnitSelection;
 		_CardSystem.RequestBattle += _CardSystem_RequestBattle;
@@ -149,6 +152,40 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.RemovePlayerCard (PlayerType.Stormshaper, card, index);
 	}
 
+	void onCardAdded(Player p, CardData c) {
+		switch (c.Type) {
+			case CardType.Healing_Card:
+				//if p.HasCardHealing 
+				
+				{
+					_GameStateHolder._ActivePlayer.LandedArmoury = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+					   "Armoury",
+					   "Welcome to the Armoury!\n" +
+						"You can use resources that you have earned to expand your army or purchase upgrades.",
+					   false);
+				}
+				break;
+			case CardType.Scout_Card:
+				break;
+			case CardType.Resource_Card:
+				break;
+			case CardType.Battle_Card:
+				break;
+			case CardType.Tactic_Card:
+				break;
+			case CardType.Alliance_Card:
+				break;
+			case CardType.Priority_Card:
+				break;
+			case CardType.Upgrade_Card:
+				break;
+			default:
+				break;
+
+		}
+	}
+
 	void _CardSystem_OnEffectApplied(bool success, CardData card, Player player, Unit u) {
 		ModalPanel p = ModalPanel.Instance();
 		if (!success) {
@@ -185,7 +222,33 @@ public class OverworldManager : MonoBehaviour
 
 	}
 
+	//This method is for when the user finishes using the armoury by Key or Button
+	public void _ArmouryUI_EndTurn() {
+		_OverworldUI._ArmouryUI.Hide();
+		endTurn();
+	}
 
+	//Handles all armoury purchases
+	public void _OverworldUI_ArmouryUI_OnPurchasedItem(PurchasableItem purchasedItem) {
+		//We don't know item purchased at compile time, so use as keyword instead of casting
+		PurchasableUnit purchasedUnit = purchasedItem as PurchasableUnit;
+		PurchasableCard purchasedCard = purchasedItem as PurchasableCard;
+		PurchasableCastlePiece purchasedCastlePiece = purchasedItem as PurchasableCastlePiece;
+
+		//Give player the item and take money away
+		if(purchasedUnit != null) {
+			_GameStateHolder._ActivePlayer.PlayerArmy.AddUnit(purchasedUnit.UNITTYPE);
+			_GameStateHolder._ActivePlayer.Currency.addPoints(-purchasedUnit.cost);
+		}
+		else if(purchasedCard != null) {
+			_GameStateHolder._ActivePlayer.AddCard(purchasedCard.Card);
+			_GameStateHolder._ActivePlayer.Currency.addPoints(-purchasedCard.cost);
+		}
+		else if(purchasedCastlePiece != null) {
+			_GameStateHolder._ActivePlayer.CastleProgress++;
+			_GameStateHolder._ActivePlayer.Currency.addPoints(-purchasedCastlePiece.cost);
+		}
+	}
 
 	void _OverworldUI_OnCommanderForceMove(TileData tile) {
 		_GameStateHolder._ActivePlayer.CommanderPosition = tile;
@@ -225,6 +288,7 @@ public class OverworldManager : MonoBehaviour
 						"You can use resources that you have earned to expand your army or purchase upgrades.",
 					   false);
 				}
+				_OverworldUI._ArmouryUI.Show(_GameStateHolder._ActivePlayer);
 				break;
 			case BuildingType.Camp:
 				if (!_GameStateHolder._ActivePlayer.LandedCamp) {
@@ -251,8 +315,8 @@ public class OverworldManager : MonoBehaviour
 					_GameStateHolder._ActivePlayer.LandedCave = true;
 					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
 						"Cave",
-						"You just landed on a camp occupied by a monster.",
-					   false);
+						"There's a decent stash of treasure in this cave.",
+					   true);
 				}
 				if (tile.Owner != _GameStateHolder._ActivePlayer.Type) {
 					if (tile.Owner != PlayerType.None) {
@@ -269,17 +333,24 @@ public class OverworldManager : MonoBehaviour
 				}
 				break;
 			case BuildingType.Fortress:
-				if (!_GameStateHolder._ActivePlayer.lan) {
-					_GameStateHolder._ActivePlayer.LandedCave = true;
+				bool ownsSurroundingTiles = tile.GetConnectedTiles().FindAll(t => t.Owner == _GameStateHolder._ActivePlayer.Type).Count >= 3;
+				if (!_GameStateHolder._ActivePlayer.LandedFortress) {
+					_GameStateHolder._ActivePlayer.LandedFortress = true;
 					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
-						"Cave",
-						"You just landed on a camp occupied by a monster.",
-					   false);
+						"Fortress",
+						"This fortress seems eerie. It looks like there are many like it around Nekark.",
+						true);
+					if (!ownsSurroundingTiles) {
+						TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+							"Fortress",
+							"I suggest securing the surrounding area!",
+							false);
+					}
 				}
-					// Make sure that the fortress type matches the player type
+				// Make sure that the fortress type matches the player type
 				if (tile.Owner == _GameStateHolder._ActivePlayer.Type) {
 					// make sure the player owns at least 3 surrounding tiles
-					if (tile.GetConnectedTiles ().FindAll (t => t.Owner == _GameStateHolder._ActivePlayer.Type).Count >= 3) {
+					if (ownsSurroundingTiles) {
 						// Battle lost immortal
 						p.ShowOK("Fortress", "A bloody Lost Immortal just showed up innit blud!", () => {
 							startBattle(BattleType.LostImmortal);
@@ -289,14 +360,33 @@ public class OverworldManager : MonoBehaviour
 					}
 					break;
 				}
-				//p.ShowOK ("Fortress", "Nothing appeared.", endTurn);
 				endTurn();
-					// end turn
 				break;
 			case BuildingType.Inn:
+				if(!_GameStateHolder._ActivePlayer.LandedInn) {
+					_GameStateHolder._ActivePlayer.LandedInn = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Inn",
+						"The Inn is a good place to heal your units./n"+
+						"Inns are a good place to rest and revive your units when they are knocked out.",
+						true);
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Inn",
+						"Unfortunately, sometimes units cannot be healed and you will need to visit the inn another time.",
+						true);
+				}
 				Audio.AudioInstance.PlaySFX(SoundEffect.Inn);
 				if (_GameStateHolder._InactivePlayer.CastleProgress >= 4) {
-					p.ShowOK ("Oh No!", "The inn won't accept you!", endTurn);
+						if(!_GameStateHolder._ActivePlayer.LandedInnUnavailable) {
+							_GameStateHolder._ActivePlayer.LandedInnUnavailable = true;
+							TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+								"Inn",
+								"Oh no!" +
+								"The inn has turned you away! The " + _GameStateHolder._InactivePlayer.Type.ToString() + "army is putting too much pressure on them!./n" +
+								"Looks like there's no rest for us anymore...",
+								true);
+						}
+						p.ShowOK ("Oh No!", "The inn won't accept you!", endTurn);
 					break;
 				}
 
@@ -338,6 +428,23 @@ public class OverworldManager : MonoBehaviour
 
 
 	void endBattle() {
+		
+		if (_BattleData._EndState == BattleEndState.Loss && !_GameStateHolder._ActivePlayer.HasLost) {
+			_GameStateHolder._ActivePlayer.HasLost = true;
+			TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+				"Battle",
+				"We lost this fight, but there are many more battles to win!",
+				true);
+		}
+
+		if(_BattleData._EndState == BattleEndState.Win && !_GameStateHolder._ActivePlayer.HasWon) {
+			_GameStateHolder._ActivePlayer.HasWon = true;
+			TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+				"Battle",
+				"We won this fight and reaped the spoils, but there are many more battles to win!",
+				true);
+		}
+
 		ModalPanel p = ModalPanel.Instance ();
 		_OverworldUI.Disable ();
 		TileData tile = _GameStateHolder._ActivePlayer.CommanderPosition;
@@ -537,11 +644,11 @@ public class OverworldManager : MonoBehaviour
             TutorialPanel.Instance().Tutor(p.Type,
                 "Tutorial",
                 "The red bars to the right of them represent individual unit's health.\n" +
-                 "Hovering your mouse over each icon will show the individual units of that type.",
+                 "Hovering your mouse over each icon will show the status of individual units of that type.",
                 false);
             TutorialPanel.Instance().Tutor(p.Type,
                 "Tutorial",
-                "Throughout the game you will come across chance items known as cards.\n" +
+                "Throughout your skirmish you will come across items known as cards.\n" +
                 "The cards you have collected are shown in the bottom right.\n" +
                 "Click on a card, and press use to use a specific card.",
                 false);
@@ -551,11 +658,11 @@ public class OverworldManager : MonoBehaviour
                 false);
             TutorialPanel.Instance().Tutor(p.Type,
                 "Tutorial",
-                "You can also move by holding and dragging me to an adjacent tile on the board.",
+                "You can also move around the land by holding and dragging me to an adjacent tile on the board.",
                 false);
             TutorialPanel.Instance().Tutor(p.Type,
                 "Tutorial",
-                "You will notice that the accessible tiles get highlighted while you are moving me.",
+                "You will notice that only the accessible tiles get highlighted while you are moving me.",
                 false);
             TutorialPanel.Instance().Tutor(p.Type,
                 "Tutorial",
@@ -623,12 +730,16 @@ public class OverworldManager : MonoBehaviour
                 DebugUI.getUI().SetMessage("Test", 22, Color.green);
             }
 
-            if (Input.GetKeyDown(KeyCode.Alpha9))
+            if (Input.GetKey(KeyCode.Alpha9))
             {
                 _GameStateHolder._ActivePlayer.Currency.addPoints(10);
             }
 
-            if (Input.GetKeyDown(KeyCode.N))
+			if(Input.GetKey(KeyCode.Alpha0)) {
+				_GameStateHolder._ActivePlayer.Currency.addPoints(-10);
+			}
+
+			if (Input.GetKeyDown(KeyCode.N))
             {
                 // move back using up a turn
                 if (_GameStateHolder._ActivePlayer.PreviousCommanderPosition && _GameStateHolder._ActivePlayer.PreviousCommanderPosition != _GameStateHolder._ActivePlayer.CommanderPosition)

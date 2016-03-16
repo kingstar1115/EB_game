@@ -18,9 +18,11 @@ public class Player : ScriptableObject
 	public bool HasMoved;
 	public bool IsScouting;
 	public bool LandedInn;
+	public bool LandedInnUnavailable;
 	public bool LandedCave;
 	public bool LandedArmoury;
 	public bool LandedCamp;
+	public bool LandedFortress;
 	public bool HasBattled;
 	public bool HasBattledMonster;
 	public bool HasBattledLostImmortal;
@@ -33,6 +35,14 @@ public class Player : ScriptableObject
 	public bool HasCaptured;
 	public bool HasLeftDefender;
 	public bool HasLandedInnNoEntry;
+	public bool HasGotCardAlliance;
+	public bool HasGotCardBattle;
+	public bool HasGotCardHealing;
+	public bool HasGotCardPriority;
+	public bool HasGotCardResource;
+	public bool HasGotCardScout;
+	public bool HasGotCardTactic;
+	public bool HasGotCardUpgrade;
 
 	public event PlayerUnitCallback OnUpdateUnit = delegate { };
 	public event PlayerUnitCallback OnAddUnit = delegate { };
