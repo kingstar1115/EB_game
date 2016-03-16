@@ -71,12 +71,15 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.OnPause += _OverworldUI_OnPause;
 		_OverworldUI.OnUnPause += _OverworldUI_OnUnPause;
 		_OverworldUI.OnPlayerUseCard += _OverworldUI_OnPlayerUseCard;
+		_OverworldUI._ArmouryUI.OnPurchasedItem += _OverworldUI_ArmouryUI_OnPurchasedItem;
 		_BattlebeardPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_BattlebeardPlayer.OnCardAdded += _BattlebeardPlayer_OnCardAdded;
 		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
+		_BattlebeardPlayer.Currency.OnChange += _OverworldUI._ArmouryUI_OnCurrencyChanged;
 		_StormshaperPlayer.Currency.OnChange += _OverworldUI._ResourceUI.UpdateResources;
 		_StormshaperPlayer.OnCardAdded += _StormshapersPlayer_OnCardAdded;
 		_StormshaperPlayer.OnCardRemoved += _StormshapersPlayer_OnCardRemoved;
+		_StormshaperPlayer.Currency.OnChange += _OverworldUI._ArmouryUI_OnCurrencyChanged;
 
 		_CardSystem.RequestUnitSelection +=_CardSystem_RequestUnitSelection;
 		_CardSystem.RequestBattle += _CardSystem_RequestBattle;
@@ -189,7 +192,33 @@ public class OverworldManager : MonoBehaviour
 
 	}
 
+	//This method is for when the user finishes using the armoury by Key or Button
+	public void _ArmouryUI_EndTurn() {
+		_OverworldUI._ArmouryUI.Hide();
+		endTurn();
+	}
 
+	//Handles all armoury purchases
+	public void _OverworldUI_ArmouryUI_OnPurchasedItem(PurchasableItem purchasedItem) {
+		//We don't know item purchased at compile time, so use as keyword instead of casting
+		PurchasableUnit purchasedUnit = purchasedItem as PurchasableUnit;
+		PurchasableCard purchasedCard = purchasedItem as PurchasableCard;
+		PurchasableCastlePiece purchasedCastlePiece = purchasedItem as PurchasableCastlePiece;
+
+		//Give player the item and take money away
+		if(purchasedUnit != null) {
+			_GameStateHolder._ActivePlayer.PlayerArmy.AddUnit(purchasedUnit.UNITTYPE);
+			_GameStateHolder._ActivePlayer.Currency.addPoints(-purchasedUnit.cost);
+		}
+		else if(purchasedCard != null) {
+			_GameStateHolder._ActivePlayer.AddCard(purchasedCard.Card);
+			_GameStateHolder._ActivePlayer.Currency.addPoints(-purchasedCard.cost);
+		}
+		else if(purchasedCastlePiece != null) {
+			_GameStateHolder._ActivePlayer.CastleProgress++;
+			_GameStateHolder._ActivePlayer.Currency.addPoints(-purchasedCastlePiece.cost);
+		}
+	}
 
 	void _OverworldUI_OnCommanderForceMove(TileData tile) {
 		_GameStateHolder._ActivePlayer.CommanderPosition = tile;
@@ -220,7 +249,7 @@ public class OverworldManager : MonoBehaviour
 			ModalPanel p = ModalPanel.Instance ();
 			switch (tile.Building) {
 			case BuildingType.Armoury:
-				p.ShowOK ("Armoury", "You landed on the Armoury.", endTurn);
+				_OverworldUI._ArmouryUI.Show(_GameStateHolder._ActivePlayer);
 				break;
 			case BuildingType.Camp:
 				if (tile.Owner != _GameStateHolder._ActivePlayer.Type) {
@@ -638,12 +667,16 @@ public class OverworldManager : MonoBehaviour
                 DebugUI.getUI().SetMessage("Test", 22, Color.green);
             }
 
-            if (Input.GetKeyDown(KeyCode.Alpha9))
+            if (Input.GetKey(KeyCode.Alpha9))
             {
                 _GameStateHolder._ActivePlayer.Currency.addPoints(10);
             }
 
-            if (Input.GetKeyDown(KeyCode.N))
+			if(Input.GetKey(KeyCode.Alpha0)) {
+				_GameStateHolder._ActivePlayer.Currency.addPoints(-10);
+			}
+
+			if (Input.GetKeyDown(KeyCode.N))
             {
                 // move back using up a turn
                 if (_GameStateHolder._ActivePlayer.PreviousCommanderPosition && _GameStateHolder._ActivePlayer.PreviousCommanderPosition != _GameStateHolder._ActivePlayer.CommanderPosition)
