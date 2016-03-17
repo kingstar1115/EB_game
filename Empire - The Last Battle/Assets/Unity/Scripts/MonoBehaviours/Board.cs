@@ -18,11 +18,11 @@ public class Board : MonoBehaviour {
 	int battlebeardCastleState = 0;
 	int stormshaperCastleState = 0;
 
-    public void Initialise() {
+    public void Initialise(bool loadGame = false) {
         _TileTypeDataManager.Initialise();
         _FlagManager.Initialise();
 		_DefendingUnitManager.Initialise();
-        Generate(this.gameObject.transform.position);
+        Generate(this.gameObject.transform.position, loadGame);
     }
 
     public void Generate(Vector3 origin, bool loadGame = false) {
@@ -48,6 +48,8 @@ public class Board : MonoBehaviour {
                 tile.Y = j;
                 if (!loadGame) {
                     tile.Height = GetRandomHeight(tile);
+					tile.Defended = false;
+					tile.Owner = PlayerType.None;
                 }
 
                 Vector3 position = new Vector3(i * _TileWidth, tile.Height, j * _TileWidth) + boardStart;

@@ -29,7 +29,8 @@ public class OverworldManager : MonoBehaviour
 	void Start() {
 		//new game setup
 		SceneFaderUI.ScreenFader.StartFadeOverTime(SceneFaderUI.FadeDir.FadeOut);
-		_Board.Initialise();
+		bool newGame = _BattleData._EndState == BattleEndState.None;
+		_Board.Initialise(!newGame);
 
 		if (_BattleData._EndState == BattleEndState.None) {
 			_BattlebeardPlayer.ResetArmy();
@@ -94,7 +95,7 @@ public class OverworldManager : MonoBehaviour
 
 		Audio.AudioInstance.PlayMusic(_OverworldMusic, true);
 
-		if (_BattleData._EndState == BattleEndState.None) {
+		if (newGame) {
 
 			//test by adding cards.
 			_BattlebeardPlayer.SetCards(_StartCards);
