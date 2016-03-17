@@ -25,6 +25,7 @@ public class BattleUnitPositionManager : MonoBehaviour {
     public GameObject _MarkerReserveOppositionC;
 
     public GameObject _ActivePlayerUnit;
+	public BattleUnitUI _ActivePlayerUnitUI;
     public GameObject [] _ActivePlayerUnits = new GameObject[8];
 	public BattleUnitUI [] _ActivePlayerUnitUIs = new BattleUnitUI[8];
     public GameObject _ActiveOpposition;
@@ -235,9 +236,15 @@ public class BattleUnitPositionManager : MonoBehaviour {
 		_ActivePlayerUnitUIs [(int)t].gameObject.SetActive (false);
     }
 
-    public void SetActiveUnit(UnitType t, PlayerType p) {
+    public void SetActiveUnit(Unit u, PlayerType p) {
 		List<GameObject> prefabs = p == PlayerType.Battlebeard ? _BattlebeardUnits : _StormshaperUnits;
-        _ActivePlayerUnit = (GameObject)Instantiate(prefabs[(int)t], _MarkerActivePlayerUnit.transform.position, _MarkerActivePlayerUnit.transform.rotation);
+		_ActivePlayerUnit = (GameObject)Instantiate(prefabs[(int)u.Type], _MarkerActivePlayerUnit.transform.position, _MarkerActivePlayerUnit.transform.rotation);
+
+		//battle unit ui 
+		GameObject unitUI = _UnitUIPool.GetPooledObject();
+		awakenUnitUI(unitUI, _MarkerActivePlayerUnit, _ActivePlayerUnit);
+		_ActivePlayerUnitUI = unitUI.GetComponent<BattleUnitUI>();
+		_ActivePlayerUnitUI.AddUnit(u);
 	}
 
 	public void SetOpposition(UnitType t, PlayerType p, iBattleable unit) {

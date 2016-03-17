@@ -89,7 +89,7 @@ public class BattleManager : MonoBehaviour {
 			Audio.AudioInstance.PlaySFX(SoundEffect.Dead);
 		}
 
-		//toto - a case where there is a ko but there are more units of that type 
+		//toto - a case where there is a ko but there are more units of that type ----------***********************HERERERERERER ! ! ! ! add remove active unit to ui
 		if (u.IsKO() && !p.PlayerArmy.GetActiveUnitTypes().Contains(u.Type)) {
 			_BattleUnitPositionManager.RemoveUnit(u.Type);
 			_instigatorBattlers.Remove(u);
@@ -97,6 +97,8 @@ public class BattleManager : MonoBehaviour {
 		else if (!_instigatorBattlers.Contains(u)) {
 			OnAddUnit(p, u);
 		}
+
+		OnBattleAbleUpdate (u);
 	}
 
 	void setActiveUnits() {
@@ -405,6 +407,8 @@ public class BattleManager : MonoBehaviour {
 			totalDamage = _oppositionBattler.GetStrength();
 		}
 		target.ReduceHP(totalDamage);
+		OnBattleAbleTakeDamage (target, totalDamage);
+		OnBattleAbleUpdate (target);
 		Debug.Log(t + " attaked " + target.GetType() + " for " + totalDamage + " damage.");
 		Debug.Log(target.GetCurrentHP() + " hp left (" + target.GetHPPercentage()*100 + "%)");
 		return totalDamage;
@@ -468,16 +472,11 @@ public class BattleManager : MonoBehaviour {
 	}
 
 	void setActiveUnit(Unit u) {
-		_BattleUnitPositionManager.SetActiveUnit(u.Type, _GameStateHolder._ActivePlayer.Type);
+		_BattleUnitPositionManager.SetActiveUnit(u, _GameStateHolder._ActivePlayer.Type);
 		_instigatorBattlers.Add(u);
 	}
 
 	void setActiveArmy() {
-		foreach(UnitType t in _GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnitTypes()) {
-			_BattleUnitPositionManager.InitUnitUI(t, _GameStateHolder._ActivePlayer.Type);
-		}
-		_instigatorBattlers = _GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits();
-
 		//wanna get all the units here to check if active, if new type and pass in unit to add unit
 		List<UnitType> types = new List<UnitType> ();
 		foreach (var unit in _GameStateHolder._ActivePlayer.PlayerArmy.GetUnits()) {

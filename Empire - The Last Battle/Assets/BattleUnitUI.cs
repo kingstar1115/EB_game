@@ -79,7 +79,8 @@ public class BattleUnitUI : MonoBehaviour
 
     void BattleManager_OnBattleAbleUpdate(iBattleable battleAbleObject)
     {
-        _healthBarSliders[battleAbleObject.GetUniqueID()].value = battleAbleObject.GetHPPercentage();
+		if(_healthBarSliders.ContainsKey(battleAbleObject.GetUniqueID()))
+        	_healthBarSliders[battleAbleObject.GetUniqueID()].value = battleAbleObject.GetHPPercentage();
     }
 
 	public void TakeDamage(int amount)
