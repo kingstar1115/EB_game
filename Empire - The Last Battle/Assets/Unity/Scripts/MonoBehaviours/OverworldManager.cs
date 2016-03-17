@@ -162,10 +162,9 @@ public class OverworldManager : MonoBehaviour
 					p.HasGotCardHealing = true;
 					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
 						"Cards",
-						"You just got a healing card!\n" +
-						"You can use this to heal your units at any time./n" +
+						"Healing cards can be used to heal your units at any time.\n" +
 						"The number of units the can be healed is written on the card.",
-					   true);
+					   false);
 				}
 				break;
 			case CardType.Scout_Card:
@@ -173,11 +172,10 @@ public class OverworldManager : MonoBehaviour
 					p.HasGotCardScout = true;
 					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
 						"Cards",
-						"You just got a scout card!\n" +
-						"Scouting allows you to make use of the scouts in your army./n" +
-						"Using this card allows you can move further in a turn without alerting anybody./n" +
-						"Having more Sscouts allows you to move further.",
-					   true);
+						"Scout cards allows you to make use of the scouts in your army.\n" +
+						"Using this card allows you can move further in a turn without alerting anybody.\n" +
+						"Having more scouts allows you to move further.",
+					   false);
 				}
 				break;
 			case CardType.Resource_Card:
@@ -185,10 +183,9 @@ public class OverworldManager : MonoBehaviour
 					p.HasGotCardResource = true;
 					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
 						"Cards",
-						"You just got a resource card!\n" +
-						"With more resources you can purchase things in the Armoury located in the centre of Nekark." + 
+						"Resource cards give you resources so you can purchase things in the Armoury located in the centre of Nekark." + 
 						"Your resources are shown in the top left of the screen.",
-					   true);
+					   false);
 				}
 				break;
 			case CardType.Battle_Card:
@@ -196,9 +193,8 @@ public class OverworldManager : MonoBehaviour
 					p.HasGotCardBattle = true;
 					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
 						"Cards",
-						"You just got a battle card!\n" +
-						"...and an enemy appeared out of nowhere!",
-					   true);
+						"Battle cards... Aargh! An enemy appeared out of nowhere!",
+					   false);
 				}
 				break;
 			case CardType.Tactic_Card:
@@ -206,10 +202,9 @@ public class OverworldManager : MonoBehaviour
 					p.HasGotCardTactic = true;
 					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
 						"Cards",
-						"You just got a tactic card!\n" +
-						"With this card you can temporarily increase the strength of a unit in battle./n" +
+						"Tactic cards temporarily increase the strength of a unit in battle.\n" +
 						"It only lasts for one attack, so use wisely.",
-					   true);
+					   false);
 				}
 				break;
 			case CardType.Alliance_Card:
@@ -217,9 +212,8 @@ public class OverworldManager : MonoBehaviour
 					p.HasGotCardAlliance = true;
 					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
 						"Cards",
-						"You just got an alliance card!\n" +
-						"Using this card calls forth a new unit to fight for you.",
-					   true);
+						"Alliance cards call forth a new unit to fight for you.",
+					   false);
 				}
 				break;
 			case CardType.Priority_Card:
@@ -227,9 +221,8 @@ public class OverworldManager : MonoBehaviour
 					p.HasGotCardPriority = true;
 					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
 						"Cards",
-						"You just got a priority card!\n" +
-						"This will give you a speed advantage at the beginning of upcoming battles.",
-					   true);
+						"Priority cards will give you a speed advantage at the beginning of upcoming battles.",
+					   false);
 				}
 				break;
 			case CardType.Upgrade_Card:
@@ -237,10 +230,9 @@ public class OverworldManager : MonoBehaviour
 					p.HasGotCardPriority = true;
 					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
 						"Cards",
-						"You just got an upgrade card!\n" +
-						"With this card you can increase the strength of a unit./n" +
+						"Resource cards increase the strength of a unit.\n" +
 						"Be careful though, as it will wear off if the unit is knocked out!",
-					   true);
+					   false);
 				}
 				break;
 			default:
@@ -438,13 +430,13 @@ public class OverworldManager : MonoBehaviour
 					_GameStateHolder._ActivePlayer.LandedInn = true;
 					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
 						"Inn",
-						"The Inn is a good place to heal your units./n"+
+						"The Inn is a good place to heal your units.\n"+
 						"Inns are a good place to rest and revive your units when they are knocked out.",
 						true);
 					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
 						"Inn",
 						"Unfortunately, sometimes units cannot be healed and you will need to visit the inn another time.",
-						true);
+						false);
 				}
 				Audio.AudioInstance.PlaySFX(SoundEffect.Inn);
 				if (_GameStateHolder._InactivePlayer.CastleProgress >= 4) {
@@ -453,7 +445,7 @@ public class OverworldManager : MonoBehaviour
 							TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
 								"Inn",
 								"Oh no!" +
-								"The inn has turned you away! The " + _GameStateHolder._InactivePlayer.Type.ToString() + "army is putting too much pressure on them!./n" +
+								"The inn has turned you away! The " + _GameStateHolder._InactivePlayer.Type.ToString() + "army is putting too much pressure on them!.\n" +
 								"Looks like there's no rest for us anymore...",
 								true);
 						}
