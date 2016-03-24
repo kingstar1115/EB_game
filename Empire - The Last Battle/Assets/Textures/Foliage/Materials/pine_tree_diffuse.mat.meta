@@ -1,6 +1,11 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
+guid: fe3168fe215b74f44aab9386cbe4d14f
+timeCreated: 1458822190
+=======
 guid: 8d24cf31494a72348a05e8002c201f62
 timeCreated: 1458831489
+>>>>>>> ewan/master
 licenseType: Pro
 NativeFormatImporter:
   userData: 

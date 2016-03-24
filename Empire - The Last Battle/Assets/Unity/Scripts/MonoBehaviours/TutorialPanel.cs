@@ -19,7 +19,7 @@ class TutorialData {
 		return contents[index];
 	}
 	public string GetTitle() {
-		return contents[index];
+		return titles[index];
 	}
 	public void Next() {
 		if(HasNext()) {
