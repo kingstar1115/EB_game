@@ -4,8 +4,12 @@ using UnityEngine.UI;
 
 public class ResourceUI : MonoBehaviour
 {
+	public Transform InTransform;
+	public Transform OutTransform;
 	public Text ResourceText;
 	public Image SSImage, BBImage;
+	public GameObject Images;
+	bool showing;
 
 	public void UpdateResources(int val)
 	{
@@ -29,5 +33,15 @@ public class ResourceUI : MonoBehaviour
 		{
 			DebugUI.getUI().SetMessage("An Error has occurured in resourceUI; playerType cannot be none", 22, Color.red);
 		}
+	}
+
+	public void Show(){
+		showing = true;
+		Images.GetComponent<LerpPosition>().LerpTo(new Vector3(Images.transform.position.x, InTransform.position.y));
+	}
+
+	public void Hide(){
+		showing = false;
+		Images.GetComponent<LerpPosition>().LerpTo(new Vector3(Images.transform.position.x, OutTransform.position.y));
 	}
 }
