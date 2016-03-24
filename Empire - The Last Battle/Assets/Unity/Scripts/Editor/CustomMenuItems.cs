@@ -76,5 +76,23 @@ public class CustomMenuItems {
     public static void CreateUnitBaseData() {
         DataEditor.CreateScriptableObject("UnitBaseData", "Units/");
     }
+
+	[MenuItem("Assets/Create/ELB/Armoury/PurchasableUnit")]
+	public static void CreatePurchasableUnitData()
+	{
+		DataEditor.CreateScriptableObject(typeof(PurchasableUnit).Name, "Armoury/PurchasableUnits/");
+	}
+
+	[MenuItem("Assets/Create/ELB/Armoury/PurchasableCard")]
+	public static void CreatePurchasableCardData()
+	{
+		DataEditor.CreateScriptableObject(typeof(PurchasableCard).Name, "Armoury/PurchasableCards/");
+	}
+
+	[MenuItem("Assets/Create/ELB/Armoury/PurchasableCastlePiece")]
+	public static void CreatePurchasableCastlePieceData()
+	{
+		DataEditor.CreateScriptableObject(typeof(PurchasableCastlePiece).Name, "Armoury/PurchasableCastlePiece/");
+	}
 }
 
