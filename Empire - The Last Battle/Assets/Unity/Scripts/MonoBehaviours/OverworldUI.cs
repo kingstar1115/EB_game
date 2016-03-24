@@ -155,6 +155,7 @@ public class OverworldUI : MonoBehaviour
 	}
 
 	public void Hide() {
+		_ResourceUI.Hide ();
 		_ArmyUI.Hide();
 		_HandUI.Hide();
 		//show the card ui if there is a selected card
@@ -163,6 +164,7 @@ public class OverworldUI : MonoBehaviour
 	}
 
 	public void Show() {
+		_ResourceUI.Show ();
 		_ArmyUI.Show();
 		_HandUI.Show();
 	}
