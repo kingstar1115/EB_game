@@ -83,6 +83,11 @@ public class Unit : ScriptableObject, iBattleable {
 		OnUpdate(this);
 	}
 
+    public int GetUniqueID()
+    {
+        return this.GetHashCode();
+    }
+
 	public bool HasUpgrade() {
 		return CurrentUpgrade != null;
 	}

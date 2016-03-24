@@ -5,6 +5,11 @@ using System.Linq;
 
 public class BattleManager : MonoBehaviour {
 
+    public delegate void BattleAction(iBattleable battleAbleObject);
+    public static event BattleAction OnBattleAbleUpdate = delegate { };
+    public delegate void BattleIntAction(iBattleable battleAbleObject, int val);
+    public static event BattleIntAction OnBattleAbleTakeDamage = delegate { };
+
 	public GameStateHolder _GameStateHolder;
 	public BattleData _BattleData;
 	public BattleUnitPositionManager _BattleUnitPositionManager;
@@ -36,6 +41,10 @@ public class BattleManager : MonoBehaviour {
 		// add player event listeners
 		_GameStateHolder._ActivePlayer.Initialise();
 
+        //ui event listeners
+        _BattleUnitPositionManager.OnPause += _BattleUnitPositionManager_OnPause;
+        _BattleUnitPositionManager.OnUnPause += _BattleUnitPositionManager_OnUnPause;
+
 		if (_BattleData._BattleType == BattleType.LostImmortal) {
 			_setupLostImmortalBattle();
 		}
@@ -54,29 +63,59 @@ public class BattleManager : MonoBehaviour {
 		Audio.AudioInstance.PlaySFX(SoundEffect.Charge);
 	}
 
+    void _BattleUnitPositionManager_OnUnPause()
+    {
+        _BattleUnitPositionManager._Paused = false;
+    }
+
+    void _BattleUnitPositionManager_OnPause()
+    {
+        _BattleUnitPositionManager._Paused = true;
+    }
+
 	void removeListeners() {
 		_GameStateHolder._ActivePlayer.PlayerArmy.RemoveListeners();
 		_GameStateHolder._InactivePlayer.PlayerArmy.RemoveListeners();
+		OnBattleAbleUpdate = delegate {};
+		OnBattleAbleTakeDamage = delegate {};
 	}
 
 	private void OnAddUnit(Player p, Unit u) {
 		_instigatorBattlers.Add(u);
-		_BattleUnitPositionManager.SetUnit(u.Type, p.Type);
+		_BattleUnitPositionManager.InitUnitUI(u.Type, p.Type);
 		
 	}
 
 	private void OnUpdateUnit(Player p, Unit u) {
-		if (u.IsKO()) {
+		//if there is a KO
+		if (u.IsKO()){
+			//play the sound effect for KO unit
 			Audio.AudioInstance.PlaySFX(SoundEffect.Dead);
-		}
 
-		if (u.IsKO() && !p.PlayerArmy.GetActiveUnitTypes().Contains(u.Type)) {
-			_BattleUnitPositionManager.RemoveUnit(u.Type);
-			_instigatorBattlers.Remove(u);
+			//if the battle is pvp
+			if(_BattleData._BattleType == BattleType.PvP)
+			{
+				//remove the correct unit 
+				if(_BattleData._InitialPlayer == p)
+				{
+					//remove active player
+					_BattleUnitPositionManager.RemoveInstigatorPlayer();
+				}
+				else
+				{
+					_BattleUnitPositionManager.RemoveOpposition();
+				}
+			}
+			else if(!p.PlayerArmy.GetActiveUnitTypes().Contains(u.Type)) {
+				_BattleUnitPositionManager.RemoveUnit(u.Type);
+				_instigatorBattlers.Remove(u);
+			}
 		}
 		else if (!_instigatorBattlers.Contains(u)) {
 			OnAddUnit(p, u);
 		}
+
+		OnBattleAbleUpdate (u);
 	}
 
 	void setActiveUnits() {
@@ -146,7 +185,7 @@ public class BattleManager : MonoBehaviour {
 	}
 
 	void switchPlayer() {
-		activePlayer = activePlayer == BattlerType.Instigator ? BattlerType.Opposition : BattlerType.Instigator;
+		activePlayer = (activePlayer == BattlerType.Instigator) ? BattlerType.Opposition : BattlerType.Instigator;
 		startTurn();
 	}
 
@@ -161,6 +200,7 @@ public class BattleManager : MonoBehaviour {
 
 	void startTurnPlayer() {
 		// show player UI
+        _BattleUnitPositionManager.SetPlayer(GetActivePlayer());
 	}
 
 	void startTurnMonster() {
@@ -232,13 +272,21 @@ public class BattleManager : MonoBehaviour {
 	void _setupMonsterBattle() {
 		Debug.Log("Battle Monster");
 		setActiveArmy();
+
 		setOpposition(getMonster());
 		Audio.AudioInstance.PlayMusic(MusicTrack.Dungeon);
+
+        //init the UI
+        if (GetActivePlayerType() == PlayerType.Battlebeard)
+			_BattleUnitPositionManager.Initialise(_BattlebeardPlayer, null, _BattlebeardPlayer);
+        else
+			_BattleUnitPositionManager.Initialise(null, _StormshaperPlayer, _StormshaperPlayer);
 	}
 
 	void _setupLostImmortalBattle() {
 		Debug.Log("Battle Lost Immortal");
 		setActiveArmy();
+
 		// generate a lost immortal based on the beaten lost immortals
 		MonsterType[] monsters = getLostImmortalMonsters();
 		setOpposition(monsters[0]);
@@ -249,6 +297,12 @@ public class BattleManager : MonoBehaviour {
 		//_BattleUnitPositionManager.SetReserveAAsOpposition();
 		//_oppositionBattler = _oppositionReserveA;
 		//_oppositionReserveA = null;
+
+        //init the UI
+        if (GetActivePlayerType() == PlayerType.Battlebeard)
+            _BattleUnitPositionManager.Initialise(_BattlebeardPlayer, null, _BattlebeardPlayer);
+        else
+            _BattleUnitPositionManager.Initialise(null, _StormshaperPlayer, _StormshaperPlayer);
 
 		Audio.AudioInstance.PlayMusic(MusicTrack.Dungeon);
 	}
@@ -347,13 +401,21 @@ public class BattleManager : MonoBehaviour {
 
 		Audio.AudioInstance.PlayMusic(MusicTrack.Dungeon);
 		Debug.Log("Battle Player");
+
+        //init the UI
+		_BattleUnitPositionManager.Initialise(_BattlebeardPlayer, _StormshaperPlayer, _GameStateHolder._ActivePlayer);
 	}
 
 	public void AttackButton() {
 		if (_BattleData._BattleType != BattleType.PvP && activePlayer != BattlerType.Instigator) {
 			return;
 		}
-		Attack(activePlayer, _oppositionBattler);
+		iBattleable target = _oppositionBattler;
+		if (_BattleData._BattleType == BattleType.PvP && activePlayer != BattlerType.Instigator) {
+			target = _instigatorBattlers[0];
+		}
+
+		Attack(activePlayer, target);
 		Audio.AudioInstance.PlaySFX(SoundEffect.Hit1);
 		StartCoroutine(endTurn());
 	}
@@ -367,6 +429,8 @@ public class BattleManager : MonoBehaviour {
 			totalDamage = _oppositionBattler.GetStrength();
 		}
 		target.ReduceHP(totalDamage);
+		OnBattleAbleTakeDamage (target, totalDamage);
+		OnBattleAbleUpdate (target);
 		Debug.Log(t + " attaked " + target.GetType() + " for " + totalDamage + " damage.");
 		Debug.Log(target.GetCurrentHP() + " hp left (" + target.GetHPPercentage()*100 + "%)");
 		return totalDamage;
@@ -404,40 +468,87 @@ public class BattleManager : MonoBehaviour {
 
 
 	void setOppositionA(MonsterType t) {
-		_BattleUnitPositionManager.SetReserveOppositionA(t);
-		_oppositionReserveA = _MonsterManager.NewMonster(t);
+        _oppositionReserveA = _MonsterManager.NewMonster(t);
+        _BattleUnitPositionManager.SetReserveOppositionA(t, _oppositionReserveA);
 	}
 
-	void setOppositionB(MonsterType t) {
-		_BattleUnitPositionManager.SetReserveOppositionB(t);
-		_oppositionReserveB = _MonsterManager.NewMonster(t);
+    void setOppositionB(MonsterType t){
+        _oppositionReserveB = _MonsterManager.NewMonster(t);
+        _BattleUnitPositionManager.SetReserveOppositionB(t, _oppositionReserveB);
 	}
 
-	void setOppositionC(MonsterType t) {
-		_BattleUnitPositionManager.SetReserveOppositionC(t);
-		_oppositionReserveC = _MonsterManager.NewMonster(t);
+    void setOppositionC(MonsterType t){
+        _oppositionReserveC = _MonsterManager.NewMonster(t);
+        _BattleUnitPositionManager.SetReserveOppositionC(t, _oppositionReserveC);
 	}
 
 	void setOpposition(MonsterType t) {
-		_BattleUnitPositionManager.SetOpposition(t);
-		_oppositionBattler = _MonsterManager.NewMonster(t);
+        _oppositionBattler = _MonsterManager.NewMonster(t);
+        _BattleUnitPositionManager.SetOpposition(t, _oppositionBattler);
+		
 	}
 
 	void setOpposition(Unit u) {
-		_BattleUnitPositionManager.SetOpposition(u.Type, _GameStateHolder._InactivePlayer.Type);
+		_BattleUnitPositionManager.SetOpposition(u.Type, _GameStateHolder._InactivePlayer.Type, u);
 		_oppositionBattler = u;
 	}
 
 	void setActiveUnit(Unit u) {
-		_BattleUnitPositionManager.SetActiveUnit(u.Type, _GameStateHolder._ActivePlayer.Type);
+		_BattleUnitPositionManager.SetActiveUnit(u, _GameStateHolder._ActivePlayer.Type);
 		_instigatorBattlers.Add(u);
 	}
 
 	void setActiveArmy() {
-		foreach(UnitType t in _GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnitTypes()) {
-			_BattleUnitPositionManager.SetUnit(t, _GameStateHolder._ActivePlayer.Type);
+		//wanna get all the units here to check if active, if new type and pass in unit to add unit
+		List<UnitType> types = new List<UnitType> ();
+		foreach (var unit in _GameStateHolder._ActivePlayer.PlayerArmy.GetUnits()) {
+
+			if(!unit.IsKO())
+			{
+				//log unit
+				_instigatorBattlers.Add(unit);
+
+				//set up ui 
+				if(!types.Contains(unit.Type))
+				{
+					//init for new type
+					_BattleUnitPositionManager.InitUnitUI(unit.Type, _GameStateHolder._ActivePlayer.Type);
+
+					//log type
+					types.Add(unit.Type);
+				}
+
+				//add individual unit ui 
+				_BattleUnitPositionManager.AddUnitToUI(unit);
+			}
 		}
-		_instigatorBattlers = _GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits();
+	}
+
+	public PlayerType GetPlayerTypeByBattler(BattlerType bType)
+	{
+		if (bType == BattlerType.Instigator) {
+			return _GameStateHolder._ActivePlayer.Type;
+		} else if (_BattleData._BattleType == BattleType.PvP){
+			return _GameStateHolder._InactivePlayer.Type;
+		}
+
+		return PlayerType.None;
+	}
+
+	public PlayerType GetActivePlayerType()
+	{
+		return GetPlayerTypeByBattler(activePlayer);
+	}
+
+	public Player GetActivePlayer()
+	{
+		if (activePlayer == BattlerType.Instigator) {
+			return _GameStateHolder._ActivePlayer;
+		} else if (_BattleData._BattleType == BattleType.PvP){
+			return _GameStateHolder._InactivePlayer;
+		}
+		
+		return null;
 	}
 
 	// Update is called once per frame
