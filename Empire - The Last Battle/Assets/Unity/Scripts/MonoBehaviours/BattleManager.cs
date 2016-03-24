@@ -76,6 +76,8 @@ public class BattleManager : MonoBehaviour {
 	void removeListeners() {
 		_GameStateHolder._ActivePlayer.PlayerArmy.RemoveListeners();
 		_GameStateHolder._InactivePlayer.PlayerArmy.RemoveListeners();
+		OnBattleAbleUpdate = delegate {};
+		OnBattleAbleTakeDamage = delegate {};
 	}
 
 	private void OnAddUnit(Player p, Unit u) {
@@ -85,14 +87,29 @@ public class BattleManager : MonoBehaviour {
 	}
 
 	private void OnUpdateUnit(Player p, Unit u) {
-		if (u.IsKO()) {
+		//if there is a KO
+		if (u.IsKO()){
+			//play the sound effect for KO unit
 			Audio.AudioInstance.PlaySFX(SoundEffect.Dead);
-		}
 
-		//toto - a case where there is a ko but there are more units of that type ----------***********************HERERERERERER ! ! ! ! add remove active unit to ui
-		if (u.IsKO() && !p.PlayerArmy.GetActiveUnitTypes().Contains(u.Type)) {
-			_BattleUnitPositionManager.RemoveUnit(u.Type);
-			_instigatorBattlers.Remove(u);
+			//if the battle is pvp
+			if(_BattleData._BattleType == BattleType.PvP)
+			{
+				//remove the correct unit 
+				if(_BattleData._InitialPlayer == p)
+				{
+					//remove active player
+					_BattleUnitPositionManager.RemoveInstigatorPlayer();
+				}
+				else
+				{
+					_BattleUnitPositionManager.RemoveOpposition();
+				}
+			}
+			else if(!p.PlayerArmy.GetActiveUnitTypes().Contains(u.Type)) {
+				_BattleUnitPositionManager.RemoveUnit(u.Type);
+				_instigatorBattlers.Remove(u);
+			}
 		}
 		else if (!_instigatorBattlers.Contains(u)) {
 			OnAddUnit(p, u);
@@ -168,7 +185,7 @@ public class BattleManager : MonoBehaviour {
 	}
 
 	void switchPlayer() {
-		activePlayer = activePlayer == BattlerType.Instigator ? BattlerType.Opposition : BattlerType.Instigator;
+		activePlayer = (activePlayer == BattlerType.Instigator) ? BattlerType.Opposition : BattlerType.Instigator;
 		startTurn();
 	}
 
@@ -393,7 +410,12 @@ public class BattleManager : MonoBehaviour {
 		if (_BattleData._BattleType != BattleType.PvP && activePlayer != BattlerType.Instigator) {
 			return;
 		}
-		Attack(activePlayer, _oppositionBattler);
+		iBattleable target = _oppositionBattler;
+		if (_BattleData._BattleType == BattleType.PvP && activePlayer != BattlerType.Instigator) {
+			target = _instigatorBattlers[0];
+		}
+
+		Attack(activePlayer, target);
 		Audio.AudioInstance.PlaySFX(SoundEffect.Hit1);
 		StartCoroutine(endTurn());
 	}
