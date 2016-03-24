@@ -466,6 +466,7 @@ public class OverworldManager : MonoBehaviour
 	{
 		ModalPanel p = ModalPanel.Instance();
 		_OverworldUI.Disable();
+		_BattleData._EndState = BattleEndState.None;
 		p.ShowOK("Congratz!!", Enum.GetName(typeof(PlayerType), player.Type) + " player wins!", Reset);
 	}
 
