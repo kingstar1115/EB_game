@@ -415,7 +415,7 @@ public class OverworldManager : MonoBehaviour
 			if (_BattleData._EndState == BattleEndState.Win) {
 				_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
 				_Board.SetTilePrisoner(tile);
-
+				tile.Prisoner = true;
 				Unit prisoner = _GameStateHolder._InactivePlayer.PlayerArmy.GetDefendingUnit (tile);
 				prisoner.SetPrisoner (true);
 				prisoner.SetDefending (false); //tbh should just do this in SetPrisoner()

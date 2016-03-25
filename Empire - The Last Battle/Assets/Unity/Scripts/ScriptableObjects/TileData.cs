@@ -8,6 +8,7 @@ public class TileData : ScriptableObject {
     public PlayerType Owner;
     public float Height;
 	public bool Defended;
+	public bool Prisoner;
 
 	private List<TileData>ConnectedTiles;
     public GameObject TileObject {
@@ -26,6 +27,11 @@ public class TileData : ScriptableObject {
 	public bool IsDefended() {
 		return Defended;
 	}
+
+	public bool HasPrisoner() {
+		return Prisoner;
+	}
+
 	public void AddConnectedTile(TileData t) {
 		if (ConnectedTiles == null) {
 			ConnectedTiles = new List<TileData>();

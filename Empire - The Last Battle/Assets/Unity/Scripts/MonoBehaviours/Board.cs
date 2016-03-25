@@ -101,6 +101,15 @@ public class Board : MonoBehaviour {
                 // set owner flag
                 _FlagManager.SetFlagForTile(tile);
 
+				if(tile.IsDefended()) { 
+					_DefendingUnitManager.SetDefenderForTile (tile);
+				}
+
+				if(tile.HasPrisoner()) {
+					_DefendingUnitManager.SetPrisonerForTile (tile);
+					_DefendingUnitManager.SetCageForTile (tile);
+				}
+
 				//if the tile is a start tile set them up
 				if (tile.Building == BuildingType.StartTileBattlebeard) {
 					_BBStartTile = tile;
@@ -146,6 +155,7 @@ public class Board : MonoBehaviour {
 
 	public void SetTilePrisoner(TileData t){
 		_DefendingUnitManager.SetPrisonerForTile(t);
+		_DefendingUnitManager.SetCageForTile (t);
 	}
 
 	// set the state of a specific castle. 0-4. 0 is no castle, 4 is fully built.
