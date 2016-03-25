@@ -12,6 +12,10 @@ public class Pool : MonoBehaviour
 	
 	void Start()
 	{
+        //dont need initiate it twice
+        if (pooledSprites != null)
+            return;
+
 		pooledSprites = new List<GameObject>();
 		
 		//instantiate pool objects
@@ -25,6 +29,9 @@ public class Pool : MonoBehaviour
 	
 	public GameObject GetPooledObject()
 	{
+        if (pooledSprites == null)
+            Start();
+
 		for (int i = 0; i < pooledSprites.Count; i++)
 		{
 			if (!pooledSprites[i].activeInHierarchy)

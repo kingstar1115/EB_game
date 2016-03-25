@@ -226,7 +226,8 @@ public class ArmyUI : MonoBehaviour {
 	void Update() {
 
 		// If there is anything in the UI
-		if (enabled && getUnitTypeUI(currentPlayer).Count > 0) {
+        if (enabled && currentPlayer!=PlayerType.None && getUnitTypeUI(currentPlayer).Count > 0)
+        {
 			bool leftDown = Input.GetKeyDown(KeyCode.LeftArrow);
 			bool rightDown = Input.GetKeyDown(KeyCode.RightArrow);
 			bool upDown = Input.GetKeyDown(KeyCode.UpArrow);
@@ -264,7 +265,8 @@ public class ArmyUI : MonoBehaviour {
 
 	void OnGUI() {
 		// listen for mouse move
-		if (enabled && (Input.GetAxis("Mouse X") != lastMousePos.x || Input.GetAxis("Mouse Y") != lastMousePos.y)) {
+        if (enabled && currentPlayer != PlayerType.None && (Input.GetAxis("Mouse X") != lastMousePos.x || Input.GetAxis("Mouse Y") != lastMousePos.y))
+        {
 			List<UnitTypeUI> data = getUnitTypeUI(currentPlayer);
 			for (int i = 0; i < data.Count; i++) {
 				if (data[i].IsMouseOver()) {

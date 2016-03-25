@@ -46,4 +46,9 @@ public class Monster : iBattleable {
     public void Heal() {
         currentHp = hp;
     }
+
+    public int GetUniqueID()
+    {
+        return this.GetHashCode();
+    }
 }

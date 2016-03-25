@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-public interface iBattleable {
+public interface iBattleable 
+{
     bool IsKO();
 
     int GetCurrentHP();
@@ -17,4 +18,6 @@ public interface iBattleable {
     void ReduceHP(int HP);
 
     void Heal();
+
+    int GetUniqueID();
 }
