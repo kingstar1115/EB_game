@@ -383,7 +383,9 @@ public class OverworldManager : MonoBehaviour
 				}
 				if (tile.IsDefended ()) {
 					Unit defendingUnit = _GameStateHolder._ActivePlayer.PlayerArmy.GetDefendingUnit (tile);
-					PromptToReplaceDefendingUnit (_GameStateHolder._ActivePlayer, defendingUnit, p, endTurn);
+					p.ShowOKCancel("Replace or remove unit", "Would you like the option to remove or replace this unit?", () => 
+						StartCoroutine(PromptToReplaceDefendingUnit (_GameStateHolder._ActivePlayer, defendingUnit, p, endTurn)),
+						endTurn);
 				} else {
 					if (_GameStateHolder._ActivePlayer.PlayerArmy.GetTotalActiveUnits () > 1) {
 						PromptForDefendingUnit ("Your land is undefended. Would you like to leave a unit to defend?", _GameStateHolder._ActivePlayer, p, endTurn);
@@ -394,7 +396,7 @@ public class OverworldManager : MonoBehaviour
 				break;
 			case BuildingType.Cave:
 				
-					if (tile.Owner != _GameStateHolder._ActivePlayer.Type) {
+				if (tile.Owner != _GameStateHolder._ActivePlayer.Type) {
 					if (tile.Owner != PlayerType.None) {
 						if (tile.IsDefended ()) {
 							p.ShowOK ("Cave", "You enter the cave to explore. An enemy unit ambushes you!", () => {
@@ -436,7 +438,9 @@ public class OverworldManager : MonoBehaviour
 				else {
 					if (tile.IsDefended ()) {
 						Unit defendingUnit = _GameStateHolder._ActivePlayer.PlayerArmy.GetDefendingUnit (tile);
-						PromptToReplaceDefendingUnit (_GameStateHolder._ActivePlayer, defendingUnit, p, endTurn);
+						p.ShowOKCancel("Replace or remove unit", "Would you like the option to remove or replace this unit?", () => 
+							StartCoroutine(PromptToReplaceDefendingUnit (_GameStateHolder._ActivePlayer, defendingUnit, p, endTurn)),
+							endTurn);
 					} else {
 						if (_GameStateHolder._ActivePlayer.PlayerArmy.GetTotalActiveUnits () > 1) {
 							PromptForDefendingUnit ("Your land is undefended. Would you like to leave a unit to defend?", _GameStateHolder._ActivePlayer, p, endTurn);
@@ -791,15 +795,24 @@ public class OverworldManager : MonoBehaviour
 			endTurn);
 	}
 
-	void PromptToReplaceDefendingUnit(Player p, Unit u, ModalPanel mp, UnityAction onDone) {
-		mp.ShowOKCancel("Replace defending unit", "This tile is currently defended by " + u.Type.ToString() + ". Would you like to replace this unit?",
-			() => DefendingUnitSelection(p, mp, onDone),
-			onDone);
+	IEnumerator PromptToReplaceDefendingUnit(Player p, Unit u, ModalPanel mp, UnityAction onDone) {
+		yield return new WaitForSeconds (0.5f);
+		mp.ShowOKCancel("Replace or remove defending unit", "This tile is currently defended by " + u.Type.ToString() + ". Would you like to replace or remove this unit?",
+			() => RemoveDefendingUnit(p, u, () => DefendingUnitSelection(p, mp, onDone)),
+			() => RemoveDefendingUnit(p, u, onDone));
+	}
+
+	void RemoveDefendingUnit(Player p, Unit u, UnityAction onDone) {
+		TileData tile = p.CommanderPosition;
+		TeardownDefendedTile (u, p, tile, onDone);
 	}
 
 	void DefendingUnitSelection(Player p, ModalPanel mp, UnityAction onDone) {
 		//Only allow active units
+
 		UnitSelection flags = UnitSelection.Active;
+
+		flags = flags | UnitSelection.NotDefending;
 
 		_OverworldUI.ShowUnitSelectionUI(flags);
 
@@ -820,6 +833,15 @@ public class OverworldManager : MonoBehaviour
 		u.SetDefending (true);
 		_Board.SetTileDefence (t);
 		_OverworldUI._ArmyUI.OnClickUnit -= remove;
+
+		onDone();
+	}
+
+	void TeardownDefendedTile(Unit u, Player p, TileData t, UnityAction onDone) {
+		t.Defended = false;
+		u.SetPosition(null);
+		u.SetDefending (false);
+		_Board.UnsetTileDefence (t);
 
 		onDone();
 	}
