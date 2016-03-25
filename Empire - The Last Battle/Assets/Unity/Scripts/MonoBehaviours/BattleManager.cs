@@ -78,6 +78,7 @@ public class BattleManager : MonoBehaviour {
 		_GameStateHolder._InactivePlayer.PlayerArmy.RemoveListeners();
 		OnBattleAbleUpdate = delegate {};
 		OnBattleAbleTakeDamage = delegate {};
+		_BattleUnitPositionManager.RemoveListeners();
 	}
 
 	private void OnAddUnit(Player p, Unit u) {
@@ -503,7 +504,7 @@ public class BattleManager : MonoBehaviour {
 		List<UnitType> types = new List<UnitType> ();
 		foreach (var unit in _GameStateHolder._ActivePlayer.PlayerArmy.GetUnits()) {
 
-			if(!unit.IsKO())
+			if(!unit.IsKO() && !unit.IsDefending())
 			{
 				//log unit
 				_instigatorBattlers.Add(unit);
