@@ -1,14 +1,8 @@
 fileFormatVersion: 2
-<<<<<<< HEAD
-guid: 73578871fd6e5dd4f911b8f7ea668668
+guid: 527255c63bfdb3947869b0e1b7c18e28
 folderAsset: yes
-timeCreated: 1458822190
-=======
-guid: 97a169f41ca9b6746ac3e8e1bfaa7e4d
-folderAsset: yes
-timeCreated: 1458831489
->>>>>>> ewan/master
-licenseType: Pro
+timeCreated: 1459033586
+licenseType: Free
 DefaultImporter:
   userData: 
   assetBundleName: 
