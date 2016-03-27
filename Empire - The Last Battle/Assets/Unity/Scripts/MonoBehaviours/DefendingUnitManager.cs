@@ -84,6 +84,16 @@ public class DefendingUnitManager : MonoBehaviour {
 		}
 	}
 
+	public void UnsetPrisonerForTile(TileData t) {
+		PrisonerData prisonerData;
+		prisonerLookup.TryGetValue(t, out prisonerData);
+
+		if (prisonerData != null) {
+			Destroy(prisonerData.CurrentPrisoner.gameObject);
+			prisonerData.CurrentPrisoner = null;
+		}
+	}
+
 	GameObject setPrisonerObject(TileData t, PrisonerData pd) {
 
 		if (t.Owner == PlayerType.None) {

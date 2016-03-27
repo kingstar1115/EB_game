@@ -160,6 +160,10 @@ public class Board : MonoBehaviour {
 		_DefendingUnitManager.SetPrisonerForTile(t);
 	}
 
+	public void UnsetTilePrisoner(TileData t) {
+		_DefendingUnitManager.UnsetPrisonerForTile(t);
+	}
+
 	// set the state of a specific castle. 0-4. 0 is no castle, 4 is fully built.
 	public void SetCastleState(PlayerType p, int state) {
 		if (p == PlayerType.Battlebeard) {

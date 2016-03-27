@@ -103,7 +103,16 @@ public class OverworldManager : MonoBehaviour
 
 			// add some start units
 			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
 			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Pikeman);
+			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+
+			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
 			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
 			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Pikeman);
 
@@ -355,7 +364,7 @@ public class OverworldManager : MonoBehaviour
 					_GameStateHolder._ActivePlayer.LandedCamp = true;
 					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
 						"Camp",
-						"You just landed on a camp occupied by a monster.",
+						"You just landed on a camp. You can add it to your empire if you defeat the enemies lurking there.",
 					   false);
 				}
 				if (tile.Owner != _GameStateHolder._ActivePlayer.Type) {
@@ -365,17 +374,22 @@ public class OverworldManager : MonoBehaviour
 							startBattle (BattleType.Monster);
 						});
 					} else {
-						// PVP BATTLE
-						if (tile.IsDefended ()) {
-							p.ShowOK ("Camp", "You see a camp, there appears to be an enemy unit defending. The enemy attacks you!", () => {
-								startBattle (BattleType.PvP);
+						
+						if (tile.IsDefended()) {
+							p.ShowOK("Camp", "You see a camp, there appears to be an enemy unit defending. The enemy attacks you!", () => {
+								startBattle(BattleType.PvP);
 							});
 						} else {
-							if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count > 1) {
-								PromptForDefendingUnit("You enter the camp, it's been abandoned. Leave a unit to defend this camp?", _GameStateHolder._ActivePlayer, p, endTurn);
+							_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
+							Unit prisoner = _GameStateHolder._ActivePlayer.PlayerArmy.GetDefendingUnit(tile);
+							if (prisoner != null) {
+								_Board.UnsetTilePrisoner(tile);
+								PromptForReturnPrisoner(_GameStateHolder._ActivePlayer, prisoner, tile, p, endTurn);
+							} else if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count > 1) {
+								StartCoroutine(PromptForDefendingUnit("You enter the camp, it's been abandoned. Leave a unit to defend this camp?", _GameStateHolder._ActivePlayer, p, endTurn));
 							} else {
 								//TODO: Add some text here to give the player some info
-								endTurn ();
+								endTurn();
 							}
 						}
 					}
@@ -388,53 +402,48 @@ public class OverworldManager : MonoBehaviour
 						endTurn);
 				} else {
 					if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count > 1) {
-						PromptForDefendingUnit ("Your land is undefended. Would you like to leave a unit to defend this camp?", _GameStateHolder._ActivePlayer, p, endTurn);
+							StartCoroutine(PromptForDefendingUnit ("Your land is undefended. Would you like to leave a unit to defend this camp?", _GameStateHolder._ActivePlayer, p, endTurn));
 					} else {
 						endTurn ();
 					}
 				}
 				break;
-			case BuildingType.Cave:
-				
+			case BuildingType.Cave:				
 				if (tile.Owner != _GameStateHolder._ActivePlayer.Type) {
-					if (tile.Owner != PlayerType.None) {
-						if (tile.IsDefended ()) {
-							p.ShowOK ("Cave", "You enter the cave to explore. An enemy unit ambushes you!", () => {
-								startBattle (BattleType.PvP);
-							});
-						} else {
-							if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count > 1) {
-								PromptForDefendingUnit ("You enter the cave, there's no sign of the enemy. Leave a unit to defend this cave?", _GameStateHolder._ActivePlayer, p, endTurn);
-							} else {
-								endTurn ();
-							}
-						}
-					} else {
-						if(!_GameStateHolder._ActivePlayer.LandedCave) {
-							_GameStateHolder._ActivePlayer.LandedCave = true;
-							TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
-								"Cave",
-								"There's a decent stash of treasure in this cave.",
-								true);
-						}
-						if(!_GameStateHolder._ActivePlayer.HasCaptured) {
-							_GameStateHolder._ActivePlayer.HasCaptured = true;
-							TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
-								"Cave",
-								"You captured the cave and made it part of your empire!",
-								true);
-						}
-							CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
-						_GameStateHolder._ActivePlayer.AddCard(c);
-						_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
-						if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count > 1) {
-							PromptForDefendingUnit ("Your land is undefended. Would you like to leave a unit to defend this cave?", _GameStateHolder._ActivePlayer, p, endTurn);
-						} else {
-							endTurn ();
-						}
+					if (tile.Owner != PlayerType.None && tile.IsDefended()) {
+						p.ShowOK("Cave", "You enter the cave to explore. An enemy unit ambushes you!", () => {
+							startBattle(BattleType.PvP);
+						});
 					}
-				}
-				else {
+
+					if(!_GameStateHolder._ActivePlayer.LandedCave) {
+						_GameStateHolder._ActivePlayer.LandedCave = true;
+						TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+							"Cave",
+							"There's a decent stash of treasure in this cave.",
+							true);
+					}
+					if(!_GameStateHolder._ActivePlayer.HasCaptured) {
+						_GameStateHolder._ActivePlayer.HasCaptured = true;
+						TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+							"Cave",
+							"You captured the cave and made it part of your empire!",
+							true);
+					}
+					CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
+					_GameStateHolder._ActivePlayer.AddCard(c);
+					_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
+
+					Unit prisoner = _GameStateHolder._ActivePlayer.PlayerArmy.GetDefendingUnit(tile);
+					if (prisoner != null) {
+						_Board.UnsetTilePrisoner(tile);
+						PromptForReturnPrisoner(_GameStateHolder._ActivePlayer, prisoner, tile, p, endTurn);
+					} else if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count > 1) {
+						StartCoroutine(PromptForDefendingUnit("You enter the cave, there's no sign of the enemy. Leave a unit to defend this cave?", _GameStateHolder._ActivePlayer, p, endTurn));
+					} else {
+						endTurn();
+					}
+				} else {
 					if (tile.IsDefended ()) {
 						Unit defendingUnit = _GameStateHolder._ActivePlayer.PlayerArmy.GetDefendingUnit (tile);
 						p.ShowOKCancel("Take back unit", "Should this " + defendingUnit.Type + " stop defending this cave?", () => 
@@ -442,7 +451,7 @@ public class OverworldManager : MonoBehaviour
 							endTurn);
 					} else {
 						if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count > 1) {
-							PromptForDefendingUnit ("Your land is undefended. Would you like to leave a unit to defend this cave?", _GameStateHolder._ActivePlayer, p, endTurn);
+								StartCoroutine(PromptForDefendingUnit ("Your land is undefended. Would you like to leave a unit to defend this cave?", _GameStateHolder._ActivePlayer, p, endTurn));
 						} else {
 							endTurn ();
 						}
@@ -601,7 +610,7 @@ public class OverworldManager : MonoBehaviour
 					_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
 				}
 				if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count > 1) {
-					PromptForDefendingUnit ("This tile now belongs to your kingdom. Leave a unit to defend your honour?", _GameStateHolder._ActivePlayer, p, endTurn);
+					StartCoroutine(PromptForDefendingUnit ("This tile now belongs to your kingdom. Leave a unit to defend your honour?", _GameStateHolder._ActivePlayer, p, endTurn));
 				} else {
 					endTurn();
 				}
@@ -615,15 +624,18 @@ public class OverworldManager : MonoBehaviour
 		else if (_BattleData._BattleType == BattleType.PvP) {
 			if (_BattleData._EndState == BattleEndState.Win) {
 				_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
-				_Board.SetTilePrisoner(tile);
+
+				// the unit defending is now a prisoner
 				tile.Prisoner = true;
-				Unit prisoner = _GameStateHolder._InactivePlayer.PlayerArmy.GetDefendingUnit (tile);
-				prisoner.SetPrisoner (true);
-				prisoner.SetDefending (false); //tbh should just do this in SetPrisoner()
+				Unit defender = _GameStateHolder._InactivePlayer.PlayerArmy.GetDefendingUnit (tile);
+				defender.SetPrisoner (true);
+				defender.SetDefending (false); //tbh should just do this in SetPrisoner()
+				tile.Defended = false;
+				_Board.UnsetTileDefence(tile);
+				_Board.SetTilePrisoner(tile);
 
-				// need to do something if the other player was totally knocked out
-				//
-
+				Unit prisoner = _GameStateHolder._ActivePlayer.PlayerArmy.GetDefendingUnit(tile);
+				
 				if (tile.Building == BuildingType.Cave) {
 					if(!_GameStateHolder._ActivePlayer.HasCaptured) {
 						_GameStateHolder._ActivePlayer.HasCaptured = true;
@@ -634,46 +646,44 @@ public class OverworldManager : MonoBehaviour
 					}
 					CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
 					_GameStateHolder._ActivePlayer.AddCard(c);
-//					p.ShowOK("Card Recieved!", "You beat the other player and recieved a " + c.Name + " card.", endTurn);
-					if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count > 1) {
-						PromptForDefendingUnit ("This tile now belongs to your kingdom. Leave a unit to defend your honour?", _GameStateHolder._ActivePlayer, p, endTurn);
+
+					// if the active player had a prisoner on the tile 
+					if (prisoner != null) {
+						PromptForReturnPrisoner(_GameStateHolder._ActivePlayer, prisoner, tile, p, endTurn);
+					} else if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count > 1) {
+						StartCoroutine(PromptForDefendingUnit ("This tile now belongs to your kingdom. Leave a unit to defend your honour?", _GameStateHolder._ActivePlayer, p, endTurn));
 					} else {
 						endTurn ();
 					}
 
 				}
 				else {
-					if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count > 1) {
-						PromptForDefendingUnit ("This tile now belongs to your kingdom. Leave a unit to defend your honour?", _GameStateHolder._ActivePlayer, p, endTurn);
+					// if the active player had a prisoner on the tile 
+					if (prisoner != null) {
+						PromptForReturnPrisoner(_GameStateHolder._ActivePlayer, prisoner, tile, p, endTurn);
+						return;
+					} else if (_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits().Count > 1) {
+						StartCoroutine(PromptForDefendingUnit ("This tile now belongs to your kingdom. Leave a unit to defend your honour?", _GameStateHolder._ActivePlayer, p, endTurn));
 					} else {
 						endTurn();
 					}
 				}
 			} else {
-				// if defense battle
-				if (tile != otherPlayerTile) {
-					// defending player gets 
-				}
+				// the active player lost
+
 				_OverworldUI.Enable();
 				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
-				//endTurn();
-				//p.ShowOK("Battle", "You lost against the other player!", endTurn);
 			}
 		}
 		else if (_BattleData._BattleType == BattleType.LostImmortal) {
 			if (_BattleData._EndState == BattleEndState.Win && tile.Building == BuildingType.Fortress) {
 				tile.Owner = PlayerType.None;
 				_GameStateHolder._ActivePlayer.LostImmortalKillCount++;
-				// TODO: move this to armoury
-				_GameStateHolder._ActivePlayer.CastleProgress++;
-				//p.ShowOK ("Battle", "You beat the lost immortal!", endTurn);
 				endTurn();
 			}
 			else {
 				_OverworldUI.Enable();
 				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
-				//p.ShowOK("Battle", "You lost against the lost immortal!", endTurn);
-				//endTurn();
 			}
 		}
 		else if (_BattleData._BattleType == BattleType.Card) {
@@ -788,7 +798,8 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI._ArmyUI.OnClickUnit += selectUnit;
 	}
 
-	void PromptForDefendingUnit(string promptString, Player p, ModalPanel mp, UnityAction onDone) {
+	IEnumerator PromptForDefendingUnit(string promptString, Player p, ModalPanel mp, UnityAction onDone) {
+		yield return new WaitForSeconds(0.5f);
 		mp.ShowOKCancel ("Tile Defence", promptString, () =>
 			DefendingUnitSelection(_GameStateHolder._ActivePlayer, mp, onDone), 
 			endTurn);
@@ -799,6 +810,17 @@ public class OverworldManager : MonoBehaviour
 		mp.ShowOKCancel("Replace defending unit", "This tile is currently defended by " + u.Type.ToString() + ". Would you like to send another unit in it's place?",
 			() => RemoveDefendingUnit(p, u, () => DefendingUnitSelection(p, mp, onDone)),
 			() => RemoveDefendingUnit(p, u, onDone));
+	}
+
+	void PromptForReturnPrisoner(Player p, Unit u, TileData t, ModalPanel mp, UnityAction onDone) {
+		mp.ShowOKCancel("Unit reclaimed", "Should the unit go back to defending this tile?",
+			() => {
+				t.Defended = true;
+				u.SetPosition(t);
+				u.SetDefending(true);
+				_Board.SetTileDefence(t);
+			},
+			() => StartCoroutine(PromptForDefendingUnit("Should another unit defend instead?", p, mp, onDone)));
 	}
 
 	void RemoveDefendingUnit(Player p, Unit u, UnityAction onDone) {
@@ -832,6 +854,7 @@ public class OverworldManager : MonoBehaviour
 		u.SetDefending (true);
 		_Board.SetTileDefence (t);
 		_OverworldUI._ArmyUI.OnClickUnit -= remove;
+		_OverworldUI.HideUnitSelectionUI();
 
 		onDone();
 	}
