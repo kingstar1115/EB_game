@@ -34,6 +34,7 @@ public class UnitTypeUI : MonoBehaviour {
 
 	// Overview
 	public Color OverviewColour;
+	public Color DefendingColour;
 
 	// Size
 	public float MaxWidth = 820;
@@ -141,8 +142,10 @@ public class UnitTypeUI : MonoBehaviour {
 		Image image = g.AddComponent<Image> ();
 		g.transform.SetParent (UnitOverview.transform);
 		g.transform.localScale = Vector3.one;
-		if (u.IsKO () || u.IsDefending()) {
+		if (u.IsKO()) {
 			image.color = Color.clear;
+		} else if (u.IsDefending()) {
+			image.color = DefendingColour;
 		} else {
 			image.color = OverviewColour;
 		}
@@ -167,8 +170,10 @@ public class UnitTypeUI : MonoBehaviour {
 		ui.SetDefending (u.IsDefending ());
 		ui.SetPrisoner (u.IsPrisoner ());
 		ui.SetUpgrade(u.HasUpgrade());
-		if (u.IsKO() || u.IsDefending()) {
+		if (u.IsKO()) {
 			UnitOverview.transform.GetChild(i).GetComponent<Image>().color = Color.clear;
+		} else if (u.IsDefending()) {
+			UnitOverview.transform.GetChild(i).GetComponent<Image>().color = DefendingColour;
 		} else {
 			UnitOverview.transform.GetChild(i).GetComponent<Image>().color = OverviewColour;
 		}
