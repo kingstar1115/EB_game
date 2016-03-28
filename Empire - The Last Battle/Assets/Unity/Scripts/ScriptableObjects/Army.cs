@@ -49,7 +49,7 @@ public class Army : ScriptableObject {
 	}
 
 	public List<Unit> GetUpgradableUnits() {
-		return units.FindAll(x => x.IsUpgradeable());
+		return units.FindAll(x => !x.IsDefending() && x.IsUpgradeable());
 	}
 
 	public List<Unit> GetDefendingUnits() {
@@ -65,7 +65,7 @@ public class Army : ScriptableObject {
 	}
 
 	public List<Unit> GetTempUpgradableUnits() {
-		return units.FindAll(x => x.IsTempUpgradeable());
+		return units.FindAll(x => !x.IsDefending() && x.IsTempUpgradeable());
 	}
 
 	public List<Unit> GetUnits(UnitType type) {
@@ -76,13 +76,8 @@ public class Army : ScriptableObject {
 		return units;
 	}
 
-	public int GetTotalActiveUnits() {
-		List<Unit> activeUnits = units.FindAll(x => x.IsActive());
-		return activeUnits.Count;
-	}
-
 	public List<Unit> GetActiveUnits(UnitType type) {
-		return units.FindAll(x => (!x.IsKO() || !x.IsDefending() ) && x.Type == type);
+		return units.FindAll(x => (!x.IsDefending() && !x.IsKO()) && x.Type == type);
 	}
 
 	public List<UnitType> GetActiveUnitTypes() {
@@ -96,20 +91,20 @@ public class Army : ScriptableObject {
 	}
 
 	public List<Unit> GetActiveUnits() {
-		return units.FindAll(x => !x.IsKO() || !x.IsDefending());
+		return units.FindAll(x => !x.IsDefending() && !x.IsKO());
 	}
 
 	public List<Unit> GetKOUnits(UnitType type) {
-		return units.FindAll(x => x.IsKO() && x.Type == type);
+		return units.FindAll(x => !x.IsDefending() && x.IsKO() && x.Type == type);
 	}
 
 	public List<Unit> GetKOUnits() {
-		return units.FindAll(x => x.IsKO());
+		return units.FindAll(x => !x.IsDefending() && x.IsKO());
 	}
 
-	public List<Unit> GetRandomUnits(int maxNumber, bool b_ShouldBeKo = false) {
+	public List<Unit> GetRandomUnits(int maxNumber, List<Unit> from) {
 		List<Unit> RandomUnits = new List<Unit>();
-		List<Unit> AllUnits = b_ShouldBeKo ? GetKOUnits() : units;
+		List<Unit> AllUnits = new List<Unit>(from);
 		if (AllUnits.Count < maxNumber) {
 			maxNumber = AllUnits.Count;
 		}

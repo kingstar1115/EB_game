@@ -12,6 +12,8 @@ public enum UnitSelection {
 	NotUpgraded = 8,
 	TempUpgraded = 16,
 	NotTempUpgraded = 32,
+	Defending = 64,
+	NotDefending = 128
 }
 
 public delegate void UIUnitTypeIndexCallback(UnitType t, int i);
@@ -32,6 +34,7 @@ public class UnitTypeUI : MonoBehaviour {
 
 	// Overview
 	public Color OverviewColour;
+	public Color DefendingColour;
 
 	// Size
 	public float MaxWidth = 820;
@@ -139,8 +142,10 @@ public class UnitTypeUI : MonoBehaviour {
 		Image image = g.AddComponent<Image> ();
 		g.transform.SetParent (UnitOverview.transform);
 		g.transform.localScale = Vector3.one;
-		if (u.IsKO () || u.IsDefending()) {
+		if (u.IsKO()) {
 			image.color = Color.clear;
+		} else if (u.IsDefending()) {
+			image.color = DefendingColour;
 		} else {
 			image.color = OverviewColour;
 		}
@@ -165,8 +170,10 @@ public class UnitTypeUI : MonoBehaviour {
 		ui.SetDefending (u.IsDefending ());
 		ui.SetPrisoner (u.IsPrisoner ());
 		ui.SetUpgrade(u.HasUpgrade());
-		if (u.IsKO() || u.IsDefending()) {
+		if (u.IsKO()) {
 			UnitOverview.transform.GetChild(i).GetComponent<Image>().color = Color.clear;
+		} else if (u.IsDefending()) {
+			UnitOverview.transform.GetChild(i).GetComponent<Image>().color = DefendingColour;
 		} else {
 			UnitOverview.transform.GetChild(i).GetComponent<Image>().color = OverviewColour;
 		}
@@ -260,16 +267,18 @@ public class UnitTypeUI : MonoBehaviour {
 			 upgraded = (flags & UnitSelection.Upgraded) == UnitSelection.Upgraded,
 			 notUpgraded = (flags & UnitSelection.NotUpgraded) == UnitSelection.NotUpgraded,
 			 tempUpgraded = (flags & UnitSelection.TempUpgraded) == UnitSelection.TempUpgraded,
-			 notTempUpgraded = (flags & UnitSelection.NotTempUpgraded) == UnitSelection.NotTempUpgraded;
+			 notTempUpgraded = (flags & UnitSelection.NotTempUpgraded) == UnitSelection.NotTempUpgraded,
+			 defending = (flags & UnitSelection.Defending) == UnitSelection.Defending,
+			 notDefending = (flags & UnitSelection.NotDefending) == UnitSelection.NotDefending;  
 
 		_units.ForEach(ui => {
-			if (inactive && ui.IsKO || 
-				active && !ui.IsKO || 
+			if (inactive && (ui.IsKO || ui.IsDefending) || 
+				active && (!ui.IsKO && !ui.IsDefending) || 
 				upgraded && ui.IsUpgraded || 
 				notUpgraded && !ui.IsUpgraded ||
 				tempUpgraded && ui.isTempUpgraded ||
-				notTempUpgraded && !ui.isTempUpgraded) {
-
+				notTempUpgraded && !ui.isTempUpgraded
+				) {
 				ui.EnableSelection();
 			}
 		});

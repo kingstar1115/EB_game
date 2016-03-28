@@ -33,6 +33,11 @@ public class BattleManager : MonoBehaviour {
 		_BattlebeardPlayer = _GameStateHolder._ActivePlayer.Type == PlayerType.Battlebeard ? _GameStateHolder._ActivePlayer : _GameStateHolder._InactivePlayer;
 		// set up the units and stuff
 
+		activePlayer = BattlerType.None;
+
+		// init the ui
+		_BattleUnitPositionManager.Initialise(_BattlebeardPlayer, _StormshaperPlayer);
+
 		Debug.Log(_BattleData._BattleType);
 
 		_instigatorBattlers = new List<Unit>();
@@ -74,8 +79,8 @@ public class BattleManager : MonoBehaviour {
     }
 
 	void removeListeners() {
-		_GameStateHolder._ActivePlayer.PlayerArmy.RemoveListeners();
-		_GameStateHolder._InactivePlayer.PlayerArmy.RemoveListeners();
+		_GameStateHolder._ActivePlayer.RemoveListeners();
+		_GameStateHolder._InactivePlayer.RemoveListeners();
 		OnBattleAbleUpdate = delegate {};
 		OnBattleAbleTakeDamage = delegate {};
 		_BattleUnitPositionManager.RemoveListeners();
@@ -101,14 +106,17 @@ public class BattleManager : MonoBehaviour {
 				{
 					//remove active player
 					_BattleUnitPositionManager.RemoveInstigatorPlayer();
+					_instigatorBattlers.Remove(u);
 				}
 				else
 				{
 					_BattleUnitPositionManager.RemoveOpposition();
 				}
 			}
-			else if(!p.PlayerArmy.GetActiveUnitTypes().Contains(u.Type)) {
-				_BattleUnitPositionManager.RemoveUnit(u.Type);
+			else {
+				if (!p.PlayerArmy.GetActiveUnitTypes().Contains(u.Type)) {
+					_BattleUnitPositionManager.RemoveUnit(u.Type);
+				}
 				_instigatorBattlers.Remove(u);
 			}
 		}
@@ -279,9 +287,9 @@ public class BattleManager : MonoBehaviour {
 
         //init the UI
         if (GetActivePlayerType() == PlayerType.Battlebeard)
-			_BattleUnitPositionManager.Initialise(_BattlebeardPlayer, null, _BattlebeardPlayer);
+			_BattleUnitPositionManager.Initialise(_BattlebeardPlayer, null);
         else
-			_BattleUnitPositionManager.Initialise(null, _StormshaperPlayer, _StormshaperPlayer);
+			_BattleUnitPositionManager.Initialise(null, _StormshaperPlayer);
 	}
 
 	void _setupLostImmortalBattle() {
@@ -298,12 +306,6 @@ public class BattleManager : MonoBehaviour {
 		//_BattleUnitPositionManager.SetReserveAAsOpposition();
 		//_oppositionBattler = _oppositionReserveA;
 		//_oppositionReserveA = null;
-
-        //init the UI
-        if (GetActivePlayerType() == PlayerType.Battlebeard)
-            _BattleUnitPositionManager.Initialise(_BattlebeardPlayer, null, _BattlebeardPlayer);
-        else
-            _BattleUnitPositionManager.Initialise(null, _StormshaperPlayer, _StormshaperPlayer);
 
 		Audio.AudioInstance.PlayMusic(MusicTrack.Dungeon);
 	}
@@ -402,9 +404,6 @@ public class BattleManager : MonoBehaviour {
 
 		Audio.AudioInstance.PlayMusic(MusicTrack.Dungeon);
 		Debug.Log("Battle Player");
-
-        //init the UI
-		_BattleUnitPositionManager.Initialise(_BattlebeardPlayer, _StormshaperPlayer, _GameStateHolder._ActivePlayer);
 	}
 
 	public void AttackButton() {
@@ -432,7 +431,7 @@ public class BattleManager : MonoBehaviour {
 		target.ReduceHP(totalDamage);
 		OnBattleAbleTakeDamage (target, totalDamage);
 		OnBattleAbleUpdate (target);
-		Debug.Log(t + " attaked " + target.GetType() + " for " + totalDamage + " damage.");
+		Debug.Log(t + " attacked " + target.GetType() + " for " + totalDamage + " damage.");
 		Debug.Log(target.GetCurrentHP() + " hp left (" + target.GetHPPercentage()*100 + "%)");
 		return totalDamage;
 	}
@@ -504,14 +503,12 @@ public class BattleManager : MonoBehaviour {
 		List<UnitType> types = new List<UnitType> ();
 		foreach (var unit in _GameStateHolder._ActivePlayer.PlayerArmy.GetUnits()) {
 
-			if(!unit.IsKO() && !unit.IsDefending())
-			{
+			if(!unit.IsDefending() && !unit.IsKO()) {
 				//log unit
 				_instigatorBattlers.Add(unit);
 
 				//set up ui 
-				if(!types.Contains(unit.Type))
-				{
+				if(!types.Contains(unit.Type)) {
 					//init for new type
 					_BattleUnitPositionManager.InitUnitUI(unit.Type, _GameStateHolder._ActivePlayer.Type);
 
@@ -559,6 +556,7 @@ public class BattleManager : MonoBehaviour {
 }
 
 public enum BattlerType {
+	None,
 	Instigator,
 	Opposition
 }

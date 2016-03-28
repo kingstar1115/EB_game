@@ -13,12 +13,10 @@ public class DefendingUnitManager : MonoBehaviour {
 
 	Dictionary<TileData, DefenderData> defenderLookup;
 	Dictionary<TileData, PrisonerData> prisonerLookup;
-	Dictionary<TileData, CageData> cageLookup;
 
 	public void Initialise () {
 		defenderLookup = new Dictionary<TileData, DefenderData>();
 		prisonerLookup = new Dictionary<TileData, PrisonerData>();
-		cageLookup = new Dictionary<TileData, CageData>();
 	}
 
 	public void SetDefenderForTile(TileData t) {
@@ -60,6 +58,16 @@ public class DefendingUnitManager : MonoBehaviour {
 		}   
 	}
 
+	public void UnsetDefenderForTile(TileData t) {
+		DefenderData defenderData;
+		defenderLookup.TryGetValue (t, out defenderData);
+
+		if (defenderData != null) {
+			Destroy (defenderData.CurrentDefender.gameObject);
+			defenderData.CurrentDefender = null;
+		}
+	}
+
 	public void SetPrisonerForTile(TileData t) {
 		PrisonerData prisonerData;
 		prisonerLookup.TryGetValue(t, out prisonerData);
@@ -73,6 +81,16 @@ public class DefendingUnitManager : MonoBehaviour {
 		if (prisonerData.Marker) {
 			prisonerData.CurrentPrisoner = setPrisonerObject(t, prisonerData);
 			prisonerData.CurrentType = t.Owner;
+		}
+	}
+
+	public void UnsetPrisonerForTile(TileData t) {
+		PrisonerData prisonerData;
+		prisonerLookup.TryGetValue(t, out prisonerData);
+
+		if (prisonerData != null) {
+			Destroy(prisonerData.CurrentPrisoner.gameObject);
+			prisonerData.CurrentPrisoner = null;
 		}
 	}
 
@@ -104,30 +122,6 @@ public class DefendingUnitManager : MonoBehaviour {
 		}   
 	}
 
-	public void SetCageForTile(TileData t) {
-		CageData cageData;
-		cageLookup.TryGetValue(t, out cageData);
-
-		if (cageData == null) {
-			cageData = new CageData();
-			cageData.Marker = Utils.GetFirstChildWithTag("MarkerCage", t.TileObject);
-			cageLookup.Add(t, cageData);
-		}
-
-		if(cageData.Marker) {
-			cageData.CageObject = setCageObject(t, cageData);
-		}
-	}
-
-	GameObject setCageObject(TileData t, CageData cd) {
-
-		if (t.Owner == PlayerType.None) {
-			return null;
-		} else {
-			return (GameObject)Instantiate(CageObject, cd.Marker.transform.position, cd.Marker.transform.rotation);
-		}   
-	}
-
 	public class DefenderData {
 		public GameObject Marker;
 		public GameObject CurrentDefender;
@@ -138,10 +132,5 @@ public class DefendingUnitManager : MonoBehaviour {
 		public GameObject Marker;
 		public GameObject CurrentPrisoner;
 		public PlayerType CurrentType;
-	}
-
-	public class CageData {
-		public GameObject Marker;
-		public GameObject CageObject;
 	}
 }

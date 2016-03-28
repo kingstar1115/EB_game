@@ -107,7 +107,6 @@ public class Board : MonoBehaviour {
 
 				if(tile.HasPrisoner()) {
 					_DefendingUnitManager.SetPrisonerForTile (tile);
-					_DefendingUnitManager.SetCageForTile (tile);
 				}
 
 				//if the tile is a start tile set them up
@@ -153,9 +152,16 @@ public class Board : MonoBehaviour {
 		_DefendingUnitManager.SetDefenderForTile(t);
 	}
 
+	public void UnsetTileDefence(TileData t) {
+		_DefendingUnitManager.UnsetDefenderForTile(t);
+	}
+
 	public void SetTilePrisoner(TileData t){
 		_DefendingUnitManager.SetPrisonerForTile(t);
-		_DefendingUnitManager.SetCageForTile (t);
+	}
+
+	public void UnsetTilePrisoner(TileData t) {
+		_DefendingUnitManager.UnsetPrisonerForTile(t);
 	}
 
 	// set the state of a specific castle. 0-4. 0 is no castle, 4 is fully built.
