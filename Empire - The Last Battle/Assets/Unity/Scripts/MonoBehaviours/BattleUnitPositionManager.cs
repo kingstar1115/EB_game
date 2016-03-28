@@ -44,7 +44,7 @@ public class BattleUnitPositionManager : MonoBehaviour {
     public CardDisplayUI _CardDisplayUI;
     public HandUI _HandUI;
     public ArmyUI _ArmyUI;
-    public UnityEngine.UI.Image _PlayerLogo;
+    public BattleButtonsUI _ButtonsUI;
 	public Pool _UnitUIPool;
 	public Pool _HealthBarPool;
 
@@ -84,6 +84,10 @@ public class BattleUnitPositionManager : MonoBehaviour {
 
         _CardDisplayUI.Init();
 
+		//int button ui and player image
+        _ButtonsUI.Init();
+        //_ButtonsUI._PlayerImage.sprite = _PlayerLogos[(int)activePlayer.Type];
+		
         //add event listeners
         Enable();
     }
@@ -97,10 +101,11 @@ public class BattleUnitPositionManager : MonoBehaviour {
         //remove event listeners
         _CardDisplayUI.OnCardUse -= _CardDisplayUI_OnCardUse;
         _CardDisplayUI.Hide();
-        _HandUI._Enabled = false;
 
         //disable components
         _ArmyUI.Disable();
+        _HandUI._Enabled = false;
+        _ButtonsUI._Enabled = false;
         _enabled = false;
     }
 
@@ -113,10 +118,10 @@ public class BattleUnitPositionManager : MonoBehaviour {
         //add event listeners		
         _CardDisplayUI.OnCardUse += _CardDisplayUI_OnCardUse;
 
-        _HandUI._Enabled = true;
-
         //enable components
         _ArmyUI.Enable();
+        _HandUI._Enabled = true;
+        _ButtonsUI._Enabled = true;
         _enabled = true;
     }
 
@@ -135,6 +140,8 @@ public class BattleUnitPositionManager : MonoBehaviour {
     {
         _ArmyUI.Hide();
         _HandUI.Hide();
+        _ButtonsUI.Hide();
+
         //show the card ui if there is a selected card
         if (_HandUI.m_SelectedCardUI != null)
             _CardDisplayUI.Show();
@@ -144,6 +151,7 @@ public class BattleUnitPositionManager : MonoBehaviour {
     {
         _ArmyUI.Show();
         _HandUI.Show();
+        _ButtonsUI.Show();
     }
 
     public void ShowUnitSelectionUI(UnitSelection flags)
@@ -333,9 +341,11 @@ public class BattleUnitPositionManager : MonoBehaviour {
     public void SwitchFocus(PlayerType pType){
 		_ArmyUI.SwitchPlayer (pType);
         _HandUI.SetHand(_BattleManager.GetActivePlayer().Hand);
+        _ButtonsUI._Enabled = true;
+        _ButtonsUI.Show();
 
         //set logo as well
-        _PlayerLogo.sprite = _PlayerLogos[(int)pType];
+        _ButtonsUI._PlayerImage.sprite = _PlayerLogos[(int)pType];
 	}
 
 	public void PauseScreenClickHandler()
