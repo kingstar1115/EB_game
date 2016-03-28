@@ -73,8 +73,13 @@ public class BattleUnitUI : MonoBehaviour
 
     void BattleManager_OnBattleAbleTakeDamage(iBattleable battleAbleObject, int val)
     {
-        //damage flash 
-        TakeDamage(val);
+		//check that the battlable thing taking damage is associated with this ui 
+		if (_units.Contains (battleAbleObject)) 
+		{
+			//damage flash 
+			TakeDamage(val);
+		}
+        
     }
 
     void BattleManager_OnBattleAbleUpdate(iBattleable battleAbleObject)
