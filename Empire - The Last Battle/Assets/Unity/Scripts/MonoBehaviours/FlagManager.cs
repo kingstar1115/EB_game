@@ -25,7 +25,7 @@ public class FlagManager : MonoBehaviour {
         if (flagData.Marker) {
             flagData.CurrentFlag = setFlagObject(t, flagData);
             flagData.CurrentType = t.Owner;
-        }  
+        } 
     }
 
 

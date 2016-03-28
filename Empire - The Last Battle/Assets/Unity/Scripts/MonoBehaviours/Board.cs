@@ -13,14 +13,16 @@ public class Board : MonoBehaviour {
     public string _MarkerCommanderSS_Tag;
 	public GameObject[] _BattlebeardCastles;
 	public GameObject[] _StormshaperCastles;
+	public DefendingUnitManager _DefendingUnitManager;
 
 	int battlebeardCastleState = 0;
 	int stormshaperCastleState = 0;
 
-    public void Initialise() {
+    public void Initialise(bool loadGame = false) {
         _TileTypeDataManager.Initialise();
         _FlagManager.Initialise();
-        Generate(this.gameObject.transform.position);
+		_DefendingUnitManager.Initialise();
+        Generate(this.gameObject.transform.position, loadGame);
     }
 
     public void Generate(Vector3 origin, bool loadGame = false) {
@@ -46,6 +48,8 @@ public class Board : MonoBehaviour {
                 tile.Y = j;
                 if (!loadGame) {
                     tile.Height = GetRandomHeight(tile);
+					tile.Defended = false;
+					tile.Owner = PlayerType.None;
                 }
 
                 Vector3 position = new Vector3(i * _TileWidth, tile.Height, j * _TileWidth) + boardStart;
@@ -97,6 +101,14 @@ public class Board : MonoBehaviour {
                 // set owner flag
                 _FlagManager.SetFlagForTile(tile);
 
+				if(tile.IsDefended()) { 
+					_DefendingUnitManager.SetDefenderForTile (tile);
+				}
+
+				if(tile.HasPrisoner()) {
+					_DefendingUnitManager.SetPrisonerForTile (tile);
+				}
+
 				//if the tile is a start tile set them up
 				if (tile.Building == BuildingType.StartTileBattlebeard) {
 					_BBStartTile = tile;
@@ -135,6 +147,22 @@ public class Board : MonoBehaviour {
         t.Owner = p;
         _FlagManager.SetFlagForTile(t);
     }
+
+	public void SetTileDefence(TileData t) {
+		_DefendingUnitManager.SetDefenderForTile(t);
+	}
+
+	public void UnsetTileDefence(TileData t) {
+		_DefendingUnitManager.UnsetDefenderForTile(t);
+	}
+
+	public void SetTilePrisoner(TileData t){
+		_DefendingUnitManager.SetPrisonerForTile(t);
+	}
+
+	public void UnsetTilePrisoner(TileData t) {
+		_DefendingUnitManager.UnsetPrisonerForTile(t);
+	}
 
 	// set the state of a specific castle. 0-4. 0 is no castle, 4 is fully built.
 	public void SetCastleState(PlayerType p, int state) {

@@ -12,6 +12,8 @@ public enum UnitSelection {
 	NotUpgraded = 8,
 	TempUpgraded = 16,
 	NotTempUpgraded = 32,
+	Defending = 64,
+	NotDefending = 128
 }
 
 public delegate void UIUnitTypeIndexCallback(UnitType t, int i);
@@ -32,6 +34,7 @@ public class UnitTypeUI : MonoBehaviour {
 
 	// Overview
 	public Color OverviewColour;
+	public Color DefendingColour;
 
 	// Size
 	public float MaxWidth = 820;
@@ -120,23 +123,29 @@ public class UnitTypeUI : MonoBehaviour {
 	}
 
 	public void AddUnit(Unit u) {
-		GameObject obj = Instantiate(UnitPrefab);
-		obj.transform.SetParent(UnitList.transform);
+		GameObject obj = Instantiate (UnitPrefab);
+		obj.transform.SetParent (UnitList.transform);
 		obj.transform.localScale = Vector3.one;
-		UnitUI ui = obj.GetComponent<UnitUI>();
-		ui.SetImage(getSprite(u.Type));
-		ui.SetKO(u.IsKO());
-		ui.SetIndex(_units.Count);
-		ui.SetUpgrade(u.HasUpgrade());
+		UnitUI ui = obj.GetComponent<UnitUI> ();
+		ui.SetImage (getSprite (u.Type));
+		ui.SetKO (u.IsKO ());
+		ui.SetIndex (_units.Count);
+		ui.SetUpgrade (u.HasUpgrade ());
+		ui.SetDefending (u.IsDefending ());
+		ui.SetPrisoner (u.IsPrisoner ());
 		ui.OnClick += _clickUnit;
-		if (_selectMode) { ui.EnableSelection(); }
-		_units.Add(ui);
-		GameObject g = new GameObject();
-		Image image = g.AddComponent<Image>();
-		g.transform.SetParent(UnitOverview.transform);
+		if (_selectMode) {
+			ui.EnableSelection ();
+		}
+		_units.Add (ui);
+		GameObject g = new GameObject ();
+		Image image = g.AddComponent<Image> ();
+		g.transform.SetParent (UnitOverview.transform);
 		g.transform.localScale = Vector3.one;
 		if (u.IsKO()) {
 			image.color = Color.clear;
+		} else if (u.IsDefending()) {
+			image.color = DefendingColour;
 		} else {
 			image.color = OverviewColour;
 		}
@@ -158,9 +167,13 @@ public class UnitTypeUI : MonoBehaviour {
 	public void UpdateUnit(int i, Unit u) {
 		UnitUI ui = _units[i];
 		ui.SetKO(u.IsKO());
+		ui.SetDefending (u.IsDefending ());
+		ui.SetPrisoner (u.IsPrisoner ());
 		ui.SetUpgrade(u.HasUpgrade());
 		if (u.IsKO()) {
 			UnitOverview.transform.GetChild(i).GetComponent<Image>().color = Color.clear;
+		} else if (u.IsDefending()) {
+			UnitOverview.transform.GetChild(i).GetComponent<Image>().color = DefendingColour;
 		} else {
 			UnitOverview.transform.GetChild(i).GetComponent<Image>().color = OverviewColour;
 		}
@@ -254,16 +267,18 @@ public class UnitTypeUI : MonoBehaviour {
 			 upgraded = (flags & UnitSelection.Upgraded) == UnitSelection.Upgraded,
 			 notUpgraded = (flags & UnitSelection.NotUpgraded) == UnitSelection.NotUpgraded,
 			 tempUpgraded = (flags & UnitSelection.TempUpgraded) == UnitSelection.TempUpgraded,
-			 notTempUpgraded = (flags & UnitSelection.NotTempUpgraded) == UnitSelection.NotTempUpgraded;
+			 notTempUpgraded = (flags & UnitSelection.NotTempUpgraded) == UnitSelection.NotTempUpgraded,
+			 defending = (flags & UnitSelection.Defending) == UnitSelection.Defending,
+			 notDefending = (flags & UnitSelection.NotDefending) == UnitSelection.NotDefending;  
 
 		_units.ForEach(ui => {
-			if (inactive && ui.IsKO || 
-				active && !ui.IsKO || 
+			if (inactive && (ui.IsKO || ui.IsDefending) || 
+				active && (!ui.IsKO && !ui.IsDefending) || 
 				upgraded && ui.IsUpgraded || 
 				notUpgraded && !ui.IsUpgraded ||
 				tempUpgraded && ui.isTempUpgraded ||
-				notTempUpgraded && !ui.isTempUpgraded) {
-
+				notTempUpgraded && !ui.isTempUpgraded
+				) {
 				ui.EnableSelection();
 			}
 		});

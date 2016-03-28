@@ -78,16 +78,16 @@ public class BattleUnitPositionManager : MonoBehaviour {
     }
 
     // Use this for initialization
-    public void Initialise(Player battlebeard, Player stormshaper, Player activePlayer)
+    public void Initialise(Player battlebeard, Player stormshaper)
     {
         _ArmyUI.Initialise(battlebeard, stormshaper);
 
         _CardDisplayUI.Init();
 
-        //int button ui and player image
+		//int button ui and player image
         _ButtonsUI.Init();
-        _ButtonsUI._PlayerImage.sprite = _PlayerLogos[(int)activePlayer.Type];
-
+        //_ButtonsUI._PlayerImage.sprite = _PlayerLogos[(int)activePlayer.Type];
+		
         //add event listeners
         Enable();
     }
