@@ -284,12 +284,6 @@ public class BattleManager : MonoBehaviour {
 
 		setOpposition(getMonster());
 		Audio.AudioInstance.PlayMusic(MusicTrack.Dungeon);
-
-        //init the UI
-        if (GetActivePlayerType() == PlayerType.Battlebeard)
-			_BattleUnitPositionManager.Initialise(_BattlebeardPlayer, null);
-        else
-			_BattleUnitPositionManager.Initialise(null, _StormshaperPlayer);
 	}
 
 	void _setupLostImmortalBattle() {
