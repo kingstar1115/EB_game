@@ -630,7 +630,7 @@ public class OverworldManager : MonoBehaviour
 				Unit defender = _GameStateHolder._InactivePlayer.PlayerArmy.GetDefendingUnit (tile);
 				defender.SetPrisoner (true);
 				defender.SetDefending (false); //tbh should just do this in SetPrisoner()
-				tile.Defended = false;
+				tile.SetDefender(null);
 				_Board.UnsetTileDefence(tile);
 				_Board.SetTilePrisoner(tile);
 
@@ -815,7 +815,7 @@ public class OverworldManager : MonoBehaviour
 	void PromptForReturnPrisoner(Player p, Unit u, TileData t, ModalPanel mp, UnityAction onDone) {
 		mp.ShowOKCancel("Unit reclaimed", "Should the unit go back to defending this tile?",
 			() => {
-				t.Defended = true;
+				t.SetDefender(u);
 				u.SetPosition(t);
 				u.SetDefending(true);
 				_Board.SetTileDefence(t);
@@ -849,7 +849,7 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void SetupDefendedTile(Unit u, Player p, TileData t, UnityAction onDone, UIPlayerUnitTypeIndexCallback remove) {
-		t.Defended = true;
+		t.SetDefender(u);
 		u.SetPosition(t);
 		u.SetDefending (true);
 		_Board.SetTileDefence (t);
@@ -860,7 +860,7 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void TeardownDefendedTile(Unit u, Player p, TileData t, UnityAction onDone) {
-		t.Defended = false;
+		t.SetDefender(null);
 		u.SetPosition(null);
 		u.SetDefending (false);
 		_Board.UnsetTileDefence (t);
@@ -1037,8 +1037,6 @@ public class OverworldManager : MonoBehaviour
 		_StormshaperPlayer.RemoveListeners();
 		_OverworldUI.RemoveListeners();
 		_CardSystem.RemoveListeners();
-		ModalPanel.RemoveListeners();
-		TutorialPanel.RemoveListeners();
 	}
 
 

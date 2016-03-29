@@ -154,6 +154,8 @@ public class OverworldUI : MonoBehaviour
 		_HandUI.RemoveListeners();
 		_battlebeardCommanderUI.RemoveListeners();
 		_stormshaperCommanderUI.RemoveListeners();
+		TutorialPanel.RemoveListeners();
+		ModalPanel.RemoveListeners();
 
 	}
 

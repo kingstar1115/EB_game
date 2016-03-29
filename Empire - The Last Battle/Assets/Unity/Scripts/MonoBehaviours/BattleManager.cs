@@ -12,6 +12,7 @@ public class BattleManager : MonoBehaviour {
 
 	public GameStateHolder _GameStateHolder;
 	public BattleData _BattleData;
+	public CardSystem _CardSystem;
 	public BattleUnitPositionManager _BattleUnitPositionManager;
 	public Player _StormshaperPlayer;
 	public Player _BattlebeardPlayer;
@@ -49,23 +50,32 @@ public class BattleManager : MonoBehaviour {
         //ui event listeners
         _BattleUnitPositionManager.OnPause += _BattleUnitPositionManager_OnPause;
         _BattleUnitPositionManager.OnUnPause += _BattleUnitPositionManager_OnUnPause;
+		_BattleUnitPositionManager.OnPlayerUseCard += UseCard;
+
+		_BattlebeardPlayer.OnCardAdded += _BattlebeardPlayer_OnCardAdded;
+		_BattlebeardPlayer.OnCardRemoved += _BattlebeardPlayer_OnCardRemoved;
+		_StormshaperPlayer.OnCardAdded += _StormshaperPlayer_OnCardAdded;
+		_StormshaperPlayer.OnCardRemoved += _StormshaperPlayer_OnCardRemoved;
+
+		// init the card system
+		_CardSystem.RequestUnitSelection += _CardSystem_RequestUnitSelection;
+		_CardSystem.OnEffectApplied += _CardSystem_OnEffectApplied;
+
 
 		if (_BattleData._BattleType == BattleType.LostImmortal) {
 			_setupLostImmortalBattle();
+			// start pre battle stuff
+			StartCoroutine(_preBattle());
 		}
 		else if (_BattleData._BattleType == BattleType.Monster || _BattleData._BattleType == BattleType.Card) {
 			_setupMonsterBattle();
+			// start pre battle stuff
+			StartCoroutine(_preBattle());
 		}
 		else if (_BattleData._BattleType == BattleType.PvP) {
 			_setupPvPBattle();
-		}
-
-		// set the state to pre battle
-		_GameStateHolder._gameState = GameState.PreBattle;
-
-		// start pre battle stuff
-		StartCoroutine(_preBattle());
-		Audio.AudioInstance.PlaySFX(SoundEffect.Charge);
+			// pre battle starts inside the setup because we wait for unit selection (blargh)
+		}		
 	}
 
     void _BattleUnitPositionManager_OnUnPause()
@@ -133,6 +143,9 @@ public class BattleManager : MonoBehaviour {
 
 	IEnumerator _preBattle() {
 		yield return new WaitForSeconds(2);
+		// set the state to pre battle
+		_GameStateHolder._gameState = GameState.PreBattle;
+
 		if (_BattleData._BattleType == BattleType.PvP) {
 			calculateFirstTurnPvP();
 		}
@@ -273,6 +286,7 @@ public class BattleManager : MonoBehaviour {
 		// set state to battle
 		_GameStateHolder._gameState = GameState.Battle;
 
+		Audio.AudioInstance.PlaySFX(SoundEffect.Charge);
 
 		startTurn();
 
@@ -389,15 +403,31 @@ public class BattleManager : MonoBehaviour {
 	}
 
 	void _setupPvPBattle() {
-
-		// yeah.. for this we have to get the unit selection UI out for both players
-
-		// for now it's like this
-		setOpposition(_GameStateHolder._InactivePlayer.PlayerArmy.GetActiveUnits()[0]);
-		setActiveUnit(_GameStateHolder._ActivePlayer.PlayerArmy.GetActiveUnits()[0]);
-
 		Audio.AudioInstance.PlayMusic(MusicTrack.Dungeon);
-		Debug.Log("Battle Player");
+		TileData t = _BattleData._InitialPlayer.CommanderPosition;
+		setOpposition(t.Defender);
+		ModalPanel.Instance().ShowOK("Battle Start", "An enemy " + t.Defender.Type + " was waiting for you.\n" +
+			"Which unit do you want to send to battle it?", () => {
+				_BattleUnitPositionManager._ArmyUI.SwitchPlayer(_GameStateHolder._ActivePlayer.Type);
+				_selectUnit(_GameStateHolder._ActivePlayer, (ut, i) => {
+					Unit u = _GameStateHolder._ActivePlayer.PlayerArmy.GetUnits(ut)[i];
+					setActiveUnit(u);
+					Debug.Log("Battle Player");
+					// start pre battle stuff
+					StartCoroutine(_preBattle());
+				});
+			});
+	}
+
+	void _selectUnit(Player p, UIUnitTypeIndexCallback next) {
+		_BattleUnitPositionManager.ShowUnitSelectionUI(UnitSelection.Active);
+		UIPlayerUnitTypeIndexCallback selectUnit = null;
+		selectUnit = (PlayerType PlayerType, UnitType ut, int i) => {
+			_BattleUnitPositionManager._ArmyUI.OnClickUnit -= selectUnit;
+			_BattleUnitPositionManager.HideUnitSelectionUI();
+			next(ut, i);
+		};
+		_BattleUnitPositionManager._ArmyUI.OnClickUnit += selectUnit;
 	}
 
 	public void AttackButton() {
@@ -547,6 +577,186 @@ public class BattleManager : MonoBehaviour {
 	void Update () {
 	
 	}
+
+	void onCardAdded(Player p, CardData c) {
+		switch(c.Type) {
+			case CardType.Healing_Card:
+				if(!p.HasGotCardHealing) {
+					p.HasGotCardHealing = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"Healing cards can be used to heal your units at any time.\n" +
+						"The number of units the can be healed is written on the card.",
+					   false);
+				}
+				break;
+			case CardType.Scout_Card:
+				if(!p.HasGotCardScout) {
+					p.HasGotCardScout = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"Scout cards allows you to make use of the scouts in your army.\n" +
+						"Using this card allows you can move further in a turn without alerting anybody.\n" +
+						"Having more scouts allows you to move further.",
+					   false);
+				}
+				break;
+			case CardType.Resource_Card:
+				if(!p.HasGotCardResource) {
+					p.HasGotCardResource = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"Resource cards give you resources so you can purchase things in the Armoury located in the centre of Nekark." +
+						"Your resources are shown in the top left of the screen.",
+					   false);
+				}
+				break;
+			case CardType.Battle_Card:
+				if(!p.HasGotCardBattle) {
+					p.HasGotCardBattle = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"Battle cards... Aargh! An enemy appeared out of nowhere!",
+					   false);
+				}
+				break;
+			case CardType.Tactic_Card:
+				if(!p.HasGotCardTactic) {
+					p.HasGotCardTactic = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"Tactic cards temporarily increase the strength of a unit in battle.\n" +
+						"It only lasts for one attack, so use wisely.",
+					   false);
+				}
+				break;
+			case CardType.Alliance_Card:
+				if(!p.HasGotCardAlliance) {
+					p.HasGotCardAlliance = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"Alliance cards call forth a new unit to fight for you.",
+					   false);
+				}
+				break;
+			case CardType.Priority_Card:
+				if(!p.HasGotCardPriority) {
+					p.HasGotCardPriority = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"Priority cards will give you a speed advantage at the beginning of upcoming battles.",
+					   false);
+				}
+				break;
+			case CardType.Upgrade_Card:
+				if(!p.HasGotCardPriority) {
+					p.HasGotCardPriority = true;
+					TutorialPanel.Instance().Tutor(_GameStateHolder._ActivePlayer.Type,
+						"Cards",
+						"Resource cards increase the strength of a unit.\n" +
+						"Be careful though, as it will wear off if the unit is knocked out!",
+					   false);
+				}
+				break;
+			default:
+				break;
+
+		}
+	}
+
+	void _CardSystem_OnEffectApplied(bool success, CardData card, Player player, Unit u) {
+		ModalPanel p = ModalPanel.Instance();
+		if(!success) {
+			// we wont bother with this in the final but for now it hides the previous modal after it shows this one.
+			p.ShowOK("Oh No!", "Card could not be used", null);
+			return;
+		}
+		
+		if(_BattleUnitPositionManager._HandUI.m_SelectedCardUI != null) {
+			_GameStateHolder._ActivePlayer.RemoveCard(_BattleUnitPositionManager._HandUI.m_SelectedCardUI._Index);
+		}
+		else {
+			_GameStateHolder._ActivePlayer.RemoveCard(card);
+		}
+
+	}
+
+	void _BattlebeardPlayer_OnCardAdded(CardData card) {
+		//inform ui
+		onCardAdded(getPlayer(PlayerType.Battlebeard), card);
+		_BattleUnitPositionManager.AddPlayerCard(PlayerType.Battlebeard, card);
+	}
+
+	void _BattlebeardPlayer_OnCardRemoved(CardData card, int index) {
+		//inform ui
+		_BattleUnitPositionManager.RemovePlayerCard(PlayerType.Battlebeard, card, index);
+	}
+
+	void _StormshaperPlayer_OnCardAdded(CardData card) {
+		//inform ui
+
+		onCardAdded(getPlayer(PlayerType.Stormshaper), card);
+		_BattleUnitPositionManager.AddPlayerCard(PlayerType.Stormshaper, card);
+	}
+
+	void _StormshaperPlayer_OnCardRemoved(CardData card, int index) {
+		//inform ui
+		_BattleUnitPositionManager.RemovePlayerCard(PlayerType.Stormshaper, card, index);
+	}
+
+	void _CardSystem_RequestUnitSelection(CardData c, int numSelection, Player p, CardAction action, EndCardAction done) {
+		// assume P is going to be the current player
+
+		UnitSelection flags = UnitSelection.None;
+		if(c.Type == CardType.Healing_Card) {
+			flags = flags | UnitSelection.Inactive;
+		}
+		if(c.Type == CardType.Upgrade_Card) {
+			flags = flags | UnitSelection.Active;
+			flags = flags | UnitSelection.NotUpgraded;
+		}
+		if(c.Type == CardType.Tactic_Card) {
+			flags = flags | UnitSelection.Active;
+			flags = flags | UnitSelection.NotTempUpgraded;
+		}
+
+		_BattleUnitPositionManager.ShowUnitSelectionUI(flags);
+
+		int selectedUnits = 0;
+		UIPlayerUnitTypeIndexCallback selectUnit = null;
+		selectUnit = (PlayerType pt, UnitType u, int i) => {
+			Unit unit = _GameStateHolder._ActivePlayer.PlayerArmy.GetUnits(u)[i];
+			selectedUnits++;
+			// perform the action each time something is selected. This will only effect healing.
+			// we don't want the player to be stuck with no units to select
+			action(c, p, unit);
+			// we reached the total?
+			if(selectedUnits == numSelection) {
+				// don't listen for namy more and hide the UI
+				_BattleUnitPositionManager._ArmyUI.OnClickUnit -= selectUnit;
+				_BattleUnitPositionManager.HideUnitSelectionUI();
+				done(true, c, p, unit);
+			}
+
+		};
+		_BattleUnitPositionManager._ArmyUI.OnClickUnit += selectUnit;
+	}
+
+	void UseCard(CardData card) {
+		ModalPanel p = ModalPanel.Instance();
+		p.ShowOKCancel("Card", "Use " + card.Name + " card?", () => {
+			_CardSystem.UseCard(card, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer);
+		}, null);
+
+
+		//use the card
+		//if (_CardSystem.CanUseCard (card, _GameStateHolder._gameState))
+		//{
+		//	_CardSystem.ApplyEffect (card, _GameStateHolder._ActivePlayer);	
+		//}
+
+	}
+
 }
 
 public enum BattlerType {

@@ -12,8 +12,8 @@ public class ModalPanel : MonoBehaviour {
 	public GameObject OkPanel;
 	public GameObject CancelPanel;
 	public GameObject ModalPanelObject;
-	Button okButton;
-	Button cancelButton;
+	public Button OkButton;
+	public Button CancelButton;
 	static ModalPanel modalPanel;
 
 	public static ModalPanel Instance() {
@@ -27,15 +27,16 @@ public class ModalPanel : MonoBehaviour {
 	}
 
 	// Use this for initialization
-	void Start () {
-		okButton = OkPanel.GetComponentInChildren<Button>();
-		cancelButton = CancelPanel.GetComponentInChildren<Button>();
+	void Awake () {
 		hide();
 	}
 
 	public static void RemoveListeners() {
-		modalPanel.okButton.onClick.RemoveAllListeners();
-		modalPanel.cancelButton.onClick.RemoveAllListeners();
+		if(modalPanel != null) {
+			modalPanel.OkButton.onClick.RemoveAllListeners();
+			modalPanel.CancelButton.onClick.RemoveAllListeners();
+			modalPanel = null;
+		}
 	}
 
 	void setupButton(Button b, GameObject p, UnityAction a) {
@@ -51,26 +52,30 @@ public class ModalPanel : MonoBehaviour {
 		ModalPanelObject.SetActive(true);
 		setTitle(title);
 		setContent(content);
-		setupButton(okButton, OkPanel, onOk);
-		setupButton(cancelButton, CancelPanel, onCancel);
+		setupButton(OkButton, OkPanel, onOk);
+		setupButton(CancelButton, CancelPanel, onCancel);
 	}
 
 	public void ShowOK(string title, string content, UnityAction onOk) {
 		ModalPanelObject.SetActive(true);
 		setTitle(title);
 		setContent(content);
-		setupButton(okButton, OkPanel, onOk);
+		setupButton(OkButton, OkPanel, onOk);
 	}
 	public void ShowCancel(string title, string content, UnityAction onCancel) {
 		ModalPanelObject.SetActive(true);
 		setTitle(title);
 		setContent(content);
-		setupButton(cancelButton, CancelPanel, onCancel);
+		setupButton(CancelButton, CancelPanel, onCancel);
 	}
 
 	void hide() {
-		okButton.onClick.RemoveAllListeners();
-		cancelButton.onClick.RemoveAllListeners();
+		if (OkButton !=null) {
+			OkButton.onClick.RemoveAllListeners();
+		}
+		if (CancelButton != null) {
+			CancelButton.onClick.RemoveAllListeners();
+		}
 		OkPanel.SetActive(false);
 		CancelPanel.SetActive(false);
 		ModalPanelObject.SetActive(false);

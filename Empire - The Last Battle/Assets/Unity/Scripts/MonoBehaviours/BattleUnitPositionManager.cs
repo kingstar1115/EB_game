@@ -118,8 +118,8 @@ public class BattleUnitPositionManager : MonoBehaviour {
         //add event listeners		
         _CardDisplayUI.OnCardUse += _CardDisplayUI_OnCardUse;
 
-        //enable components
-        _ArmyUI.Enable();
+		//enable components
+		_ArmyUI.Enable();
         _HandUI._Enabled = true;
         _ButtonsUI._Enabled = true;
         _enabled = true;
@@ -133,8 +133,10 @@ public class BattleUnitPositionManager : MonoBehaviour {
         _ArmyUI.RemoveListeners();
         _CardDisplayUI.RemoveListeners();
         _HandUI.RemoveListeners();
+		TutorialPanel.RemoveListeners();
+		ModalPanel.RemoveListeners();
 
-    }
+	}
 
     public void Hide()
     {

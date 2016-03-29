@@ -82,9 +82,13 @@ public class TutorialPanel : MonoBehaviour {
 	}
 
 	// Use this for initialization
-	void Start () {
-		battlebeardData = new TutorialData();
-		stormshaperData = new TutorialData();
+	void Awake () {
+		if (battlebeardData == null) {
+			battlebeardData = new TutorialData();
+		}
+		if(stormshaperData == null) {
+			stormshaperData = new TutorialData();
+		}
 		addListeners();
 	}
 
@@ -95,9 +99,12 @@ public class TutorialPanel : MonoBehaviour {
 	}
 
 	public static void RemoveListeners() {
-		Instance().ForwardButton.onClick.RemoveAllListeners();
-		Instance().BackButton.onClick.RemoveAllListeners();
-		Instance().ContinueButton.onClick.RemoveAllListeners();
+		if (tutorialPanel != null) {
+			Instance().ForwardButton.onClick.RemoveAllListeners();
+			Instance().BackButton.onClick.RemoveAllListeners();
+			Instance().ContinueButton.onClick.RemoveAllListeners();
+			tutorialPanel = null;
+		}
 	}
 
 	public void Tutor(PlayerType p, string title, string content, bool jump) {
