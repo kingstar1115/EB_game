@@ -7,7 +7,7 @@ public class TileData : ScriptableObject {
     public BuildingType Building;
     public PlayerType Owner;
     public float Height;
-	public bool Defended;
+	public Unit Defender;
 	public bool Prisoner;
 
 	private List<TileData>ConnectedTiles;
@@ -25,7 +25,11 @@ public class TileData : ScriptableObject {
     }
 
 	public bool IsDefended() {
-		return Defended;
+		return Defender != null;
+	}
+
+	public void SetDefender(Unit u) {
+		Defender = u;
 	}
 
 	public bool HasPrisoner() {

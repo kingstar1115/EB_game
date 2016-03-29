@@ -32,7 +32,7 @@ public class CardSystem : MonoBehaviour {
 	public event UnitSelectionCallback RequestUnitSelection = delegate { };
 	public event BasicCardAction RequestBattle = delegate {};
 
-public bool CanUseCard(CardData cData, GameState gameState)
+	public bool CanUseCard(CardData cData, GameState gameState)
 	{
 		//check that the card can use the game state 
 		return (cData.UseableGameState & gameState) == gameState;

@@ -48,7 +48,7 @@ public class Board : MonoBehaviour {
                 tile.Y = j;
                 if (!loadGame) {
                     tile.Height = GetRandomHeight(tile);
-					tile.Defended = false;
+					tile.SetDefender(null);
 					tile.Owner = PlayerType.None;
                 }
 
