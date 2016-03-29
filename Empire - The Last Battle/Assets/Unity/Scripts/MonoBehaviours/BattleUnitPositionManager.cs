@@ -39,7 +39,10 @@ public class BattleUnitPositionManager : MonoBehaviour {
 
     //non unit ui stuff	
 	public Camera _WorldCamera;
-    public Canvas _Canvas;
+	public Camera _InstigatorCamera;
+	public Camera _OppositionCamera;
+	Camera activeCamera;
+	public Canvas _Canvas;
     public GameObject _PauseScreen;
     public CardDisplayUI _CardDisplayUI;
     public HandUI _HandUI;
@@ -47,6 +50,8 @@ public class BattleUnitPositionManager : MonoBehaviour {
     public BattleButtonsUI _ButtonsUI;
 	public Pool _UnitUIPool;
 	public Pool _HealthBarPool;
+
+	Resolution res;
 
     // Use this for initialization
     void Start() {
@@ -80,9 +85,13 @@ public class BattleUnitPositionManager : MonoBehaviour {
     // Use this for initialization
     public void Initialise(Player battlebeard, Player stormshaper)
     {
+		res = Screen.currentResolution;
+
         _ArmyUI.Initialise(battlebeard, stormshaper);
 
         _CardDisplayUI.Init();
+
+		changeCamera(_WorldCamera);
 
 		//int button ui and player image
         _ButtonsUI.Init();
@@ -216,23 +225,62 @@ public class BattleUnitPositionManager : MonoBehaviour {
 	{
 		//set position
 		unitUI.transform.SetParent (_Canvas.transform);
-        Vector3 desiredUIWorldPosition = new Vector3(marker.transform.position.x, 
-            marker.transform.position.y + unitModelPrefab.GetComponentInChildren<Renderer>().bounds.extents.y,
-            marker.transform.position.z);
-
-        Vector2 viewportPos = _WorldCamera.WorldToViewportPoint(desiredUIWorldPosition);
-        RectTransform tansform = unitUI.GetComponent<RectTransform>();
-        tansform.anchorMin = viewportPos;
-        tansform.anchorMax = viewportPos;
-        tansform.anchoredPosition = new Vector2(0, 0);
-        tansform.localScale = new Vector3(1, 1, 1);
+		repositionUnitUI(unitUI, marker, unitModelPrefab);
 		
 		//init
 		unitUI.SetActive (true);
 		unitUI.GetComponent<BattleUnitUI> ().Init (_HealthBarPool); 
 	}
 
-	public void AddUnitToUI(Unit unit) 
+	void repositionUnitUI(GameObject unitUI, GameObject marker, GameObject unitModelPrefab) {
+		Vector3 desiredUIWorldPosition = new Vector3(marker.transform.position.x,
+		  marker.transform.position.y + unitModelPrefab.GetComponentInChildren<Renderer>().bounds.extents.y,
+		  marker.transform.position.z);
+
+		Vector2 viewportPos = activeCamera.WorldToViewportPoint(desiredUIWorldPosition);
+		RectTransform transform = unitUI.GetComponent<RectTransform>();
+		transform.anchorMin = viewportPos;
+		transform.anchorMax = viewportPos;
+		transform.anchoredPosition = new Vector2(0, 0);
+		transform.localScale = new Vector3(1, 1, 1);
+	}
+
+	void repositionUIs() {
+		if(_InstigatorPlayerUnit != null) {
+			repositionUnitUI(_InstigatorPlayerUnitUI.gameObject, _MarkerActivePlayerUnit, _InstigatorPlayerUnit);
+		}
+		else {
+			for(int i = 0; i < _ActivePlayerUnitUIs.Length; i++) {
+				if(_ActivePlayerUnitUIs[i] != null) {
+					repositionUnitUI(_ActivePlayerUnitUIs[i].gameObject, _MarkerActivePlayerUnits[i], _ActivePlayerUnits[i]);
+				}			
+			}
+		}
+		if(_ActiveOpposition != null) {
+			repositionUnitUI(_ActiveOppositionUI.gameObject, _MarkerActiveOpposition, _ActiveOpposition);
+		}
+		if(_ReserveOppositionA != null) {
+			repositionUnitUI(_ReserveOppositionAUI.gameObject, _MarkerReserveOppositionA, _InstigatorPlayerUnit);
+		}
+		if(_ReserveOppositionB != null) {
+			repositionUnitUI(_ReserveOppositionBUI.gameObject, _MarkerReserveOppositionB, _ReserveOppositionB);
+		}
+		if(_ReserveOppositionC != null) {
+			repositionUnitUI(_ReserveOppositionCUI.gameObject, _MarkerReserveOppositionC, _ReserveOppositionC);
+		}
+
+	}
+
+	void changeCamera(Camera c) {
+		if (activeCamera != null) {
+			activeCamera.gameObject.SetActive(false);
+		}
+		activeCamera = c;
+		activeCamera.gameObject.SetActive(true);
+		repositionUIs();
+	}
+
+public void AddUnitToUI(Unit unit) 
 	{
 		//get the apropriate unit ui and add a unit to track
 		_ActivePlayerUnitUIs [(int)unit.Type].AddUnit (unit);
@@ -341,7 +389,11 @@ public class BattleUnitPositionManager : MonoBehaviour {
     }
 
     public void SwitchFocus(PlayerType pType){
-		_ArmyUI.SwitchPlayer (pType);
+
+		Camera c = _BattleManager.activePlayer == BattlerType.Instigator ? _InstigatorCamera : _OppositionCamera;
+		changeCamera(c);
+
+		_ArmyUI.SwitchPlayer (_BattleManager.GetActivePlayer().Type);
         _HandUI.SetHand(_BattleManager.GetActivePlayer().Hand);
         _ButtonsUI._Enabled = true;
         _ButtonsUI.Show();
@@ -379,6 +431,13 @@ public class BattleUnitPositionManager : MonoBehaviour {
 
 	void Update()
 	{
+		if(!res.Equals(Screen.currentResolution)) {
+
+			repositionUIs();
+
+			res = Screen.currentResolution;
+		}
+
 		//check for pause switch by key 
 		if (Input.GetKeyDown(KeyCode.Escape))
 		{

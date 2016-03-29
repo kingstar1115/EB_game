@@ -407,7 +407,7 @@ public class BattleManager : MonoBehaviour {
 		TileData t = _BattleData._InitialPlayer.CommanderPosition;
 		setOpposition(t.Defender);
 		ModalPanel.Instance().ShowOK("Battle Start", "An enemy " + t.Defender.Type + " was waiting for you.\n" +
-			"Which unit do you want to send to battle it?", () => {
+			"You will need to choose who to send out!", () => {
 				_BattleUnitPositionManager._ArmyUI.SwitchPlayer(_GameStateHolder._ActivePlayer.Type);
 				_selectUnit(_GameStateHolder._ActivePlayer, (ut, i) => {
 					Unit u = _GameStateHolder._ActivePlayer.PlayerArmy.GetUnits(ut)[i];
