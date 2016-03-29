@@ -201,8 +201,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 197602}
   m_LocalRotation: {x: 0, y: .89407599, z: 0, w: .447915375}
-  m_LocalPosition: {x: .592000008, y: 0, z: .574999988}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: .159840003, y: 0, z: .155249998}
+  m_LocalScale: {x: .270000011, y: .270000011, z: .270000011}
   m_Children:
   - {fileID: 419934}
   - {fileID: 469322}
@@ -214,9 +214,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 146354}
-  m_LocalRotation: {x: -.707106829, y: 0, z: -0, w: .707106829}
-  m_LocalPosition: {x: .430999994, y: 0, z: .314999998}
-  m_LocalScale: {x: 100, y: 100, z: 100}
+  m_LocalRotation: {x: -.707106829, y: 0, z: 0, w: .707106829}
+  m_LocalPosition: {x: .11637, y: 0, z: .0850500017}
+  m_LocalScale: {x: 27, y: 27, z: 27}
   m_Children:
   - {fileID: 402658}
   - {fileID: 417504}
@@ -267,8 +267,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 135590}
   m_LocalRotation: {x: -.707106829, y: 0, z: 0, w: .707106709}
-  m_LocalPosition: {x: .395999998, y: .00159999996, z: .523999989}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: .106920004, y: .000432000001, z: .141479999}
+  m_LocalScale: {x: .270000011, y: .270000011, z: .270000011}
   m_Children: []
   m_Father: {fileID: 463748}
   m_RootOrder: 1
@@ -280,7 +280,7 @@ Transform:
   m_GameObject: {fileID: 178840}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 27.3729801, y: 27.3729992, z: 27.3729992}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 417402}
   - {fileID: 452026}
@@ -319,8 +319,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 109184}
   m_LocalRotation: {x: -.0796910897, y: .859720588, z: .382171154, w: .329355657}
-  m_LocalPosition: {x: .620999992, y: .0197000001, z: .439999998}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: .167670012, y: .00531900022, z: .118800007}
+  m_LocalScale: {x: .270000011, y: .270000011, z: .270000041}
   m_Children: []
   m_Father: {fileID: 463748}
   m_RootOrder: 3
@@ -596,8 +596,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 0}
   m_AABB:
-    m_Center: {x: -.0292292833, y: -.00415156782, z: .084787719}
-    m_Extent: {x: .193449825, y: .193207204, z: .0791099966}
+    m_Center: {x: -.0292291641, y: -.00415147841, z: .0847877264}
+    m_Extent: {x: .19344981, y: .193207175, z: .0791100189}
   m_DirtyAABB: 0
 --- !u!183 &18364778
 Cloth:

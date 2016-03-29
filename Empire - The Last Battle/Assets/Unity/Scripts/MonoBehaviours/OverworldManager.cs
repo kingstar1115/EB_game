@@ -414,6 +414,7 @@ public class OverworldManager : MonoBehaviour
 						p.ShowOK("Cave", "You enter the cave to explore. An enemy unit ambushes you!", () => {
 							startBattle(BattleType.PvP);
 						});
+						return;
 					}
 
 					if(!_GameStateHolder._ActivePlayer.LandedCave) {

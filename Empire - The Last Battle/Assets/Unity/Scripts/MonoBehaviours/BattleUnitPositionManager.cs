@@ -53,6 +53,8 @@ public class BattleUnitPositionManager : MonoBehaviour {
 
 	Resolution res;
 
+	public BattleScene _BattleScene;
+
     // Use this for initialization
     void Start() {
 
@@ -86,6 +88,8 @@ public class BattleUnitPositionManager : MonoBehaviour {
     public void Initialise(Player battlebeard, Player stormshaper)
     {
 		res = Screen.currentResolution;
+
+		_BattleScene.Initialise();
 
         _ArmyUI.Initialise(battlebeard, stormshaper);
 
