@@ -128,6 +128,7 @@ public class TutorialPanel : MonoBehaviour {
 		if (showing || p == PlayerType.None) { return; }
 		if (p != currentPlayer) {
 			currentData = (p == PlayerType.Battlebeard ? battlebeardData : stormshaperData);
+			currentPlayer = p;
 			CommanderImage.sprite = (p == PlayerType.Battlebeard ? BattlebeardImage : StormshaperImage);
 		}
 		if(currentData.NeverShow) { return; }
