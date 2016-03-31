@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Name: Resource_12
   m_EditorClassIdentifier: 
   Type: 1
-  UseableGameState: 0
+  UseableGameState: -1
   Value: 12
   Name: Resource

@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Name: Alliance
   m_EditorClassIdentifier: 
   Type: 4
-  UseableGameState: 0
+  UseableGameState: 2
   Value: 0
   Name: Alliance
