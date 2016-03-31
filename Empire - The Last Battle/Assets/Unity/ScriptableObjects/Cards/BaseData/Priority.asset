@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Name: Priority
   m_EditorClassIdentifier: 
   Type: 6
-  UseableGameState: 0
+  UseableGameState: 4
   Value: 0
   Name: Priority

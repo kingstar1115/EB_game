@@ -49,7 +49,7 @@ public class Army : ScriptableObject {
 	}
 
 	public List<Unit> GetUpgradableUnits() {
-		return units.FindAll(x => !x.IsDefending() && x.IsUpgradeable());
+		return units.FindAll(x => x.IsActive() && x.IsUpgradeable());
 	}
 
 	public List<Unit> GetDefendingUnits() {
@@ -57,15 +57,23 @@ public class Army : ScriptableObject {
 	}
 
 	public List<Unit> GetNonDefendingUnits() {
-		return units.FindAll (x => !x.IsDefending ());
+		return units.FindAll(x => !x.IsDefending());
+	}
+
+	public List<Unit> GetPrisonerUnits() {
+		return units.FindAll(x => x.IsPrisoner ());
+	}
+
+	public List<Unit> GetNonPrisonerUnits() {
+		return units.FindAll(x => !x.IsPrisoner ());
 	}
 
 	public Unit GetDefendingUnit(TileData tile) {
-		return units.Find (_Unit => _Unit.Position == tile);
+		return units.Find(_Unit => _Unit.Position == tile);
 	}
 
 	public List<Unit> GetTempUpgradableUnits() {
-		return units.FindAll(x => !x.IsDefending() && x.IsTempUpgradeable());
+		return units.FindAll(x => x.IsActive() && x.IsTempUpgradeable());
 	}
 
 	public List<Unit> GetUnits(UnitType type) {
@@ -77,7 +85,7 @@ public class Army : ScriptableObject {
 	}
 
 	public List<Unit> GetActiveUnits(UnitType type) {
-		return units.FindAll(x => (!x.IsDefending() && !x.IsKO()) && x.Type == type);
+		return units.FindAll(x => x.IsActive() && x.Type == type);
 	}
 
 	public List<UnitType> GetActiveUnitTypes() {
@@ -91,15 +99,15 @@ public class Army : ScriptableObject {
 	}
 
 	public List<Unit> GetActiveUnits() {
-		return units.FindAll(x => !x.IsDefending() && !x.IsKO());
+		return units.FindAll(x => x.IsActive());
 	}
 
 	public List<Unit> GetKOUnits(UnitType type) {
-		return units.FindAll(x => !x.IsDefending() && x.IsKO() && x.Type == type);
+		return units.FindAll(x => x.IsKO() && x.Type == type);
 	}
 
 	public List<Unit> GetKOUnits() {
-		return units.FindAll(x => !x.IsDefending() && x.IsKO());
+		return units.FindAll(x => x.IsKO());
 	}
 
 	public List<Unit> GetRandomUnits(int maxNumber, List<Unit> from) {

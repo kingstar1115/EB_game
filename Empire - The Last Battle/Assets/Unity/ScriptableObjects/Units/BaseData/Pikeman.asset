@@ -13,5 +13,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Type: 1
   Speed: 2
-  Strength: 8
-  HP: 12
+  Strength: 2
+  HP: 20

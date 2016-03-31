@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Name: AirElementalBaseData
   m_EditorClassIdentifier: 
   Speed: 2
-  Strength: 7
-  HP: 20
+  Strength: 14
+  HP: 30

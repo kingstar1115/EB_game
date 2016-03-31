@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Name: Upgrade
   m_EditorClassIdentifier: 
   Type: 7
-  UseableGameState: 0
+  UseableGameState: 10
   Value: 0
   Name: Upgrade

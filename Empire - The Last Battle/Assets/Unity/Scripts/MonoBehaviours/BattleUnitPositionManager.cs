@@ -12,6 +12,11 @@ public class BattleUnitPositionManager : MonoBehaviour {
 
     public BattleManager _BattleManager;
 
+	public SpoilsUI _SpoilsUI;
+
+	public GameObject _TreasureChestInstigator;
+	public GameObject _TreasureChestOpposition;
+
     public List<GameObject> _BattlebeardUnits;
     public List<GameObject> _StormshaperUnits;
     public List<GameObject> _Monsters;
@@ -42,7 +47,7 @@ public class BattleUnitPositionManager : MonoBehaviour {
 	public Camera _InstigatorCamera;
 	public Camera _OppositionCamera;
 	Camera activeCamera;
-	public Canvas _Canvas;
+	public Canvas _CanvasUnitUI;
     public GameObject _PauseScreen;
     public CardDisplayUI _CardDisplayUI;
     public HandUI _HandUI;
@@ -122,6 +127,8 @@ public class BattleUnitPositionManager : MonoBehaviour {
         _enabled = false;
     }
 
+
+
     public void Enable()
     {
         if (_enabled)
@@ -153,6 +160,7 @@ public class BattleUnitPositionManager : MonoBehaviour {
 
     public void Hide()
     {
+		_SpoilsUI.Hide();
         _ArmyUI.Hide();
         _HandUI.Hide();
         _ButtonsUI.Hide();
@@ -186,6 +194,15 @@ public class BattleUnitPositionManager : MonoBehaviour {
     {
         SwitchFocus(p.Type);
     }
+
+	public void ShowSpoils(CardData c) {
+		_SpoilsUI.SetCard(c);
+		_SpoilsUI.Show();
+	}
+
+	public void HideSpoils() {
+		_SpoilsUI.Hide();
+	}
 
     public void _CardDisplayUI_OnCardUse(CardData cardData)
     {
@@ -228,7 +245,7 @@ public class BattleUnitPositionManager : MonoBehaviour {
 	void awakenUnitUI(GameObject unitUI, GameObject marker, GameObject unitModelPrefab)
 	{
 		//set position
-		unitUI.transform.SetParent (_Canvas.transform);
+		unitUI.transform.SetParent (_CanvasUnitUI.transform);
 		repositionUnitUI(unitUI, marker, unitModelPrefab);
 		
 		//init
@@ -237,8 +254,13 @@ public class BattleUnitPositionManager : MonoBehaviour {
 	}
 
 	void repositionUnitUI(GameObject unitUI, GameObject marker, GameObject unitModelPrefab) {
+		Renderer r = unitModelPrefab.GetComponentInChildren<Renderer>();
+		if (r == null) {
+			return;
+		}
+
 		Vector3 desiredUIWorldPosition = new Vector3(marker.transform.position.x,
-		  marker.transform.position.y + unitModelPrefab.GetComponentInChildren<Renderer>().bounds.extents.y,
+		  marker.transform.position.y + r.bounds.extents.y,
 		  marker.transform.position.z);
 
 		Vector2 viewportPos = activeCamera.WorldToViewportPoint(desiredUIWorldPosition);
@@ -247,6 +269,23 @@ public class BattleUnitPositionManager : MonoBehaviour {
 		transform.anchorMax = viewportPos;
 		transform.anchoredPosition = new Vector2(0, 0);
 		transform.localScale = new Vector3(1, 1, 1);
+	}
+
+	public void ShowChest(BattlerType t) {
+		if (t == BattlerType.Instigator) {
+			_TreasureChestInstigator.SetActive(true);
+		} else {
+			_TreasureChestOpposition.gameObject.SetActive(true);
+		}
+		
+	}
+
+	public void HideChest(BattlerType t) {
+		if (t == BattlerType.Instigator) {
+			_TreasureChestInstigator.SetActive(false);
+		} else {
+			_TreasureChestOpposition.gameObject.SetActive(false);
+		}
 	}
 
 	void repositionUIs() {
@@ -282,6 +321,10 @@ public class BattleUnitPositionManager : MonoBehaviour {
 		activeCamera = c;
 		activeCamera.gameObject.SetActive(true);
 		repositionUIs();
+	}
+
+	public void ChangeToMainCamera() {
+		changeCamera(_WorldCamera);
 	}
 
 public void AddUnitToUI(Unit unit) 

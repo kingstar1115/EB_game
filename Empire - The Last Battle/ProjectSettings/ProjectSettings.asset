@@ -135,8 +135,10 @@ PlayerSettings:
   m_BuildTargetIcons:
   - m_BuildTarget: 
     m_Icons:
-    - m_Icon: {fileID: 2800000, guid: 0f1281bd9d5f7194b8d9a110bfc68836, type: 3}
-      m_Size: 35800
+    - serializedVersion: 2
+      m_Icon: {fileID: 2800000, guid: 0f1281bd9d5f7194b8d9a110bfc68836, type: 3}
+      m_Width: 35768
+      m_Height: 35768
   m_BuildTargetBatching: []
   m_BuildTargetGraphicsAPIs: []
   webPlayerTemplate: APPLICATION:No Context Menu

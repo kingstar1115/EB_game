@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Name: Battle
   m_EditorClassIdentifier: 
   Type: 2
-  UseableGameState: 0
+  UseableGameState: -1
   Value: 0
   Name: Battle
