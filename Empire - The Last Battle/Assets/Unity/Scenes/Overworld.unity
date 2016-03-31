@@ -10616,9 +10616,10 @@ GameObject:
   m_Component:
   - 224: {fileID: 1510012600}
   - 222: {fileID: 1510012603}
-  - 114: {fileID: 1510012602}
   - 225: {fileID: 1510012604}
   - 114: {fileID: 1510012601}
+  - 114: {fileID: 1510012605}
+  - 114: {fileID: 1510012602}
   m_Layer: 0
   m_Name: SceneUI
   m_TagString: Untagged
@@ -10677,12 +10678,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1510012599}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5314ef6c361201b4eb5e6ad52c82c969, type: 3}
+  m_Script: {fileID: 11500000, guid: 1c3e99e66c498e04dbd68100cf93869e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Canvas: {fileID: 1510012604}
   FadeTime: 1
-  image: {fileID: 1510012601}
+  FadeInInstantly: 0
+  FadeOutInstantly: 0
+  TimeToStartFade: 0
 --- !u!222 &1510012603
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10700,6 +10702,18 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
+--- !u!114 &1510012605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1510012599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f76d47958bb04684c96cb3e0555896d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 1510012601}
 --- !u!1 &1513560316
 GameObject:
   m_ObjectHideFlags: 0
