@@ -8,7 +8,6 @@ PlayerSettings:
   defaultScreenOrientation: 4
   targetDevice: 2
   targetResolution: 0
-  useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: SpaceSausageStudios
   productName: Empire - The Last Battle
