@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Name: WaterElementalBaseData
   m_EditorClassIdentifier: 
   Speed: 2
-  Strength: 7
+  Strength: 10
   HP: 20

@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Name: MinotaurBaseData
   m_EditorClassIdentifier: 
   Speed: 2
-  Strength: 7
-  HP: 20
+  Strength: 10
+  HP: 14
