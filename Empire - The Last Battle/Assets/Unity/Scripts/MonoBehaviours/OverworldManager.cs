@@ -28,7 +28,7 @@ public class OverworldManager : MonoBehaviour
 	// Use this for initialization
 	void Start() {
 		//new game setup
-		SceneFaderUI.ScreenFader.StartFadeOverTime(SceneFaderUI.FadeDir.FadeOut);
+		Fader.ScreenFader.StartFadeOverTime(Fader.FadeDir.FadeOut, SceneSnapshot.ScreenSnapshot.SnapScreenShot);
 		bool newGame = _BattleData._EndState == BattleEndState.None;
 		_Board.Initialise(!newGame);
 
@@ -729,7 +729,7 @@ public class OverworldManager : MonoBehaviour
 		ModalPanel p = ModalPanel.Instance();
 		_OverworldUI.Disable();
 		_BattleData._EndState = BattleEndState.None;
-		p.ShowOK("Congratz!!", Enum.GetName(typeof(PlayerType), player.Type) + " player wins!", Reset);
+		StartCoroutine(SceneSwitcher.ChangeScene ("StartMenu"));
 	}
 
 	public CardData GenerateRandomCard(List<CardData> availableCards) {
