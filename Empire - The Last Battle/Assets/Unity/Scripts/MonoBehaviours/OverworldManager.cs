@@ -24,6 +24,7 @@ public class OverworldManager : MonoBehaviour
 
 	//****TESTS ONLY****
 	public CardList _StartCards;
+	public CardList _StartCardsEditor;
 
 	// Use this for initialization
 	void Start() {
@@ -97,25 +98,28 @@ public class OverworldManager : MonoBehaviour
 
 		if (newGame) {
 
-			//test by adding cards.
-			_BattlebeardPlayer.SetCards(_StartCards);
-			_StormshaperPlayer.SetCards(_StartCards);
+			//add apropriate start cards
+			if (!Debug.isDebugBuild)
+			{
+				_BattlebeardPlayer.SetCards(_StartCards);
+				_StormshaperPlayer.SetCards(_StartCards);
+			}
+			else
+			{
+				_BattlebeardPlayer.SetCards(_StartCardsEditor);
+				_StormshaperPlayer.SetCards(_StartCardsEditor);
+			}
 
 			// add some start units
 			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
 			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Pikeman);
-			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Warrior);
+			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Warrior);
 
 			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
 			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Pikeman);
-
+			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
+			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
 
 			setPlayer(PlayerType.Battlebeard);
 			
