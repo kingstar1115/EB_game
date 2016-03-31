@@ -41,7 +41,7 @@ public class OverworldManager : MonoBehaviour
 		_StormshaperPlayer.Initialise();
 
 		if (_BattleData._EndState == BattleEndState.None) {
-			//try get the battleboard start tile
+			//try get the battlebeard start tile
 			if (_Board._BBStartTile != null) {
 				_BattlebeardPlayer.CommanderPosition = _Board._BBStartTile;
 			}
@@ -937,7 +937,21 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void endTurn() {
-		_TurnManager.EndTurn();
+		// here we use the cards that we got.
+		// use all the resource cards
+		CardData c = _CardSystem.GetRandomCard(_GameStateHolder._ActivePlayer.Hand.cards, CardType.Resource_Card);
+		while(c != null) {
+			_CardSystem.UseCard(c, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer);
+			c = _CardSystem.GetRandomCard(_GameStateHolder._ActivePlayer.Hand.cards, CardType.Resource_Card);
+		}
+
+		// use battle card
+		c = _CardSystem.GetRandomCard(_GameStateHolder._ActivePlayer.Hand.cards, CardType.Battle_Card);
+		if (c != null) {
+			_CardSystem.UseCard(c, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer);
+		} else {
+			_TurnManager.EndTurn();
+		}
 	}
 
 	void _TurnManager_OnTurnEnd() {
