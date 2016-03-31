@@ -272,8 +272,8 @@ public class UnitTypeUI : MonoBehaviour {
 			 notDefending = (flags & UnitSelection.NotDefending) == UnitSelection.NotDefending;  
 
 		_units.ForEach(ui => {
-			if (inactive && (ui.IsKO || ui.IsDefending) || 
-				active && (!ui.IsKO && !ui.IsDefending) || 
+			if (inactive && (ui.IsKO || ui.IsDefending || ui.IsPrisoner) || 
+				active && (!ui.IsKO && !ui.IsDefending && !ui.IsPrisoner) || 
 				upgraded && ui.IsUpgraded || 
 				notUpgraded && !ui.IsUpgraded ||
 				tempUpgraded && ui.isTempUpgraded ||

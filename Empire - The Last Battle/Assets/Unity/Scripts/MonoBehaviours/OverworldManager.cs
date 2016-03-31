@@ -820,6 +820,7 @@ public class OverworldManager : MonoBehaviour
 				u.SetPosition(t);
 				u.SetDefending(true);
 				_Board.SetTileDefence(t);
+				onDone();
 			},
 			() => StartCoroutine(PromptForDefendingUnit("Should another unit defend instead?", p, mp, onDone)));
 	}
