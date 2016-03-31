@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Name: DragonBaseData
   m_EditorClassIdentifier: 
   Speed: 2
-  Strength: 7
-  HP: 20
+  Strength: 15
+  HP: 32

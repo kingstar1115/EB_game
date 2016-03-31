@@ -10823,6 +10823,7 @@ MonoBehaviour:
   _BattleScene: BattleScene
   _OverworldMusic: 01000000020000000300000004000000
   _StartCards: {fileID: 11400000, guid: c06f18da8081e3540b2c76ef1ec50314, type: 2}
+  _StartCardsEditor: {fileID: 11400000, guid: b4a9b86a953b3fe4c8ecb04fbd89b6cc, type: 2}
 --- !u!114 &1620443984
 MonoBehaviour:
   m_ObjectHideFlags: 0
