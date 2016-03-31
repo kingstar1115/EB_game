@@ -37,10 +37,19 @@ public class CardSystem : MonoBehaviour {
 	public bool CanUseCard(CardData cData, GameState gameState)
 	{
 		//check that the card can use the game state 
-		return (cData.UseableGameState & gameState) == gameState;
+		return (cData.UseableGameState & gameState) != gameState;
 	}
 
-	public void UseCard(CardData card, Player player, Player inactivePlayer) {
+	public void UseCard(CardData card, Player player, Player inactivePlayer, GameState gameState) 
+	{
+		//check if card can be used in this game state first 
+		if (CanUseCard (card, gameState)) 
+		{
+			OnEffectApplied(false, card, player, null);
+			return;
+		}
+
+		//apply the actual effect depending on card type
 		switch (card.Type) {
 			case CardType.Healing_Card:
 				int koUnits = player.PlayerArmy.GetKOUnits().Count,

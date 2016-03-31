@@ -47,7 +47,7 @@ public class BattleUnitPositionManager : MonoBehaviour {
 	public Camera _InstigatorCamera;
 	public Camera _OppositionCamera;
 	Camera activeCamera;
-	public Canvas _Canvas;
+	public Canvas _CanvasUnitUI;
     public GameObject _PauseScreen;
     public CardDisplayUI _CardDisplayUI;
     public HandUI _HandUI;
@@ -245,7 +245,7 @@ public class BattleUnitPositionManager : MonoBehaviour {
 	void awakenUnitUI(GameObject unitUI, GameObject marker, GameObject unitModelPrefab)
 	{
 		//set position
-		unitUI.transform.SetParent (_Canvas.transform);
+		unitUI.transform.SetParent (_CanvasUnitUI.transform);
 		repositionUnitUI(unitUI, marker, unitModelPrefab);
 		
 		//init

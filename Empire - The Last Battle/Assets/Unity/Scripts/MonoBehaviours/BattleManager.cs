@@ -805,18 +805,7 @@ public class BattleManager : MonoBehaviour {
 	}
 
 	void UseCard(CardData card) {
-		ModalPanel p = ModalPanel.Instance();
-		p.ShowOKCancel("Card", "Use " + card.Name + " card?", () => {
-			_CardSystem.UseCard(card, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer);
-		}, null);
-
-
-		//use the card
-		//if (_CardSystem.CanUseCard (card, _GameStateHolder._gameState))
-		//{
-		//	_CardSystem.ApplyEffect (card, _GameStateHolder._ActivePlayer);	
-		//}
-
+		_CardSystem.UseCard(card, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer, _GameStateHolder._gameState);
 	}
 
 }

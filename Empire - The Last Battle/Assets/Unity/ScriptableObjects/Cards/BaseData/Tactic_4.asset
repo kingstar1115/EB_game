@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Name: Tactic_4
   m_EditorClassIdentifier: 
   Type: 3
-  UseableGameState: 0
+  UseableGameState: 8
   Value: 3
   Name: Tactic

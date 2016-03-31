@@ -281,18 +281,7 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void UseCard(CardData card) {
-		ModalPanel p = ModalPanel.Instance();
-		p.ShowOKCancel("Card", "Use " + card.Name + " card?", () => {
-			_CardSystem.UseCard(card, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer);
-		}, null);
-
-
-		//use the card
-		//if (_CardSystem.CanUseCard (card, _GameStateHolder._gameState))
-		//{
-		//	_CardSystem.ApplyEffect (card, _GameStateHolder._ActivePlayer);	
-		//}
-
+		_CardSystem.UseCard(card, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer, _GameStateHolder._gameState);
 	}
 
 	//This method is for when the user finishes using the armoury by Key or Button
@@ -435,7 +424,7 @@ public class OverworldManager : MonoBehaviour
 							"You captured the cave and made it part of your empire!",
 							true);
 					}
-					CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
+					CardData c =_CardSystem.GetRandomCard(_AvailableCaveCards.cards);
 					_GameStateHolder._ActivePlayer.AddCard(c);
 					_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
 
@@ -649,7 +638,7 @@ public class OverworldManager : MonoBehaviour
 							"You captured the camp and made it part of your empire!",
 							!hasMessage);
 					}
-					CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
+					CardData c = _CardSystem.GetRandomCard(_AvailableCaveCards.cards);
 					_GameStateHolder._ActivePlayer.AddCard(c);
 
 					// if the active player had a prisoner on the tile 
@@ -734,15 +723,6 @@ public class OverworldManager : MonoBehaviour
 		_OverworldUI.Disable();
 		_BattleData._EndState = BattleEndState.None;
 		p.ShowOK("Congratz!!", Enum.GetName(typeof(PlayerType), player.Type) + " player wins!", Reset);
-	}
-
-	public CardData GenerateRandomCard(List<CardData> availableCards) {
-		//Generate a random card
-		List<CardType> uniqueTypes = availableCards.Select(x => x.Type).Distinct().ToList();
-		int randomTypeIndex = UnityEngine.Random.Range(0, uniqueTypes.Count - 1);
-		List<CardData> cardsOfType = availableCards.FindAll(x => x.Type == uniqueTypes[randomTypeIndex]);
-		int randomCardIndex = (short)UnityEngine.Random.Range(0, cardsOfType.Count - 1);
-		return cardsOfType[randomCardIndex];
 	}
 	
 	void _CardSystem_RequestBattle(CardData card, EndCardAction done)
@@ -946,14 +926,14 @@ public class OverworldManager : MonoBehaviour
 		// use all the resource cards
 		CardData c = _CardSystem.GetRandomCard(_GameStateHolder._ActivePlayer.Hand.cards, CardType.Resource_Card);
 		while(c != null) {
-			_CardSystem.UseCard(c, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer);
+			_CardSystem.UseCard(c, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer, _GameStateHolder._gameState);
 			c = _CardSystem.GetRandomCard(_GameStateHolder._ActivePlayer.Hand.cards, CardType.Resource_Card);
 		}
 
 		// use battle card
 		c = _CardSystem.GetRandomCard(_GameStateHolder._ActivePlayer.Hand.cards, CardType.Battle_Card);
 		if (c != null) {
-			_CardSystem.UseCard(c, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer);
+			_CardSystem.UseCard(c, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer, _GameStateHolder._gameState);
 		} else {
 			_TurnManager.EndTurn();
 		}
@@ -1033,7 +1013,7 @@ public class OverworldManager : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.C))
             {
-                CardData c = GenerateRandomCard(_CardSystem.cardList.cards);
+                CardData c = _CardSystem.GetRandomCard();
 				_GameStateHolder._ActivePlayer.AddCard(c);
             }
 
