@@ -49,7 +49,7 @@ public class Army : ScriptableObject {
 	}
 
 	public List<Unit> GetUpgradableUnits() {
-		return units.FindAll(x => !x.IsActive() && x.IsUpgradeable());
+		return units.FindAll(x => x.IsActive() && x.IsUpgradeable());
 	}
 
 	public List<Unit> GetDefendingUnits() {
