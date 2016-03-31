@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Name: HydraBaseData
   m_EditorClassIdentifier: 
   Speed: 2
-  Strength: 7
-  HP: 20
+  Strength: 20
+  HP: 36

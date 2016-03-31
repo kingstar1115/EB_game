@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Name: StartCards
   m_EditorClassIdentifier: 
   cards:
-  - {fileID: 11400000, guid: d6d4f329a0f930746819573554b3a0ff, type: 2}
-  - {fileID: 11400000, guid: d6d4f329a0f930746819573554b3a0ff, type: 2}
-  - {fileID: 11400000, guid: d6d4f329a0f930746819573554b3a0ff, type: 2}
-  - {fileID: 11400000, guid: d6d4f329a0f930746819573554b3a0ff, type: 2}
-  - {fileID: 11400000, guid: 620707777ee0c4b44b53849f2a74cf46, type: 2}
+  - {fileID: 11400000, guid: 65279c627ca93674d88ffe7f30eb5bb0, type: 2}
+  - {fileID: 11400000, guid: 65279c627ca93674d88ffe7f30eb5bb0, type: 2}
+  - {fileID: 11400000, guid: 92f1232e4d252ac4181724c3802bf8fb, type: 2}
+  - {fileID: 11400000, guid: b88ca81ac0c66de4db6ed1592e842b5b, type: 2}

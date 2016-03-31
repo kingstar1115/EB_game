@@ -232,7 +232,7 @@ public class BattleManager : MonoBehaviour {
 
 		// just attack the first one for now
 		Debug.Log("Enemy attacks!");
-		Attack(activePlayer, _instigatorBattlers[0]);
+		Attack(activePlayer, _instigatorBattlers[Random.Range(0, _instigatorBattlers.Count+1)]);
 		Audio.AudioInstance.PlaySFX(SoundEffect.Roar1);
 		StartCoroutine(endTurn());
 	}
