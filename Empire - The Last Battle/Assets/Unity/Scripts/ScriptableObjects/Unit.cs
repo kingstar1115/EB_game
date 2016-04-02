@@ -52,7 +52,7 @@ public class Unit : ScriptableObject, iBattleable {
 	}
 
 	public bool IsActive() {
-		bool x = (!IsDefending () && !IsKO ());
+		bool x = (!IsDefending () && !IsPrisoner() && !IsKO());
 		return x;
 	}
 

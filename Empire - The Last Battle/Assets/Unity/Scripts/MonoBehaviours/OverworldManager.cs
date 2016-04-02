@@ -24,11 +24,12 @@ public class OverworldManager : MonoBehaviour
 
 	//****TESTS ONLY****
 	public CardList _StartCards;
+	public CardList _StartCardsEditor;
 
 	// Use this for initialization
 	void Start() {
 		//new game setup
-		SceneFaderUI.ScreenFader.StartFadeOverTime(SceneFaderUI.FadeDir.FadeOut);
+		Fader.ScreenFader.StartFadeOverTime(Fader.FadeDir.FadeOut, SceneSnapshot.ScreenSnapshot.SnapScreenShot);
 		bool newGame = _BattleData._EndState == BattleEndState.None;
 		_Board.Initialise(!newGame);
 
@@ -41,7 +42,7 @@ public class OverworldManager : MonoBehaviour
 		_StormshaperPlayer.Initialise();
 
 		if (_BattleData._EndState == BattleEndState.None) {
-			//try get the battleboard start tile
+			//try get the battlebeard start tile
 			if (_Board._BBStartTile != null) {
 				_BattlebeardPlayer.CommanderPosition = _Board._BBStartTile;
 			}
@@ -97,25 +98,28 @@ public class OverworldManager : MonoBehaviour
 
 		if (newGame) {
 
-			//test by adding cards.
-			_BattlebeardPlayer.SetCards(_StartCards);
-			_StormshaperPlayer.SetCards(_StartCards);
+			//add apropriate start cards
+			if (!Debug.isDebugBuild)
+			{
+				_BattlebeardPlayer.SetCards(_StartCards);
+				_StormshaperPlayer.SetCards(_StartCards);
+			}
+			else
+			{
+				_BattlebeardPlayer.SetCards(_StartCardsEditor);
+				_StormshaperPlayer.SetCards(_StartCardsEditor);
+			}
 
 			// add some start units
 			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
 			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Pikeman);
-			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Warrior);
+			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Warrior);
 
 			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
 			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Pikeman);
-
+			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
+			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
 
 			setPlayer(PlayerType.Battlebeard);
 			
@@ -277,18 +281,7 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void UseCard(CardData card) {
-		ModalPanel p = ModalPanel.Instance();
-		p.ShowOKCancel("Card", "Use " + card.Name + " card?", () => {
-			_CardSystem.UseCard(card, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer);
-		}, null);
-
-
-		//use the card
-		//if (_CardSystem.CanUseCard (card, _GameStateHolder._gameState))
-		//{
-		//	_CardSystem.ApplyEffect (card, _GameStateHolder._ActivePlayer);	
-		//}
-
+		_CardSystem.UseCard(card, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer, _GameStateHolder._gameState);
 	}
 
 	//This method is for when the user finishes using the armoury by Key or Button
@@ -431,7 +424,7 @@ public class OverworldManager : MonoBehaviour
 							"You captured the cave and made it part of your empire!",
 							true);
 					}
-					CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
+					CardData c =_CardSystem.GetRandomCard(_AvailableCaveCards.cards);
 					_GameStateHolder._ActivePlayer.AddCard(c);
 					_Board.SetTileOwner(tile, _GameStateHolder._ActivePlayer.Type);
 
@@ -645,7 +638,7 @@ public class OverworldManager : MonoBehaviour
 							"You captured the camp and made it part of your empire!",
 							!hasMessage);
 					}
-					CardData c = GenerateRandomCard(_AvailableCaveCards.cards);
+					CardData c = _CardSystem.GetRandomCard(_AvailableCaveCards.cards);
 					_GameStateHolder._ActivePlayer.AddCard(c);
 
 					// if the active player had a prisoner on the tile 
@@ -729,16 +722,7 @@ public class OverworldManager : MonoBehaviour
 		ModalPanel p = ModalPanel.Instance();
 		_OverworldUI.Disable();
 		_BattleData._EndState = BattleEndState.None;
-		p.ShowOK("Congratz!!", Enum.GetName(typeof(PlayerType), player.Type) + " player wins!", Reset);
-	}
-
-	public CardData GenerateRandomCard(List<CardData> availableCards) {
-		//Generate a random card
-		List<CardType> uniqueTypes = availableCards.Select(x => x.Type).Distinct().ToList();
-		int randomTypeIndex = UnityEngine.Random.Range(0, uniqueTypes.Count - 1);
-		List<CardData> cardsOfType = availableCards.FindAll(x => x.Type == uniqueTypes[randomTypeIndex]);
-		int randomCardIndex = (short)UnityEngine.Random.Range(0, cardsOfType.Count - 1);
-		return cardsOfType[randomCardIndex];
+		StartCoroutine(SceneSwitcher.ChangeScene ("StartMenu"));
 	}
 	
 	void _CardSystem_RequestBattle(CardData card, EndCardAction done)
@@ -820,6 +804,7 @@ public class OverworldManager : MonoBehaviour
 				u.SetPosition(t);
 				u.SetDefending(true);
 				_Board.SetTileDefence(t);
+				onDone();
 			},
 			() => StartCoroutine(PromptForDefendingUnit("Should another unit defend instead?", p, mp, onDone)));
 	}
@@ -937,7 +922,21 @@ public class OverworldManager : MonoBehaviour
 	}
 
 	void endTurn() {
-		_TurnManager.EndTurn();
+		// here we use the cards that we got.
+		// use all the resource cards
+		CardData c = _CardSystem.GetRandomCard(_GameStateHolder._ActivePlayer.Hand.cards, CardType.Resource_Card);
+		while(c != null) {
+			_CardSystem.UseCard(c, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer, _GameStateHolder._gameState);
+			c = _CardSystem.GetRandomCard(_GameStateHolder._ActivePlayer.Hand.cards, CardType.Resource_Card);
+		}
+
+		// use battle card
+		c = _CardSystem.GetRandomCard(_GameStateHolder._ActivePlayer.Hand.cards, CardType.Battle_Card);
+		if (c != null) {
+			_CardSystem.UseCard(c, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer, _GameStateHolder._gameState);
+		} else {
+			_TurnManager.EndTurn();
+		}
 	}
 
 	void _TurnManager_OnTurnEnd() {
@@ -1014,7 +1013,7 @@ public class OverworldManager : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.C))
             {
-                CardData c = GenerateRandomCard(_CardSystem.cardList.cards);
+                CardData c = _CardSystem.GetRandomCard();
 				_GameStateHolder._ActivePlayer.AddCard(c);
             }
 

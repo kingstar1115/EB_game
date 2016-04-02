@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Name: WyvernBaseData
   m_EditorClassIdentifier: 
   Speed: 2
-  Strength: 7
-  HP: 20
+  Strength: 13
+  HP: 22

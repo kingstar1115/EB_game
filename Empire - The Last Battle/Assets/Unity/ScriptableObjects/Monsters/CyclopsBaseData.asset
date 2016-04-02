@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Name: CyclopsBaseData
   m_EditorClassIdentifier: 
   Speed: 2
-  Strength: 7
-  HP: 20
+  Strength: 12
+  HP: 10

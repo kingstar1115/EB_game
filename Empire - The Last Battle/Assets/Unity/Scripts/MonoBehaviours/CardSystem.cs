@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public enum CardType {
 	Healing_Card,
@@ -32,13 +33,23 @@ public class CardSystem : MonoBehaviour {
 	public event UnitSelectionCallback RequestUnitSelection = delegate { };
 	public event BasicCardAction RequestBattle = delegate {};
 
+
 	public bool CanUseCard(CardData cData, GameState gameState)
 	{
 		//check that the card can use the game state 
-		return (cData.UseableGameState & gameState) == gameState;
+		return (cData.UseableGameState & gameState) != gameState;
 	}
 
-	public void UseCard(CardData card, Player player, Player inactivePlayer) {
+	public void UseCard(CardData card, Player player, Player inactivePlayer, GameState gameState) 
+	{
+		//check if card can be used in this game state first 
+		if (CanUseCard (card, gameState)) 
+		{
+			OnEffectApplied(false, card, player, null);
+			return;
+		}
+
+		//apply the actual effect depending on card type
 		switch (card.Type) {
 			case CardType.Healing_Card:
 				int koUnits = player.PlayerArmy.GetKOUnits().Count,
@@ -161,4 +172,37 @@ public class CardSystem : MonoBehaviour {
 		RequestUnitSelection = delegate { };
 	}
 
+	public CardData GetRandomCard() {
+		return GetRandomCard(cardList.cards, GetRandomCardType());
+	}
+
+	public CardData GetRandomCard(CardType t) {
+		return GetRandomCard(cardList.cards.FindAll(x => x.Type == t));
+	}
+
+	public CardData GetRandomCard(List<CardData> c, CardType t) {
+		c = c.FindAll(x => x.Type == t);
+		if (c.Count == 0) {
+			return null;
+		}
+		int random = UnityEngine.Random.Range(0, c.Count);
+		return c[random];
+	}
+
+	public CardData GetRandomCard(List<CardData> c) {
+		if (c.Count == 0) {
+			return null;
+		}
+		CardType t = GetRandomCardType(c);
+		return GetRandomCard(c, t);
+	}
+
+	public CardType GetRandomCardType(List<CardData> c) {
+		List<CardType> t = c.Select(x => x.Type).Distinct().ToList();
+		int random = UnityEngine.Random.Range(0, t.Count);
+		return t[random];
+	}
+	public CardType GetRandomCardType() {
+		return GetRandomCardType(cardList.cards);
+	}
 }

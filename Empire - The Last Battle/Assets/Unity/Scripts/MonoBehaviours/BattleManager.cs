@@ -20,6 +20,8 @@ public class BattleManager : MonoBehaviour {
 	public BattlerType activePlayer;
 	public MonsterManager _MonsterManager;
 
+	public CardList LostImmortalCards;
+
 	List<Unit> _instigatorBattlers;
 	iBattleable _oppositionBattler;
 	iBattleable _oppositionReserveA;
@@ -28,7 +30,7 @@ public class BattleManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		SceneFaderUI.ScreenFader.StartFadeOverTime(SceneFaderUI.FadeDir.FadeOut);
+		Fader.ScreenFader.StartFadeOverTime(Fader.FadeDir.FadeOut, SceneSnapshot.ScreenSnapshot.SnapScreenShot);
 		// set up the players
 		_StormshaperPlayer = _GameStateHolder._ActivePlayer.Type == PlayerType.Stormshaper ? _GameStateHolder._ActivePlayer : _GameStateHolder._InactivePlayer;
 		_BattlebeardPlayer = _GameStateHolder._ActivePlayer.Type == PlayerType.Battlebeard ? _GameStateHolder._ActivePlayer : _GameStateHolder._InactivePlayer;
@@ -232,7 +234,7 @@ public class BattleManager : MonoBehaviour {
 
 		// just attack the first one for now
 		Debug.Log("Enemy attacks!");
-		Attack(activePlayer, _instigatorBattlers[0]);
+		Attack(activePlayer, _instigatorBattlers[Random.Range(0, _instigatorBattlers.Count)]);
 		Audio.AudioInstance.PlaySFX(SoundEffect.Roar1);
 		StartCoroutine(endTurn());
 	}
@@ -242,7 +244,7 @@ public class BattleManager : MonoBehaviour {
 		// do end turn stuff
 
 		if (_instigatorBattlers.Count() == 0) {
-			LoseBattle();
+			_endBattle(BattleEndState.Loss);
 		} else if (_oppositionBattler.IsKO())  {
 
 			if(_BattleData._BattleType == BattleType.LostImmortal) {
@@ -260,17 +262,19 @@ public class BattleManager : MonoBehaviour {
 				}
 				else {
 					_BattleUnitPositionManager.RemoveOpposition();
-					WinBattle();
+					_endBattle(BattleEndState.Win);
 				}
 			} else {
 				_BattleUnitPositionManager.RemoveOpposition();
-				WinBattle();
+				_endBattle(BattleEndState.Win);
 			}
 			
 		} else {
 			switchPlayer();
 		}
 	}
+
+	
 
 
 	Player getOtherPlayer(PlayerType p) {
@@ -460,18 +464,76 @@ public class BattleManager : MonoBehaviour {
 		return totalDamage;
 	}
 
-	public void WinBattle() {
-		_BattleData._EndState = BattleEndState.Win;
-		_endBattle();
+	void _endBattle(BattleEndState state) {
+
+		_BattleData._EndState = state;
+
+		if (_BattleData._BattleType == BattleType.PvP) {
+			if (state != BattleEndState.Loss) {
+				_BattleUnitPositionManager.ShowChest(BattlerType.Opposition);
+			} else {
+				_BattleUnitPositionManager.ShowChest(BattlerType.Instigator);
+			}
+			PlayerType p = GetPlayerTypeByBattler(activePlayer);
+			ModalPanel.Instance().ShowOK(p.ToString() + " Won", "You reap the spoils and take the enemy prisoner!", () => {
+				Player player = p == _GameStateHolder._ActivePlayer.Type ? _GameStateHolder._ActivePlayer : _GameStateHolder._InactivePlayer;
+				_reapSpoils(player);
+			});
+			_BattleUnitPositionManager.ChangeToMainCamera();
+			_BattleUnitPositionManager.Hide();
+			return;
+		}
+
+		if (state != BattleEndState.Loss) {
+			_BattleUnitPositionManager.ShowChest(BattlerType.Opposition);
+			_BattleUnitPositionManager.ChangeToMainCamera();
+			_BattleUnitPositionManager.Hide();
+			ModalPanel.Instance().ShowOK("You Won", "You reap the spoils of the battle!", () => {
+				_reapSpoils(_GameStateHolder._ActivePlayer);
+			});	
+		} else {
+			_actuallyEndBattle();
+		}
 	}
 
-	public void LoseBattle() {
-		_BattleData._EndState = BattleEndState.Loss;
-		_endBattle();
+	void _reapSpoils(Player p) {
+		List<CardData> cards = new List<CardData>();
+		if (_BattleData._BattleType != BattleType.LostImmortal) {
+			// get resource card
+			CardData randomcard = _CardSystem.GetRandomCard(CardType.Resource_Card);
+			cards.Add(randomcard);
+		} else {
+			// we should add a thing here stopping you getting more battle cards (but probably won't)
+			CardData randomcard = _CardSystem.GetRandomCard(LostImmortalCards.cards);
+			cards.Add(randomcard);
+			randomcard = _CardSystem.GetRandomCard(LostImmortalCards.cards);
+			cards.Add(randomcard);
+			randomcard = _CardSystem.GetRandomCard(LostImmortalCards.cards);
+			cards.Add(randomcard);
+			randomcard = _CardSystem.GetRandomCard(LostImmortalCards.cards);
+			cards.Add(randomcard);
+		}
+		StartCoroutine(showCards(cards, _actuallyEndBattle, p));
+	}
+	IEnumerator showCards(List<CardData> cards, System.Action action, Player p) {
+		if (cards != null && cards.Count > 0) {
+			CardData card = cards[0];
+			cards.RemoveAt(0);
+			yield return new WaitForSeconds(0.1f);
+			_BattleUnitPositionManager.ShowSpoils(card);
+			yield return new WaitForSeconds(1f);
+			_BattleUnitPositionManager.ShowSpoils(card);
+			p.AddCard(card);
+			ModalPanel.Instance().ShowOK("Spoils", "You found a " + card.Name + " card", () => {
+				_BattleUnitPositionManager.HideSpoils();
+				StartCoroutine(showCards(cards, action, p));
+			});
+		} else {
+			action();
+		}
 	}
 
-	void _endBattle() {
-
+	void _actuallyEndBattle() {
 		_tearDownScene();
 
 		//heal all non-ko troops
@@ -743,18 +805,7 @@ public class BattleManager : MonoBehaviour {
 	}
 
 	void UseCard(CardData card) {
-		ModalPanel p = ModalPanel.Instance();
-		p.ShowOKCancel("Card", "Use " + card.Name + " card?", () => {
-			_CardSystem.UseCard(card, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer);
-		}, null);
-
-
-		//use the card
-		//if (_CardSystem.CanUseCard (card, _GameStateHolder._gameState))
-		//{
-		//	_CardSystem.ApplyEffect (card, _GameStateHolder._ActivePlayer);	
-		//}
-
+		_CardSystem.UseCard(card, _GameStateHolder._ActivePlayer, _GameStateHolder._InactivePlayer, _GameStateHolder._gameState);
 	}
 
 }
