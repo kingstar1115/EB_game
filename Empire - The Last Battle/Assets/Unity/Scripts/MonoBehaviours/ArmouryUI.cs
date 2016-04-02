@@ -85,10 +85,10 @@ public class ArmouryUI : MonoBehaviour
 			//Gameobject UI items must contain the same name as scriptable objects purchasble items for this to work.
 			if (disableOn)
 				section.GetComponentsInChildren<Image>(true).Where(x => !purchasableItems.Any(z => x.name.Contains(z.name.ToString())))
-					.ToList().ForEach(x => { x.color = Color.grey; x.GetComponent<Button>().interactable = false; });
+					.ToList().ForEach(x => { x.color = Color.grey; x.GetComponent<CanvasGroup>().interactable = false; });
 			else
 				section.GetComponentsInChildren<Image>(true).Where(x => purchasableItems.Any(z => x.name.Contains(z.name.ToString())))
-					.ToList().ForEach(x => { x.color = Color.white; x.GetComponent<Button>().interactable = true; });
+                    .ToList().ForEach(x => { x.color = Color.white; x.GetComponent<CanvasGroup>().interactable = true; });
 		}
 
 		if (player.LostImmortalKillCount > 0) {
