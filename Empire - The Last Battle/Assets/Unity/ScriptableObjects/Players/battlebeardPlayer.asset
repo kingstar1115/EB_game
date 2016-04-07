@@ -16,13 +16,13 @@ MonoBehaviour:
   Type: 1
   Hand: {fileID: 11400000, guid: e5d950c574d1d1143a17d68b8f2ab99c, type: 2}
   PlayerArmy: {fileID: 11400000, guid: 8552a7ef5b73b9f47993b03b9d1a5087, type: 2}
-  HasMoved: 1
+  HasMoved: 0
   IsScouting: 0
   LandedInn: 0
   LandedInnUnavailable: 0
   LandedCave: 0
-  LandedArmoury: 1
-  LandedCamp: 1
+  LandedArmoury: 0
+  LandedCamp: 0
   LandedFortress: 0
   HasBattled: 0
   HasBattledMonster: 0
