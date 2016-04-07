@@ -4,6 +4,7 @@ using System.Collections;
 public class StartMenu : MonoBehaviour {
 	public MusicTrack[] Tracks;
 	public SoundEffect Button_Click;
+	public GameStateHolder _GameStateHolder;
 
 	//Moorland Kevin MacLeod (incompetech.com)
 	//Licensed under Creative Commons: By Attribution 3.0 License
@@ -15,6 +16,7 @@ public class StartMenu : MonoBehaviour {
 
 	void Start(){
 		Audio.AudioInstance.PlayMusic(Tracks, true);
+		_GameStateHolder._gameState = GameState.MainMenu;
 	}
 
 	public void HandlePlayGameClick(){

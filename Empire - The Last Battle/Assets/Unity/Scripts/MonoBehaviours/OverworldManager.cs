@@ -30,10 +30,12 @@ public class OverworldManager : MonoBehaviour
 	void Start() {
 		//new game setup
 		Fader.ScreenFader.StartFadeOverTime(Fader.FadeDir.FadeOut, SceneSnapshot.ScreenSnapshot.SnapScreenShot);
-		bool newGame = _BattleData._EndState == BattleEndState.None;
+		bool newGame = _GameStateHolder._gameState == GameState.MainMenu;
+
 		_Board.Initialise(!newGame);
 
-		if (_BattleData._EndState == BattleEndState.None) {
+		if (newGame) {
+			_BattleData._EndState = BattleEndState.None;
 			_BattlebeardPlayer.ResetArmy();
 			_StormshaperPlayer.ResetArmy();
 		}
@@ -41,7 +43,7 @@ public class OverworldManager : MonoBehaviour
 		_BattlebeardPlayer.Initialise();
 		_StormshaperPlayer.Initialise();
 
-		if (_BattleData._EndState == BattleEndState.None) {
+		if (newGame) {
 			//try get the battlebeard start tile
 			if (_Board._BBStartTile != null) {
 				_BattlebeardPlayer.CommanderPosition = _Board._BBStartTile;

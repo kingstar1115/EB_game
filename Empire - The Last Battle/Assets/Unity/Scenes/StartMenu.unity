@@ -963,8 +963,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88351f3806c729848ab55a275e10206e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Tracks: 0600000005000000
-  Button_Click: 8
+  Tracks: 0500000006000000
+  Button_Click: 0
+  _GameStateHolder: {fileID: 11400000, guid: 7bdc7901081974c48bfebd938eacb8e9, type: 2}
 --- !u!224 &1555973142
 RectTransform:
   m_ObjectHideFlags: 0

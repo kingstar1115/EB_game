@@ -22,9 +22,13 @@ public class ArmouryUI : MonoBehaviour
 
 	int previousCurrency;
 
-	const string k_UnitsSection = "UnitsSection";
-	const string k_CardsSection = "CardsSection";
-	const string k_CastleSection = "CastlesSection";
+	public Transform _UnitsUIParent;
+	public Transform _CardUIParent;
+	public Transform _CastleUIParent;
+
+	//const string k_UnitsSection = "UnitsSection";
+	//const string k_CardsSection = "CardsSection";
+	//const string k_CastleSection = "CastlesSection";
 
 	public IEnumerable<PurchasableUnit> AvailableUnits(Player player)
 	{
@@ -44,51 +48,55 @@ public class ArmouryUI : MonoBehaviour
 	//When the currency is changed it will update what can be shown in the armoury
 	public void CurrencyChangedUpdate(int val, Player player)
 	{
-		bool disable = false;
+		Debug.Log("Curency update: "+val);
+		//bool disable = false;
 
-		if (val <= previousCurrency)
-			disable = true;
+		//if (val <= previousCurrency)
+		//	disable = true;
 		
 		var units = AvailableUnits(player).ToList();
-		ToggleUIImages(units, k_UnitsSection, player, disable);
+		ToggleUIImages(units, _UnitsUIParent, player);
 
 		var cards = AvailableCards(player).ToList();
-		ToggleUIImages(cards, k_CardsSection, player, disable);
+		ToggleUIImages(cards, _CardUIParent, player);
 
 		var castlePieces = AvailableCastlePieces(player).ToList();
-		ToggleUIImages(castlePieces, k_CastleSection, player, disable);
+		ToggleUIImages(castlePieces, _CastleUIParent, player);
 
 		previousCurrency = val;
 	}
 
 	void UpdateItems(Player player)
 	{
-		ToggleUIImages(AvailableUnits(player).ToList(), k_UnitsSection, player);
-		ToggleUIImages(AvailableCards(player).ToList(), k_CardsSection, player);
-		ToggleUIImages(AvailableCastlePieces(player).ToList(), k_CastleSection, player);
+		ToggleUIImages(AvailableUnits(player).ToList(), _UnitsUIParent, player);
+		ToggleUIImages(AvailableCards(player).ToList(), _CardUIParent, player);
+		ToggleUIImages(AvailableCastlePieces(player).ToList(), _CastleUIParent, player);
 	}
 
-	void ToggleUIImages<T>(IList<T> purchasableItems, string sectionName, Player player, bool disableOn = true) where T : PurchasableItem
+	void ToggleUIImages<T>(IList<T> purchasableItems, Transform parentTrans, Player player, bool disableOn = false) where T : PurchasableItem
 	{
+		/*
 		Transform section = null;
 
 		//Need to loop through children transforms to get correct section gameobject (Unit, Card or Castle UI)
-        foreach (Transform child in transform)
+        foreach (Transform child in transform.GetComponentInChildren<Transform>())
 		{
+			Debug.Log("CHILD!!: "+child.name);
 			section = child.Find(sectionName);
 		}
+		*/
 
-		if (section != null)
+		if (parentTrans != null)
 		{
 			//Disables any images to stop them being clickable, usually when the user doesn't have enough money
 			//Else enable the images on the items that are passed into this method
 			//Gameobject UI items must contain the same name as scriptable objects purchasble items for this to work.
 			if (disableOn)
-				section.GetComponentsInChildren<Image>(true).Where(x => !purchasableItems.Any(z => x.name.Contains(z.name.ToString())))
-					.ToList().ForEach(x => { x.color = Color.grey; x.GetComponent<Button>().interactable = false; });
+				parentTrans.GetComponentsInChildren<Image>(true).Where(x => x.transform.parent == parentTrans && !purchasableItems.Any(z => x.name.Contains(z.name.ToString())))
+					.ToList().ForEach(x => { x.color = Color.grey; x.GetComponent<CanvasGroup>().interactable = false; });
 			else
-				section.GetComponentsInChildren<Image>(true).Where(x => purchasableItems.Any(z => x.name.Contains(z.name.ToString())))
-					.ToList().ForEach(x => { x.color = Color.white; x.GetComponent<Button>().interactable = true; });
+				parentTrans.GetComponentsInChildren<Image>(true).Where(x => x.transform.parent == parentTrans && purchasableItems.Any(z => x.name.Contains(z.name.ToString())))
+                    .ToList().ForEach(x => { x.color = Color.white; x.GetComponent<CanvasGroup>().interactable = true; });
 		}
 
 		if (player.LostImmortalKillCount > 0) {
@@ -98,6 +106,7 @@ public class ArmouryUI : MonoBehaviour
 
 	public void Show(Player player)
 	{
+		Debug.Log("show");
 		gameObject.SetActive(true);
 		UpdateItems(player);
 	}

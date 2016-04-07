@@ -11,6 +11,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd86fb5cf09c55e4db23bf209f95048b, type: 3}
   m_Name: BattleData
   m_EditorClassIdentifier: 
-  _InitialPlayer: {fileID: 11400000, guid: d253b5192bc15cb40a78cb5d5bf68ffb, type: 2}
+  _InitialPlayer: {fileID: 11400000, guid: aa3229e903b78df4092f786b363a0f56, type: 2}
   _BattleType: 0
   _EndState: 0
