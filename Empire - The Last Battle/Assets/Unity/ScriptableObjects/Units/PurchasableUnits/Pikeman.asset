@@ -11,6 +11,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69eb202e6dc40b64a87703e4a787157f, type: 3}
   m_Name: Pikeman
   m_EditorClassIdentifier: 
-  cost: 30
+  cost: 20
   UNITTYPE: 1
   purchaseLevel: 0
