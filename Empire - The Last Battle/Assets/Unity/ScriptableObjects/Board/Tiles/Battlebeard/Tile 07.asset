@@ -14,6 +14,6 @@ MonoBehaviour:
   Terrain: 0
   Building: 3
   Owner: 1
-  Height: .5
-  Defended: 0
+  Height: 2
+  Defender: {fileID: 0}
   Prisoner: 0
