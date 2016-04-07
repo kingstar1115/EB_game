@@ -12,7 +12,8 @@ public enum SoundEffect {
 	Inn,
 	Roar1,
 	Roar2,
-	Sword
+	Sword,
+	Button_Click1
 }
 
 public enum MusicTrack {
@@ -20,7 +21,9 @@ public enum MusicTrack {
 	Mountain,
 	Peaceful1,
 	Peaceful2,
-	Town
+	Town,
+	Epic,
+	Moorland
 }
 
 public class Audio : MonoBehaviour

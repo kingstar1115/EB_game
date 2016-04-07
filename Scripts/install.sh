@@ -1,10 +1,26 @@
 #! /bin/sh
 
-echo 'Downloading from http://download.unity3d.com/download_unity/e87ab445ead0/MacEditorInstaller/Unity-5.3.2f1.pkg: '
-curl -o Unity.pkg http://download.unity3d.com/download_unity/e87ab445ead0/MacEditorInstaller/Unity-5.3.2f1.pkg
+BASE_URL=http://netstorage.unity3d.com/unity
+HASH=e87ab445ead0
+VERSION=5.3.2f1
 
-echo 'Installing Unity.pkg'
-sudo installer -dumplog -package Unity.pkg -target /
+download() {
+  file=$1
+  url="$BASE_URL/$HASH/$package"
 
-echo 'Removing unity'
-rm Unity.pkg
+  echo "Downloading from $url: "
+  curl -o `basename "$package"` "$url"
+}
+
+install() {
+  package=$1
+  download "$package"
+
+  echo "Installing "`basename "$package"`
+  sudo installer -dumplog -package `basename "$package"` -target /
+}
+
+# See $BASE_URL/$HASH/unity-$VERSION-$PLATFORM.ini for complete list
+# of available packages, where PLATFORM is `osx` or `win`
+
+install "MacEditorInstaller/Unity-$VERSION.pkg"
