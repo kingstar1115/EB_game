@@ -1,2 +1,6 @@
+<<<<<<< HEAD
 m_EditorVersion: 5.1.1f1
+=======
+m_EditorVersion: 5.3.2f1
+>>>>>>> ewan/master
 m_StandardAssetsVersion: 0
