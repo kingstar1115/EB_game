@@ -214,6 +214,7 @@ public class BattleManager : MonoBehaviour {
 	}
 
 	void startTurn() {
+		_BattleUnitPositionManager.ChangeCamera();
 		if (_BattleData._BattleType == BattleType.PvP || activePlayer == BattlerType.Instigator) {
 			startTurnPlayer();
 		}
@@ -240,9 +241,14 @@ public class BattleManager : MonoBehaviour {
 	}
 
    IEnumerator endTurn() {
-		yield return new WaitForSeconds(1);
-		// do end turn stuff
-
+	   if (!(activePlayer == BattlerType.Opposition && _BattleData._BattleType != BattleType.PvP)) {
+		   // do end turn stuff
+		   _BattleUnitPositionManager._ArmyUI.Hide();
+		   _BattleUnitPositionManager._HandUI.Hide();
+		   _BattleUnitPositionManager._ButtonsUI.Hide();
+	   }
+		yield return new WaitForSeconds(2);
+		
 		if (_instigatorBattlers.Count() == 0) {
 			_endBattle(BattleEndState.Loss);
 		} else if (_oppositionBattler.IsKO())  {
@@ -434,10 +440,12 @@ public class BattleManager : MonoBehaviour {
 		_BattleUnitPositionManager._ArmyUI.OnClickUnit += selectUnit;
 	}
 
+	bool attacking = false;
 	public void AttackButton() {
-		if (_BattleData._BattleType != BattleType.PvP && activePlayer != BattlerType.Instigator) {
+		if (_BattleData._BattleType != BattleType.PvP && activePlayer != BattlerType.Instigator ) {
 			return;
 		}
+		attacking = true;
 		iBattleable target = _oppositionBattler;
 		if (_BattleData._BattleType == BattleType.PvP && activePlayer != BattlerType.Instigator) {
 			target = _instigatorBattlers[0];

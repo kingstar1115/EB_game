@@ -435,15 +435,19 @@ public void AddUnitToUI(Unit unit)
         _ReserveOppositionCUI.AddUnit(monster);
     }
 
-    public void SwitchFocus(PlayerType pType){
-
+	public void ChangeCamera() {
 		Camera c = _BattleManager.activePlayer == BattlerType.Instigator ? _InstigatorCamera : _OppositionCamera;
 		changeCamera(c);
+	}
 
-		_ArmyUI.SwitchPlayer (_BattleManager.GetActivePlayer().Type);
-        _HandUI.SetHand(_BattleManager.GetActivePlayer().Hand);
-        _ButtonsUI._Enabled = true;
-        _ButtonsUI.Show();
+    public void SwitchFocus(PlayerType pType) {
+
+		_ArmyUI.SwitchPlayer(_BattleManager.GetActivePlayer().Type);
+		_ArmyUI.Show();
+		_HandUI.SetHand(_BattleManager.GetActivePlayer().Hand);
+		_HandUI.Show();
+		_ButtonsUI._Enabled = true;
+		_ButtonsUI.Show();
 
         //set logo as well
         _ButtonsUI._PlayerImage.sprite = _PlayerLogos[(int)pType];

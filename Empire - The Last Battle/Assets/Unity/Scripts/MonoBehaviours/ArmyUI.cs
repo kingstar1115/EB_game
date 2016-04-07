@@ -111,12 +111,16 @@ public class ArmyUI : MonoBehaviour {
 	}
 
 	public void Show() {
-		getUnitTypeUI(currentPlayer).ForEach(ui => ui.Show());
+		if (currentPlayer != PlayerType.None) {
+			getUnitTypeUI(currentPlayer).ForEach(ui => ui.Show());
+		}
 	}
 
 	public void Hide() {
-		getUnitTypeUI(currentPlayer).ForEach(ui => ui.Hide());
-		resetSelection();
+		if (currentPlayer != PlayerType.None) {
+			getUnitTypeUI(currentPlayer).ForEach(ui => ui.Hide());
+			resetSelection();
+		}
 	}
 
 	void unitUpdated(Player p, Unit u) {
