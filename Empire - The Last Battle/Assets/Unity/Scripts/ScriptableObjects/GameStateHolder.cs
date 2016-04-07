@@ -15,4 +15,5 @@ public enum GameState
 	Overworld = 0x2,
 	PreBattle = 0x4,
 	Battle = 0x8,
+	MainMenu = 0x16
 }
