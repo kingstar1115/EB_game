@@ -26,7 +26,7 @@ public class BattleScene : MonoBehaviour {
 				building = Instantiate(_Buildings[1]);
 			}
 			else if (b == BuildingType.Fortress) {
-				buildingOffset = new Vector3(0, 13.279f);
+				buildingOffset = new Vector3(0, 1.03f);
 				building = Instantiate(_Buildings[2]);
 			}
 		}

@@ -122,6 +122,7 @@ public class Player : ScriptableObject
 
     public void Reset()
     {
+		ResetArmy();
         lostImmortalKillCount = 0;
 		CastleProgress = 0;
     }
