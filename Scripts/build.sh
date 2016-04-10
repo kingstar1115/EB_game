@@ -30,7 +30,7 @@ echo "Attempting to build $project for Web"
   -silent-crashes \
   -logFile \
   -projectPath "$projectPath" \
-  -buildWebPlayer  "$(pwd)/Build/ELB" \
+  -executeMethod MyEditorScript.PerformBuild \
   -quit
 #
 # echo 'Zipping files for distribution'
