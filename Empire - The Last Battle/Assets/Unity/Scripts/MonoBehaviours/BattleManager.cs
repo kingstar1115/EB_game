@@ -481,6 +481,10 @@ public class BattleManager : MonoBehaviour {
 		return totalDamage;
 	}
 
+	public void Run() {
+		_endBattle(BattleEndState.Loss);
+	}
+
 	void _endBattle(BattleEndState state) {
 
 		_BattleData._EndState = state;
