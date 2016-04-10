@@ -46,6 +46,9 @@ public class BattleUnitPositionManager : MonoBehaviour {
 	public Camera _WorldCamera;
 	public Camera _InstigatorCamera;
 	public Camera _OppositionCamera;
+	public Camera _LIWorldCamera;
+	public Camera _LIInstigatorCamera;
+	public Camera _LIOppositionCamera;
 	Camera activeCamera;
 	public Canvas _CanvasUnitUI;
     public GameObject _PauseScreen;
@@ -100,7 +103,7 @@ public class BattleUnitPositionManager : MonoBehaviour {
 
         _CardDisplayUI.Init();
 
-		changeCamera(_WorldCamera);
+		ChangeToMainCamera();
 
 		//int button ui and player image
         _ButtonsUI.Init();
@@ -324,7 +327,8 @@ public class BattleUnitPositionManager : MonoBehaviour {
 	}
 
 	public void ChangeToMainCamera() {
-		changeCamera(_WorldCamera);
+		Camera c = _BattleScene._BattleData._BattleType == BattleType.LostImmortal ? _LIWorldCamera : _WorldCamera;
+		changeCamera(c);
 	}
 
 public void AddUnitToUI(Unit unit) 
@@ -436,7 +440,8 @@ public void AddUnitToUI(Unit unit)
     }
 
 	public void ChangeCamera() {
-		Camera c = _BattleManager.activePlayer == BattlerType.Instigator ? _InstigatorCamera : _OppositionCamera;
+		bool li = _BattleManager._BattleData._BattleType == BattleType.LostImmortal;
+		Camera c = _BattleManager.activePlayer == BattlerType.Instigator ? li ? _LIInstigatorCamera : _InstigatorCamera : li ? _LIOppositionCamera : _OppositionCamera;
 		changeCamera(c);
 	}
 

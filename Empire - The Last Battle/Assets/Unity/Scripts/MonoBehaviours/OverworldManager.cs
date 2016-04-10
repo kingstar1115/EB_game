@@ -36,8 +36,8 @@ public class OverworldManager : MonoBehaviour
 
 		if (newGame) {
 			_BattleData._EndState = BattleEndState.None;
-			_BattlebeardPlayer.ResetArmy();
-			_StormshaperPlayer.ResetArmy();
+			_BattlebeardPlayer.Reset();
+			_StormshaperPlayer.Reset();
 		}
 
 		_BattlebeardPlayer.Initialise();
@@ -105,23 +105,46 @@ public class OverworldManager : MonoBehaviour
 			{
 				_BattlebeardPlayer.SetCards(_StartCards);
 				_StormshaperPlayer.SetCards(_StartCards);
+
+				// add some start units
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Warrior);
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Warrior);
+
+				_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+				_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+				_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
+				_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
+
 			}
 			else
 			{
 				_BattlebeardPlayer.SetCards(_StartCardsEditor);
 				_StormshaperPlayer.SetCards(_StartCardsEditor);
+
+				// add some start units
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Warrior);
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Archer);
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.AxeThrower);
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Ballista);
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Catapult);
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
+				_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Pikeman);
+
+				_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+				_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
+				_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
+				_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
+
 			}
 
-			// add some start units
-			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Warrior);
-			_BattlebeardPlayer.PlayerArmy.AddUnit(UnitType.Warrior);
 
-			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Scout);
-			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
-			_StormshaperPlayer.PlayerArmy.AddUnit(UnitType.Cavalry);
+
 
 			setPlayer(PlayerType.Battlebeard);
 			
@@ -672,10 +695,10 @@ public class OverworldManager : MonoBehaviour
 			}
 		}
 		else if (_BattleData._BattleType == BattleType.LostImmortal) {
-			if (_BattleData._EndState == BattleEndState.Win && tile.Building == BuildingType.Fortress) {
+			if (_BattleData._EndState == BattleEndState.Win) {
 				tile.Owner = PlayerType.None;
 				_GameStateHolder._ActivePlayer.LostImmortalKillCount++;
-				endTurn();
+				ModalPanel.Instance().ShowOK("Lost Immortal Defeated!", "You notice some blueprints among the remains of the Lost Immortal. Maybe the Armoury would be able to look at them?", endTurn);
 			}
 			else {
 				_OverworldUI.Enable();
@@ -1003,6 +1026,10 @@ public class OverworldManager : MonoBehaviour
 
 			if(Input.GetKey(KeyCode.Alpha0)) {
 				_GameStateHolder._ActivePlayer.Currency.addPoints(-10);
+			}
+
+			if(Input.GetKey(KeyCode.B)) {
+				_GameStateHolder._ActivePlayer.AddCard(_CardSystem.GetRandomCard(CardType.Battle_Card));
 			}
 
 			if (Input.GetKeyDown(KeyCode.N))

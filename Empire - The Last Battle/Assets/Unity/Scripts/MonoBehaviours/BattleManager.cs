@@ -188,22 +188,29 @@ public class BattleManager : MonoBehaviour {
 
 	void calculateFirstTurnNonPvP() {
 		// calculate speeds
-		float maxSpeedInstigator = _instigatorBattlers.Max(x => x.GetSpeed());
-		float maxSpeedOpposition = _oppositionBattler.GetSpeed();
 
-		// if now get the chance that the instigator will go first
-		float chance = 0;
-		if (maxSpeedInstigator >= maxSpeedOpposition) {
-			chance = 1 - getPercentage(maxSpeedOpposition, maxSpeedInstigator);
-		}
-		else if (maxSpeedOpposition > maxSpeedInstigator) {
-			chance = getPercentage(maxSpeedInstigator, maxSpeedOpposition);
-		}
-		if (new System.Random().NextDouble() < chance) {
+		CardData activeCard = _GameStateHolder._ActivePlayer.GetCardOfType(CardType.Priority_Card);
+		if (activeCard != null) {
+			_GameStateHolder._ActivePlayer.RemoveCard(activeCard);
 			activePlayer = BattlerType.Instigator;
-		}
-		else {
-			activePlayer = BattlerType.Opposition;
+		} else {
+			float maxSpeedInstigator = _instigatorBattlers.Max(x => x.GetSpeed());
+			float maxSpeedOpposition = _oppositionBattler.GetSpeed();
+
+			// if now get the chance that the instigator will go first
+			float chance = 0;
+			if(maxSpeedInstigator >= maxSpeedOpposition) {
+				chance = 1 - getPercentage(maxSpeedOpposition, maxSpeedInstigator);
+			}
+			else if(maxSpeedOpposition > maxSpeedInstigator) {
+				chance = getPercentage(maxSpeedInstigator, maxSpeedOpposition);
+			}
+			if(new System.Random().NextDouble() < chance) {
+				activePlayer = BattlerType.Instigator;
+			}
+			else {
+				activePlayer = BattlerType.Opposition;
+			}
 		}
 		Debug.Log(activePlayer + " goes first");
 	}
@@ -259,12 +266,14 @@ public class BattleManager : MonoBehaviour {
 					_BattleUnitPositionManager.SetReserveBAsOpposition();
 					_oppositionBattler = _oppositionReserveB;
 					_oppositionReserveB = null;
+					switchPlayer();
 				}
 				else if(_oppositionReserveC != null) {
 					_BattleUnitPositionManager.RemoveOpposition();
 					_BattleUnitPositionManager.SetReserveCAsOpposition();
 					_oppositionBattler = _oppositionReserveC;
 					_oppositionReserveC = null;
+					switchPlayer();
 				}
 				else {
 					_BattleUnitPositionManager.RemoveOpposition();
