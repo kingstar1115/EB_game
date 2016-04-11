@@ -128,7 +128,9 @@ public class BattleUnitPositionManager : MonoBehaviour {
         _HandUI._Enabled = false;
         _ButtonsUI._Enabled = false;
         _enabled = false;
-    }
+		BattleManager.OnBattleAbleUpdate -= BattleManager_OnBattleAbleUpdate;
+		BattleManager.OnBattleAbleTakeDamage -= BattleManager_OnBattleAbleTakeDamage;
+	}
 
 
 
@@ -146,7 +148,9 @@ public class BattleUnitPositionManager : MonoBehaviour {
         _HandUI._Enabled = true;
         _ButtonsUI._Enabled = true;
         _enabled = true;
-    }
+		BattleManager.OnBattleAbleUpdate += BattleManager_OnBattleAbleUpdate;
+		BattleManager.OnBattleAbleTakeDamage += BattleManager_OnBattleAbleTakeDamage;
+	}
 
     public void RemoveListeners()
     {
@@ -161,7 +165,19 @@ public class BattleUnitPositionManager : MonoBehaviour {
 
 	}
 
-    public void Hide()
+	void BattleManager_OnBattleAbleUpdate(iBattleable battleAbleObject) {
+
+	}
+
+	void BattleManager_OnBattleAbleTakeDamage(iBattleable battleAbleObject, int i) {
+		//Animator a = 
+		if (battleAbleObject.IsKO()) {
+			
+		}
+	}
+
+
+	public void Hide()
     {
 		_SpoilsUI.Hide();
         _ArmyUI.Hide();
@@ -338,6 +354,7 @@ public void AddUnitToUI(Unit unit)
 	}
 
     public void RemoveUnit(UnitType t) {
+		//_ActivePlayerUnits[(int)t].gameObject.GetComponentInChildren<Animator>().SetTrigger("Killed");
         _ActivePlayerUnits[(int)t].SetActive(false);
 		_ActivePlayerUnitUIs [(int)t].gameObject.SetActive (false);
     }
@@ -379,6 +396,7 @@ public void AddUnitToUI(Unit unit)
 	}
 
 	public void RemoveOpposition() {
+		//_ActiveOpposition.gameObject.GetComponentInChildren<Animator>().SetTrigger("Killed");
 		_ActiveOpposition.SetActive(false);
 		_ActiveOppositionUI.gameObject.SetActive (false);
 	}
