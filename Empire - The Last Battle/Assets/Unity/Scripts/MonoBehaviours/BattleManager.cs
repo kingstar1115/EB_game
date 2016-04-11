@@ -166,13 +166,13 @@ public class BattleManager : MonoBehaviour {
 		if (activeCard != null ^ inactiveCard != null) {
 			// one player has a priority card, which one?
 			if (inactiveCard != null) {
-				_GameStateHolder._InactivePlayer.RemoveCard(inactiveCard);
 				activePlayer = BattlerType.Opposition;
+				_GameStateHolder._InactivePlayer.RemoveCard(inactiveCard);
 				Debug.Log(_GameStateHolder._InactivePlayer.GetType() + " used priority card to go first");
 			} else {
+				activePlayer = BattlerType.Instigator;
 				_GameStateHolder._ActivePlayer.RemoveCard(activeCard);
 				Debug.Log(_GameStateHolder._ActivePlayer.GetType() + " used priority card to go first");
-				activePlayer = BattlerType.Instigator;
 			}
 		}
 		else {
