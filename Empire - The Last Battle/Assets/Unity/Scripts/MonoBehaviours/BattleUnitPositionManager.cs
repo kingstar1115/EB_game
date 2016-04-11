@@ -495,7 +495,7 @@ public void AddUnitToUI(Unit unit)
 	{
 		//update the hand ui here
 		Player player = _BattleManager.GetActivePlayer ();
-		if (player.Type == pType) 
+		if (player != null && player.Type == pType) 
 		{
 			//deselect card
 			_HandUI.DeselectCardNoPopdown(index);
