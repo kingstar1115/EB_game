@@ -22,6 +22,9 @@ public class Unit : ScriptableObject, iBattleable {
 	public bool Prisoner;
 	public bool Defending;
 	public event UnitCallback OnUpdate = delegate { };
+	SoundEffect hitSound = SoundEffect.Hit1;
+	SoundEffect attackSound = SoundEffect.Player_Attack;
+	SoundEffect deathSound = SoundEffect.Dead;
 
 	public void Initialise(UnitBaseData data){
 		Type = data.Type;
@@ -166,4 +169,17 @@ public class Unit : ScriptableObject, iBattleable {
 		Upgrade.Speed = (int)Mathf.Round((float)BaseData.Speed / 10);
 		return Upgrade;
 	}
+
+	public SoundEffect GetHitSound() {
+		return hitSound;
+	}
+
+	public SoundEffect GetAttackSound() {
+		return attackSound;
+	}
+
+	public SoundEffect GetDeathSound() {
+		return deathSound;
+	}
+
 }

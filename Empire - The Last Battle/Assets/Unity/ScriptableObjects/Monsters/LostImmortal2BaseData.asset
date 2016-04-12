@@ -14,3 +14,6 @@ MonoBehaviour:
   Speed: 2
   Strength: 7
   HP: 20
+  HitSound: 8
+  AttackSound: 8
+  DeathSound: 8
