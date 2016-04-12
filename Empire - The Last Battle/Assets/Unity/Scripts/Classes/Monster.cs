@@ -6,12 +6,19 @@ public class Monster : iBattleable {
     int hp, currentHp, speed, strength;
     public MonsterType Type;
 
-    public Monster(MonsterBaseData data, MonsterType type) {
+	SoundEffect hitSound;
+	SoundEffect attackSound;
+	SoundEffect deathSound;
+
+	public Monster(MonsterBaseData data, MonsterType type) {
         hp = data.HP;
         currentHp = data.HP;
         speed = data.Speed;
         strength = data.Strength;
         Type = type;
+		hitSound = data.HitSound;
+		attackSound = data.AttackSound;
+		deathSound = data.DeathSound;
     }
 
     public bool IsKO() {
@@ -51,4 +58,17 @@ public class Monster : iBattleable {
     {
         return this.GetHashCode();
     }
+
+
+	public SoundEffect GetHitSound() {
+		return hitSound;
+	}
+
+	public SoundEffect GetAttackSound() {
+		return attackSound;
+	}
+
+	public SoundEffect GetDeathSound() {
+		return deathSound;
+	}
 }

@@ -20,4 +20,10 @@ public interface iBattleable
     void Heal();
 
     int GetUniqueID();
+
+	SoundEffect GetHitSound();
+
+	SoundEffect GetAttackSound();
+
+	SoundEffect GetDeathSound();
 }

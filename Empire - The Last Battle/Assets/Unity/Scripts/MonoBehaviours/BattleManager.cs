@@ -107,8 +107,6 @@ public class BattleManager : MonoBehaviour {
 	private void OnUpdateUnit(Player p, Unit u) {
 		//if there is a KO
 		if (u.IsKO()){
-			//play the sound effect for KO unit
-			Audio.AudioInstance.PlaySFX(SoundEffect.Dead);
 
 			//if the battle is pvp
 			if(_BattleData._BattleType == BattleType.PvP)
@@ -243,7 +241,7 @@ public class BattleManager : MonoBehaviour {
 		// just attack the first one for now
 		Debug.Log("Enemy attacks!");
 		Attack(activePlayer, _instigatorBattlers[Random.Range(0, _instigatorBattlers.Count)]);
-		Audio.AudioInstance.PlaySFX(SoundEffect.Roar1);
+		Audio.AudioInstance.PlaySFX(_oppositionBattler.GetAttackSound());
 		StartCoroutine(endTurn());
 	}
 
@@ -461,7 +459,6 @@ public class BattleManager : MonoBehaviour {
 		}
 
 		Attack(activePlayer, target);
-		Audio.AudioInstance.PlaySFX(SoundEffect.Hit1);
 		StartCoroutine(endTurn());
 	}
 
@@ -469,13 +466,22 @@ public class BattleManager : MonoBehaviour {
 		int totalDamage = 0;
 		if (t == BattlerType.Instigator) {
 			totalDamage = _instigatorBattlers.Sum(x => x.GetStrength());
+			Audio.AudioInstance.PlaySFX(_instigatorBattlers[0].GetAttackSound());
 		}
 		else {
 			totalDamage = _oppositionBattler.GetStrength();
+			Audio.AudioInstance.PlaySFX(_oppositionBattler.GetAttackSound());
 		}
 		target.ReduceHP(totalDamage);
 		OnBattleAbleTakeDamage (target, totalDamage);
 		OnBattleAbleUpdate (target);
+
+		if (target.IsKO()) {
+			Audio.AudioInstance.PlaySFX(target.GetDeathSound());
+		} else {
+			Audio.AudioInstance.PlaySFX(target.GetHitSound());
+		}
+
 		Debug.Log(t + " attacked " + target.GetType() + " for " + totalDamage + " damage.");
 		Debug.Log(target.GetCurrentHP() + " hp left (" + target.GetHPPercentage()*100 + "%)");
 		return totalDamage;
@@ -489,6 +495,12 @@ public class BattleManager : MonoBehaviour {
 
 		_BattleData._EndState = state;
 
+		if (state == BattleEndState.Win) {
+			Audio.AudioInstance.PlaySFX(SoundEffect.Battle_Won);
+		} else {
+			Audio.AudioInstance.PlaySFX(SoundEffect.Battle_Lost);
+		}
+
 		if (_BattleData._BattleType == BattleType.PvP) {
 			if (state != BattleEndState.Loss) {
 				_BattleUnitPositionManager.ShowChest(BattlerType.Opposition);
@@ -497,6 +509,7 @@ public class BattleManager : MonoBehaviour {
 			}
 			PlayerType p = GetPlayerTypeByBattler(activePlayer);
 			ModalPanel.Instance().ShowOK(p.ToString() + " Won", "You reap the spoils and take the enemy prisoner!", () => {
+				Audio.AudioInstance.PlaySFX(SoundEffect.Spoils_Collected);
 				Player player = p == _GameStateHolder._ActivePlayer.Type ? _GameStateHolder._ActivePlayer : _GameStateHolder._InactivePlayer;
 				_reapSpoils(player);
 			});
@@ -510,6 +523,7 @@ public class BattleManager : MonoBehaviour {
 			_BattleUnitPositionManager.ChangeToMainCamera();
 			_BattleUnitPositionManager.Hide();
 			ModalPanel.Instance().ShowOK("You Won", "You reap the spoils of the battle!", () => {
+				Audio.AudioInstance.PlaySFX(SoundEffect.Spoils_Collected);
 				_reapSpoils(_GameStateHolder._ActivePlayer);
 			});	
 		} else {
@@ -591,6 +605,7 @@ public class BattleManager : MonoBehaviour {
 
 	void setOpposition(MonsterType t) {
         _oppositionBattler = _MonsterManager.NewMonster(t);
+		Audio.AudioInstance.PlaySFX(_oppositionBattler.GetAttackSound());
         _BattleUnitPositionManager.SetOpposition(t, _oppositionBattler);
 		
 	}
