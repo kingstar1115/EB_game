@@ -48,20 +48,19 @@ public class ArmouryUI : MonoBehaviour
 	//When the currency is changed it will update what can be shown in the armoury
 	public void CurrencyChangedUpdate(int val, Player player)
 	{
-		Debug.Log("Curency update: "+val);
-		//bool disable = false;
+		bool disable = false;
 
-		//if (val <= previousCurrency)
-		//	disable = true;
+		if (val <= previousCurrency)
+			disable = true;
 		
 		var units = AvailableUnits(player).ToList();
-		ToggleUIImages(units, _UnitsUIParent, player);
+        ToggleUIImages(units, _UnitsUIParent, player, disable);
 
 		var cards = AvailableCards(player).ToList();
-		ToggleUIImages(cards, _CardUIParent, player);
+        ToggleUIImages(cards, _CardUIParent, player, disable);
 
 		var castlePieces = AvailableCastlePieces(player).ToList();
-		ToggleUIImages(castlePieces, _CastleUIParent, player);
+        ToggleUIImages(castlePieces, _CastleUIParent, player, disable);
 
 		previousCurrency = val;
 	}
@@ -73,7 +72,7 @@ public class ArmouryUI : MonoBehaviour
 		ToggleUIImages(AvailableCastlePieces(player).ToList(), _CastleUIParent, player);
 	}
 
-	void ToggleUIImages<T>(IList<T> purchasableItems, Transform parentTrans, Player player, bool disableOn = false) where T : PurchasableItem
+	void ToggleUIImages<T>(IList<T> purchasableItems, Transform parentTrans, Player player, bool disableOn = true) where T : PurchasableItem
 	{
 		/*
 		Transform section = null;
