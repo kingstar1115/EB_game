@@ -11,7 +11,7 @@ class TutorialData {
 	public void AddData(string title, string content, bool setIndex) {
 		titles.Add(title);
 		contents.Add(content);
-		if (setIndex) {
+		if (setIndex || highestSeenIndex == index) {
 			index = titles.Count - 1;
 		}
 	}
@@ -148,12 +148,11 @@ public class TutorialPanel : MonoBehaviour {
 	}
 
 	void proceed() {
-		if (currentData.HasNext() && !currentData.hasSeenNext()) {
-			next();
-		}
-		else {
-			currentData.NeverShow = HideToggle.isOn;
+		currentData.NeverShow = HideToggle.isOn;
+		if (currentData.NeverShow || !(currentData.HasNext() && !currentData.hasSeenNext())) {
 			Hide();
+		} else {
+			next();
 		}
 	}
 
