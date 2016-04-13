@@ -47,12 +47,12 @@ public class Board : MonoBehaviour {
                 tile.X = i;
                 tile.Y = j;
                 if (!loadGame) {
-                    tile.Height = GetRandomHeight(tile);
 					tile.SetDefender(null);
 					tile.Owner = PlayerType.None;
                 }
+				tile.Height = GetHeight(tile, loadGame);
 
-                Vector3 position = new Vector3(i * _TileWidth, tile.Height, j * _TileWidth) + boardStart;
+				Vector3 position = new Vector3(i * _TileWidth, tile.Height, j * _TileWidth) + boardStart;
                 tile.TileObject = (GameObject)Instantiate(GetTerrain(tile), position, Quaternion.identity);
                 tile.TileObject.name = "Tile " + "[" + i + "," + j + "]";
 				if (_TileTypeDataManager.GetTerrainData(tile.Terrain).IsRotatable) {
@@ -215,7 +215,7 @@ public class Board : MonoBehaviour {
         return terrain && building;
     }
 
-    public float GetRandomHeight(TileData t) {
+    public float GetHeight(TileData t, bool random) {
         TerrainTypeData tD = _TileTypeDataManager.GetTerrainData(t.Terrain);
         BuildingTypeData bD = _TileTypeDataManager.GetBuildingData(t.Building);
         Vector2 range;
@@ -225,9 +225,11 @@ public class Board : MonoBehaviour {
         else if (tD.SetHeight) {
             range = tD.Height;
         }
-        else {
+        else if (random) {
             range = new Vector2();
-        }
+        } else {
+			return t.Height;
+		}
 
         return Random.Range(range.x, range.y);
     }

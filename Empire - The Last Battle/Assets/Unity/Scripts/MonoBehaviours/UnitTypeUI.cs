@@ -26,6 +26,7 @@ public class UnitTypeUI : MonoBehaviour {
 	public GameObject UnitList;
 	public GameObject UnitOverview;
 	public RectTransform PanelSlider;
+    public Animator _PlusSignAnimator;
 	RectTransform _unitsPanelTransform;
 	CanvasGroup _unitListCanvas;
 	CanvasGroup _unitOverviewCanvas;
@@ -149,6 +150,9 @@ public class UnitTypeUI : MonoBehaviour {
 		} else {
 			image.color = OverviewColour;
 		}
+
+        //animate plus indicator 
+        _PlusSignAnimator.SetTrigger("Indicate");
 	}
 
 	public void RemoveUnit(int i) {
@@ -293,6 +297,14 @@ public class UnitTypeUI : MonoBehaviour {
 	void _clickUnit(int i) {
 		OnClickUnit(_unitType, i);
 	}
+
+    public GameObject GetRightHandUnit()
+    {
+        if (_units.Count > 0)
+            return _units[_units.Count - 1].gameObject;
+
+        return null;
+    }
 
 	// Use this for initialization
 	void Start () {

@@ -11,6 +11,7 @@ public class UnitUI : MonoBehaviour {
 	public Image Defending;
 	public Image Prisoner;
 	public Button Button;
+    public Animator _Animator;
 	public UIUnitIndexCallback OnClick = delegate { };
 	int index;
 	public bool IsKO = false;
@@ -58,10 +59,12 @@ public class UnitUI : MonoBehaviour {
 
 	public void EnableSelection() {
 		Button.interactable = true;
+        _Animator.SetBool("Flash", true);
 	}
 
 	public void DisableSelection() {
 		Button.interactable = false;
+        _Animator.SetBool("Flash", false);
 	}
 
 	// Use this for initialization
