@@ -13,7 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Speed: 2
   Strength: 10
-  HP: 10
+  HP: 25
   HitSound: 10
   AttackSound: 9
   DeathSound: 11

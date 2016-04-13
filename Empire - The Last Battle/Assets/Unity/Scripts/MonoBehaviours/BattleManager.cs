@@ -355,9 +355,9 @@ public class BattleManager : MonoBehaviour {
 		switch (_GameStateHolder._ActivePlayer.CastleProgress) {
 			case 0:
 				// cyclops/minotaur/(hard)wyrm
-				// 45/45/10
-				if (rand <= .45) { monster = MonsterType.Cyclops; }
-				else if (rand <= .85) { monster = MonsterType.Minotaur; }
+				// 30/30/30
+				if (rand <= .30) { monster = MonsterType.Cyclops; }
+				else if (rand <= .60) { monster = MonsterType.Minotaur; }
 				else { monster = MonsterType.Wyrm; }
 				break;
 			case 1:
