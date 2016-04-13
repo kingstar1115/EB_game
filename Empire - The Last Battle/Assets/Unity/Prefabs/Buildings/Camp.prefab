@@ -26,7 +26,7 @@ GameObject:
   - 33: {fileID: 3325308}
   - 183: {fileID: 18392778}
   - 137: {fileID: 13735568}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: tent_cloth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -110,7 +110,7 @@ GameObject:
   - 4: {fileID: 461514}
   - 33: {fileID: 3399420}
   - 23: {fileID: 2320632}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: tent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -145,7 +145,7 @@ GameObject:
   - 4: {fileID: 486910}
   - 198: {fileID: 19895768}
   - 199: {fileID: 19922326}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Flames
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -226,7 +226,7 @@ GameObject:
   - 33: {fileID: 3365328}
   - 23: {fileID: 2336382}
   - 95: {fileID: 9512110}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: cage
   m_TagString: Cage
   m_Icon: {fileID: 0}
@@ -309,7 +309,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 425694}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: small_tent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -343,7 +343,7 @@ GameObject:
   - 4: {fileID: 400998}
   - 198: {fileID: 19803588}
   - 199: {fileID: 19983394}
-  m_Layer: 8
+  m_Layer: 2
   m_Name: Fire
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -378,7 +378,7 @@ GameObject:
   - 4: {fileID: 495332}
   - 198: {fileID: 19898360}
   - 199: {fileID: 19953876}
-  m_Layer: 8
+  m_Layer: 2
   m_Name: SparksRising
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -412,7 +412,7 @@ GameObject:
   - 4: {fileID: 483638}
   - 108: {fileID: 10803132}
   - 114: {fileID: 11494040}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -495,7 +495,7 @@ GameObject:
   - 33: {fileID: 3390466}
   - 23: {fileID: 2329446}
   - 114: {fileID: 11424030}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: FireComplex
   m_TagString: Fire
   m_Icon: {fileID: 0}

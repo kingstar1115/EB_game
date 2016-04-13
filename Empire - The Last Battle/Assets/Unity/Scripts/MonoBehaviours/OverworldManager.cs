@@ -690,6 +690,10 @@ public class OverworldManager : MonoBehaviour
 				}
 			} else {
 				// the active player lost
+				// their unit got taken prisoner
+				tile.Prisoner = true;
+				_BattleData._LostUnit.SetPrisoner(true);
+				_Board.SetTilePrisoner(tile);
 
 				_OverworldUI.Enable();
 				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
