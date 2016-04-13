@@ -30,14 +30,12 @@ public class BattleButtonsUI : MonoBehaviour
 
     public void Show()
     {
-		Debug.Log("Show");
         //do the show animation
         _animator.SetTrigger(_ShowAnimTrigger);
     }
 
     public void Hide()
     {
-		Debug.Log("Hide");
 		//do the hide animation
 		_animator.SetTrigger(_HideAnimTrigger);
     }

@@ -240,7 +240,9 @@ public class BattleManager : MonoBehaviour {
 
 		// just attack the first one for now
 		Debug.Log("Enemy attacks!");
-		Attack(activePlayer, _instigatorBattlers[Random.Range(0, _instigatorBattlers.Count)]);
+		Unit unitToAttack = _instigatorBattlers[Random.Range(0, _instigatorBattlers.Count)];
+		_BattleUnitPositionManager.Attack(unitToAttack.Type);
+		Attack(activePlayer, unitToAttack);
 		Audio.AudioInstance.PlaySFX(_oppositionBattler.GetAttackSound());
 		StartCoroutine(endTurn());
 	}
@@ -462,7 +464,7 @@ public class BattleManager : MonoBehaviour {
 		if (_BattleData._BattleType == BattleType.PvP && activePlayer != BattlerType.Instigator) {
 			target = _instigatorBattlers[0];
 		}
-
+		_BattleUnitPositionManager.Attack(activePlayer);
 		Attack(activePlayer, target);
 		StartCoroutine(endTurn());
 	}
