@@ -101,6 +101,10 @@ public class ArmyUI : MonoBehaviour {
 		Disable();
 		getUnitTypeUI(currentPlayer).ForEach(ui => ui.MakeSelectable(flags));
 		getUnitTypeUI(currentPlayer).ForEach(ui => ui.Maximise());
+
+        //indicator arrow 
+
+
 		resetSelection();
 	}
 

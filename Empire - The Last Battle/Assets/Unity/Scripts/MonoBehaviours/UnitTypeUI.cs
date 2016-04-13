@@ -294,6 +294,14 @@ public class UnitTypeUI : MonoBehaviour {
 		OnClickUnit(_unitType, i);
 	}
 
+    public GameObject GetRightHandUnit()
+    {
+        if (_units.Count > 0)
+            return _units[_units.Count - 1].gameObject;
+
+        return null;
+    }
+
 	// Use this for initialization
 	void Start () {
 	
