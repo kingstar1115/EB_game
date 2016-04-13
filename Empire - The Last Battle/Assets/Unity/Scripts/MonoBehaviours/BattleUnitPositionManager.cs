@@ -354,18 +354,46 @@ public void AddUnitToUI(Unit unit)
 	}
 
     public void RemoveUnit(UnitType t) {
-		//_ActivePlayerUnits[(int)t].gameObject.GetComponentInChildren<Animator>().SetTrigger("Killed");
-        _ActivePlayerUnits[(int)t].SetActive(false);
-		_ActivePlayerUnitUIs [(int)t].gameObject.SetActive (false);
+		_ActivePlayerUnits[(int)t].gameObject.GetComponentInChildren<Animator>().SetTrigger("Killed");
+        //_ActivePlayerUnits[(int)t].SetActive(false);
+		//_ActivePlayerUnitUIs [(int)t].gameObject.SetActive (false);
     }
 
 	public void RemoveInstigatorPlayer()
 	{
-		_InstigatorPlayerUnit.SetActive (false);
-		_InstigatorPlayerUnitUI.gameObject.SetActive (false);
+		//_InstigatorPlayerUnit.SetActive (false);
+		//_InstigatorPlayerUnitUI.gameObject.SetActive (false);
+		_InstigatorPlayerUnit.gameObject.GetComponentInChildren<Animator>().SetTrigger("Killed");
 	}
 
-    public void SetActiveUnit(Unit u, PlayerType p) {
+	public void Attack(UnitType target) {
+		_ActiveOpposition.gameObject.GetComponentInChildren<Animator>().SetTrigger("Attack");
+		_ActivePlayerUnits[(int)target].gameObject.GetComponentInChildren<Animator>().SetTrigger("Hit");
+	}
+
+	// attack
+	public void Attack(BattlerType attacker) {
+		if(attacker == BattlerType.Instigator) {
+			if (_BattleManager._BattleData._BattleType == BattleType.PvP) {
+				_InstigatorPlayerUnit.gameObject.GetComponentInChildren<Animator>().SetTrigger("Attack");
+			} else {
+				foreach(GameObject g in _ActivePlayerUnits) {
+					if (g != null) {
+						g.gameObject.GetComponentInChildren<Animator>().SetTrigger("Attack");
+					}
+				}
+			}	
+			_ActiveOpposition.gameObject.GetComponentInChildren<Animator>().SetTrigger("Hit");
+		}
+		else {
+			_ActiveOpposition.gameObject.GetComponentInChildren<Animator>().SetTrigger("Attack");
+			_InstigatorPlayerUnit.gameObject.GetComponentInChildren<Animator>().SetTrigger("Hit");
+		}
+	}
+
+
+
+	public void SetActiveUnit(Unit u, PlayerType p) {
 		List<GameObject> prefabs = p == PlayerType.Battlebeard ? _BattlebeardUnits : _StormshaperUnits;
 		_InstigatorPlayerUnit = (GameObject)Instantiate(prefabs[(int)u.Type], _MarkerActivePlayerUnit.transform.position, _MarkerActivePlayerUnit.transform.rotation);
 
@@ -396,9 +424,9 @@ public void AddUnitToUI(Unit unit)
 	}
 
 	public void RemoveOpposition() {
-		//_ActiveOpposition.gameObject.GetComponentInChildren<Animator>().SetTrigger("Killed");
-		_ActiveOpposition.SetActive(false);
-		_ActiveOppositionUI.gameObject.SetActive (false);
+		_ActiveOpposition.gameObject.GetComponentInChildren<Animator>().SetTrigger("Killed");
+		//_ActiveOpposition.SetActive(false);
+		//_ActiveOppositionUI.gameObject.SetActive (false);
 	}
 
 	public void SetReserveAAsOpposition() {

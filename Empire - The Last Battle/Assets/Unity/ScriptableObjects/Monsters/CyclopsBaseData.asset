@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Name: CyclopsBaseData
   m_EditorClassIdentifier: 
   Speed: 2
-  Strength: 12
-  HP: 10
+  Strength: 5
+  HP: 15
   HitSound: 13
   AttackSound: 12
   DeathSound: 14

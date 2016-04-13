@@ -240,7 +240,9 @@ public class BattleManager : MonoBehaviour {
 
 		// just attack the first one for now
 		Debug.Log("Enemy attacks!");
-		Attack(activePlayer, _instigatorBattlers[Random.Range(0, _instigatorBattlers.Count)]);
+		Unit unitToAttack = _instigatorBattlers[Random.Range(0, _instigatorBattlers.Count)];
+		_BattleUnitPositionManager.Attack(unitToAttack.Type);
+		Attack(activePlayer, unitToAttack);
 		Audio.AudioInstance.PlaySFX(_oppositionBattler.GetAttackSound());
 		StartCoroutine(endTurn());
 	}
@@ -252,7 +254,7 @@ public class BattleManager : MonoBehaviour {
 		   _BattleUnitPositionManager._HandUI.Hide();
 		   _BattleUnitPositionManager._ButtonsUI.Hide();
 	   }
-		yield return new WaitForSeconds(2);
+		
 		
 		if (_instigatorBattlers.Count() == 0) {
 			_endBattle(BattleEndState.Loss);
@@ -264,6 +266,7 @@ public class BattleManager : MonoBehaviour {
 					_BattleUnitPositionManager.SetReserveBAsOpposition();
 					_oppositionBattler = _oppositionReserveB;
 					_oppositionReserveB = null;
+					yield return new WaitForSeconds(2);
 					switchPlayer();
 				}
 				else if(_oppositionReserveC != null) {
@@ -271,18 +274,22 @@ public class BattleManager : MonoBehaviour {
 					_BattleUnitPositionManager.SetReserveCAsOpposition();
 					_oppositionBattler = _oppositionReserveC;
 					_oppositionReserveC = null;
+					yield return new WaitForSeconds(2);
 					switchPlayer();
 				}
 				else {
 					_BattleUnitPositionManager.RemoveOpposition();
+					yield return new WaitForSeconds(2);
 					_endBattle(BattleEndState.Win);
 				}
 			} else {
 				_BattleUnitPositionManager.RemoveOpposition();
+				yield return new WaitForSeconds(2);
 				_endBattle(BattleEndState.Win);
 			}
 			
 		} else {
+			yield return new WaitForSeconds(2);
 			switchPlayer();
 		}
 	}
@@ -348,9 +355,9 @@ public class BattleManager : MonoBehaviour {
 		switch (_GameStateHolder._ActivePlayer.CastleProgress) {
 			case 0:
 				// cyclops/minotaur/(hard)wyrm
-				// 45/45/10
-				if (rand <= .45) { monster = MonsterType.Cyclops; }
-				else if (rand <= .85) { monster = MonsterType.Minotaur; }
+				// 30/30/30
+				if (rand <= .30) { monster = MonsterType.Cyclops; }
+				else if (rand <= .60) { monster = MonsterType.Minotaur; }
 				else { monster = MonsterType.Wyrm; }
 				break;
 			case 1:
@@ -457,7 +464,7 @@ public class BattleManager : MonoBehaviour {
 		if (_BattleData._BattleType == BattleType.PvP && activePlayer != BattlerType.Instigator) {
 			target = _instigatorBattlers[0];
 		}
-
+		_BattleUnitPositionManager.Attack(activePlayer);
 		Attack(activePlayer, target);
 		StartCoroutine(endTurn());
 	}
