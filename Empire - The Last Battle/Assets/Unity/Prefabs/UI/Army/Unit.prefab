@@ -79,6 +79,8 @@ GameObject:
   - 222: {fileID: 22216470}
   - 114: {fileID: 11403664}
   - 114: {fileID: 11479080}
+  - 95: {fileID: 9548614}
+  - 225: {fileID: 22570450}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -120,6 +122,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
+--- !u!95 &9548614
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 147088}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 23f2250c1816de245a7eedf2f5cccd8a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &11403664
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -165,6 +184,7 @@ MonoBehaviour:
   Defending: {fileID: 11439688}
   Prisoner: {fileID: 11426844}
   Button: {fileID: 11479080}
+  _Animator: {fileID: 9548614}
   IsKO: 0
   IsUpgraded: 0
   isTempUpgraded: 0
@@ -513,6 +533,17 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: .5, y: .5}
+--- !u!225 &22570450
+CanvasGroup:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 147088}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -605,6 +636,10 @@ Prefab:
       propertyPath: m_Colors.m_DisabledColor.a
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _Animator
+      value: 
+      objectReference: {fileID: 9548614}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 141568}
