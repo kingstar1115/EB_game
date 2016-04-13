@@ -354,15 +354,16 @@ public void AddUnitToUI(Unit unit)
 	}
 
     public void RemoveUnit(UnitType t) {
-		//_ActivePlayerUnits[(int)t].gameObject.GetComponentInChildren<Animator>().SetTrigger("Killed");
-        _ActivePlayerUnits[(int)t].SetActive(false);
-		_ActivePlayerUnitUIs [(int)t].gameObject.SetActive (false);
+		_ActivePlayerUnits[(int)t].gameObject.GetComponentInChildren<Animator>().SetTrigger("Killed");
+        //_ActivePlayerUnits[(int)t].SetActive(false);
+		//_ActivePlayerUnitUIs [(int)t].gameObject.SetActive (false);
     }
 
 	public void RemoveInstigatorPlayer()
 	{
-		_InstigatorPlayerUnit.SetActive (false);
-		_InstigatorPlayerUnitUI.gameObject.SetActive (false);
+		//_InstigatorPlayerUnit.SetActive (false);
+		//_InstigatorPlayerUnitUI.gameObject.SetActive (false);
+		_InstigatorPlayerUnitUI.gameObject.GetComponentInChildren<Animator>().SetTrigger("Killed");
 	}
 
     public void SetActiveUnit(Unit u, PlayerType p) {
@@ -396,9 +397,9 @@ public void AddUnitToUI(Unit unit)
 	}
 
 	public void RemoveOpposition() {
-		//_ActiveOpposition.gameObject.GetComponentInChildren<Animator>().SetTrigger("Killed");
-		_ActiveOpposition.SetActive(false);
-		_ActiveOppositionUI.gameObject.SetActive (false);
+		_ActiveOpposition.gameObject.GetComponentInChildren<Animator>().SetTrigger("Killed");
+		//_ActiveOpposition.SetActive(false);
+		//_ActiveOppositionUI.gameObject.SetActive (false);
 	}
 
 	public void SetReserveAAsOpposition() {

@@ -252,7 +252,7 @@ public class BattleManager : MonoBehaviour {
 		   _BattleUnitPositionManager._HandUI.Hide();
 		   _BattleUnitPositionManager._ButtonsUI.Hide();
 	   }
-		yield return new WaitForSeconds(2);
+		
 		
 		if (_instigatorBattlers.Count() == 0) {
 			_endBattle(BattleEndState.Loss);
@@ -264,6 +264,7 @@ public class BattleManager : MonoBehaviour {
 					_BattleUnitPositionManager.SetReserveBAsOpposition();
 					_oppositionBattler = _oppositionReserveB;
 					_oppositionReserveB = null;
+					yield return new WaitForSeconds(2);
 					switchPlayer();
 				}
 				else if(_oppositionReserveC != null) {
@@ -271,18 +272,22 @@ public class BattleManager : MonoBehaviour {
 					_BattleUnitPositionManager.SetReserveCAsOpposition();
 					_oppositionBattler = _oppositionReserveC;
 					_oppositionReserveC = null;
+					yield return new WaitForSeconds(2);
 					switchPlayer();
 				}
 				else {
 					_BattleUnitPositionManager.RemoveOpposition();
+					yield return new WaitForSeconds(2);
 					_endBattle(BattleEndState.Win);
 				}
 			} else {
 				_BattleUnitPositionManager.RemoveOpposition();
+				yield return new WaitForSeconds(2);
 				_endBattle(BattleEndState.Win);
 			}
 			
 		} else {
+			yield return new WaitForSeconds(2);
 			switchPlayer();
 		}
 	}
