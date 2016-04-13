@@ -6,6 +6,7 @@ public class BattleData : ScriptableObject {
 	public Player _InitialPlayer;
 	public BattleType _BattleType;
 	public BattleEndState _EndState;
+	public Unit _LostUnit;
 }
 
 public enum BattleType {
