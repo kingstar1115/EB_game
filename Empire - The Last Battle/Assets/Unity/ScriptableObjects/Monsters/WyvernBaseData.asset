@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Name: WyvernBaseData
   m_EditorClassIdentifier: 
   Speed: 2
-  Strength: 13
-  HP: 22
+  Strength: 15
+  HP: 30
   HitSound: 10
   AttackSound: 9
   DeathSound: 11
