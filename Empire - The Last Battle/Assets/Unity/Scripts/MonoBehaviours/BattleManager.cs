@@ -37,6 +37,7 @@ public class BattleManager : MonoBehaviour {
 		// set up the units and stuff
 
 		activePlayer = BattlerType.None;
+		_BattleData._LostUnit = null;
 
 		// init the ui
 		_BattleUnitPositionManager.Initialise(_BattlebeardPlayer, _StormshaperPlayer);
@@ -501,6 +502,9 @@ public class BattleManager : MonoBehaviour {
 	void _endBattle(BattleEndState state) {
 
 		_BattleData._EndState = state;
+		if (state == BattleEndState.Loss) {
+			_BattleData._LostUnit = _instigatorBattlers[0];
+		}
 
 		if (state == BattleEndState.Win) {
 			Audio.AudioInstance.PlaySFX(SoundEffect.Battle_Won);
@@ -515,7 +519,7 @@ public class BattleManager : MonoBehaviour {
 				_BattleUnitPositionManager.ShowChest(BattlerType.Instigator);
 			}
 			PlayerType p = GetPlayerTypeByBattler(activePlayer);
-			ModalPanel.Instance().ShowOK(p.ToString() + " Won", "You reap the spoils and take the enemy prisoner!", () => {
+			ModalPanel.Instance().ShowOK(p.ToString() + " Won", "They reap the spoils and take their enemy prisoner!", () => {
 				Audio.AudioInstance.PlaySFX(SoundEffect.Spoils_Collected);
 				Player player = p == _GameStateHolder._ActivePlayer.Type ? _GameStateHolder._ActivePlayer : _GameStateHolder._InactivePlayer;
 				_reapSpoils(player);

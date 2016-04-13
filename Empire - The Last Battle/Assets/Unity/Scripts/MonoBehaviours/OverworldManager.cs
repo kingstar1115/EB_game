@@ -497,7 +497,7 @@ public class OverworldManager : MonoBehaviour
 					// make sure the player owns at least 3 surrounding tiles
 					if (ownsSurroundingTiles) {
 						// Battle lost immortal
-						p.ShowOK("Fortress", "A bloody Lost Immortal just showed up innit blud!", () => {
+						p.ShowOK("Fortress", "A " + _GameStateHolder._ActivePlayer.Type + " immortal of old appears to challenge you! Proving yourself will be a great task!", () => {
 							startBattle(BattleType.LostImmortal);
 						});
 					} else {
@@ -690,6 +690,10 @@ public class OverworldManager : MonoBehaviour
 				}
 			} else {
 				// the active player lost
+				// their unit got taken prisoner
+				tile.Prisoner = true;
+				_BattleData._LostUnit.SetPrisoner(true);
+				_Board.SetTilePrisoner(tile);
 
 				_OverworldUI.Enable();
 				_OverworldUI.ForceMoveCommander(_GameStateHolder._ActivePlayer.PreviousCommanderPosition);
