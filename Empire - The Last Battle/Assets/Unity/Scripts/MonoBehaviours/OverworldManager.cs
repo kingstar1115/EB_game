@@ -1052,7 +1052,12 @@ public class OverworldManager : MonoBehaviour
 				//Test Pvp battle and loss
 				_GameStateHolder._ActivePlayer.CastleProgress = 4;
 				_GameStateHolder._InactivePlayer.CastleProgress = 4;
-				_StormshaperPlayer.CommanderPosition = _Board.GetTileAt(0, 1);
+			}
+
+			if(Input.GetKeyDown(KeyCode.L)) {
+				//Test Pvp battle and loss
+				_GameStateHolder._ActivePlayer.LostImmortalKillCount = 4;
+				_GameStateHolder._InactivePlayer.LostImmortalKillCount = 4;
 			}
 
 			if (Input.GetKeyDown(KeyCode.I)){
