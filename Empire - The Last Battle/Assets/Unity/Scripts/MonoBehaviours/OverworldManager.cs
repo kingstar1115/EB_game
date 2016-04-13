@@ -568,6 +568,7 @@ public class OverworldManager : MonoBehaviour
 		_BattleData._BattleType = type;
 		_BattleData._InitialPlayer = _GameStateHolder._ActivePlayer;
 		tearDownScene();
+		Audio.AudioInstance.PlaySFX(SoundEffect.Play_Game);
 		StartCoroutine(SceneSwitcher.ChangeScene(_BattleScene));
 	}
 

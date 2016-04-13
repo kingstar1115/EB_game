@@ -13,14 +13,31 @@ public enum SoundEffect {
 	Roar1,
 	Roar2,
 	Sword,
-	Button_Click1
+	// new sounds
+	LostImmortal_Cry,
+	Dragon_Attack,
+	Dragon_Cry,
+	Dragon_Hurt,
+	Minotaur_Cry,
+	Minotaur_Hurt,
+	Minotaur_Dead,
+	Battle_Lost,
+	Battle_Won,
+	Player_Attack,
+	Spoils_Collected,
+	// UI
+	Commander_Land,
+	Commander_Pickup,
+	Button_Click,
+	Button_Hover,
+	Card_Shuffle,
+	Play_Game
 }
 
 public enum MusicTrack {
 	Dungeon,
 	Mountain,
-	Peaceful1,
-	Peaceful2,
+	Peaceful,
 	Town,
 	Epic,
 	Moorland

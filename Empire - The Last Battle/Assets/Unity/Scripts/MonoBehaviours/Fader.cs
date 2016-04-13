@@ -12,9 +12,10 @@ public class Fader : MonoBehaviour
 
 	[Tooltip("Time to fade in seconds")]
 	public float FadeTime;
+	public float TimeToStartFade;
 	public bool FadeInInstantly = false;
 	public bool FadeOutInstantly = false;
-	public float TimeToStartFade;
+	public float TimeToFadeOut;
 	private CanvasGroup _canvasGroup;
 	private float _alpha = 0.0f;
 	private const float _startAlpha = 0f;
@@ -52,11 +53,17 @@ public class Fader : MonoBehaviour
 
 	public void StartFadeOverTime(FadeDir dir, Action action)
 	{
-		action ();
+		if (action != null) {
+			action();
+		}
 
 		_fading = true;
 		_fadeDir = dir;
 		_currentTime = 0;
+	}
+
+	public void StartFadeOutOverTime() {
+		StartFadeOverTime(FadeDir.FadeOut, null);
 	}
 
 	private void Fade()
@@ -77,8 +84,10 @@ public class Fader : MonoBehaviour
 			_fading = false;
 			_currentTime = 0;
 
-			if (FadeOutInstantly)
-				StartFadeOverTime(FadeDir.FadeOut, () => { });
+			if (FadeOutInstantly) {
+				Invoke("StartFadeOutOverTime", TimeToFadeOut);
+			}
+				
 		}
 		//without this, the value will end at something like 0.9992367
 		else if (_alpha <= 0 && _fadeDir == FadeDir.FadeOut) {
