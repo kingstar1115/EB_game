@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: CastleSSData
   m_EditorClassIdentifier: 
   SetHeight: 1
-  Height: {x: 1, y: 1}
+  Height: {x: 2, y: 2}
   IsTraversable: 0
   Tile: 1
   Prefab: {fileID: 0}
