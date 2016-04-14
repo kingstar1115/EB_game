@@ -485,6 +485,9 @@ public class BattleManager : MonoBehaviour {
 		OnBattleAbleUpdate (target);
 
 		if (target.IsKO()) {
+			if (_BattleData._BattleType == BattleType.PvP) {
+				_BattleData._LostUnit = (Unit)target;
+			}
 			Audio.AudioInstance.PlaySFX(target.GetDeathSound());
 		} else {
 			Audio.AudioInstance.PlaySFX(target.GetHitSound());
@@ -502,9 +505,6 @@ public class BattleManager : MonoBehaviour {
 	void _endBattle(BattleEndState state) {
 
 		_BattleData._EndState = state;
-		if (state == BattleEndState.Loss) {
-			_BattleData._LostUnit = _instigatorBattlers[0];
-		}
 
 		if (state == BattleEndState.Win) {
 			Audio.AudioInstance.PlaySFX(SoundEffect.Battle_Won);
